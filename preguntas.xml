@@ -1,590 +1,156 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario Moderno</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .form-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eef2f6;
-        }
-
-        .form-group:last-child {
-            border-bottom: none;
-        }
-
-        .question-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 15px;
-        }
-
-        .options-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            background: #f7fafc;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .option-label:hover {
-            background: #edf2f7;
-            transform: translateX(5px);
-        }
-
-        .option-label input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .open-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-        }
-
-        .open-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea.open-input {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .slider-container {
-            padding: 10px 0;
-        }
-
-        .slider-wrapper {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .slider {
-            flex: 1;
-            height: 8px;
-            -webkit-appearance: none;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            outline: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
-            background: white;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #667eea;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .slider-value {
-            min-width: 60px;
-            text-align: center;
-            font-weight: 600;
-            color: #667eea;
-        }
-
-        .conditional {
-            margin-left: 30px;
-            padding-left: 20px;
-            border-left: 3px solid #667eea;
-            margin-top: 15px;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 40px;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 14px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-
-        .btn-secondary {
-            background: white;
-            color: #4a5568;
-            border: 2px solid #e2e8f0;
-        }
-
-        .btn-secondary:hover {
-            background: #f7fafc;
-            border-color: #667eea;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #718096;
-        }
-
-        .error-message {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            .form-container {
-                padding: 20px;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-            
-            .btn-primary, .btn-secondary {
-                width: 100%;
-            }
-        }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <h1>📋 Formulario Dinámico</h1>
-            <p>Cargando preguntas...</p>
-        </header>
-
-        <div class="form-container">
-            <div id="errorContainer" class="error-message" style="display: none;"></div>
-            <div id="loadingContainer" class="loading">⏳ Cargando formulario...</div>
-            <form id="dynamicForm" style="display: none;"></form>
-
-            <div class="actions">
-                <button type="button" id="submitBtn" class="btn-primary" style="display: none;">Enviar Respuestas</button>
-                <button type="button" id="exportBtn" class="btn-secondary" style="display: none;">📥 Descargar Excel</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Variables globales
-        let preguntas = [];
-        let respuestas = {};
-
-        // Cargar XML desde archivo externo
-        async function cargarXML() {
-            try {
-                const response = await fetch('preguntas.xml');
-                if (!response.ok) {
-                    throw new Error(`Error al cargar XML: ${response.status}`);
-                }
-                const xmlString = await response.text();
-                return parsearXML(xmlString);
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('errorContainer').style.display = 'block';
-                document.getElementById('errorContainer').textContent = 'Error al cargar el formulario. Verifica que el archivo preguntas.xml exista.';
-                document.getElementById('loadingContainer').style.display = 'none';
-                return [];
-            }
-        }
-
-        // Parsear XML a objeto JavaScript
-        function parsearXML(xmlString) {
-            try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-                
-                const parserError = xmlDoc.getElementsByTagName("parsererror");
-                if (parserError.length > 0) {
-                    throw new Error("XML inválido");
-                }
-                
-                const preguntasNodes = xmlDoc.getElementsByTagName("pregunta");
-                const nuevasPreguntas = [];
-                
-                for (let node of preguntasNodes) {
-                    const pregunta = {
-                        id: parseInt(node.getAttribute("id")),
-                        tipo: node.getAttribute("tipo"),
-                        requerida: node.getAttribute("requerida") === "true",
-                        texto: node.getElementsByTagName("texto")[0]?.textContent || "Pregunta sin texto"
-                    };
-                    
-                    // Descripción (opcional)
-                    const descripcion = node.getElementsByTagName("descripcion")[0];
-                    if (descripcion) {
-                        pregunta.descripcion = descripcion.textContent;
-                    }
-                    
-                    // Placeholder (para preguntas abiertas)
-                    const placeholder = node.getElementsByTagName("placeholder")[0];
-                    if (placeholder) {
-                        pregunta.placeholder = placeholder.textContent;
-                    }
-                    
-                    if (pregunta.tipo === "multiple") {
-                        pregunta.opciones = [];
-                        const opciones = node.getElementsByTagName("opcion");
-                        for (let opt of opciones) {
-                            pregunta.opciones.push(opt.textContent);
-                        }
-                    }
-                    
-                    if (pregunta.tipo === "abierta") {
-                        pregunta.multilinea = node.getAttribute("multilinea") === "true";
-                    }
-                    
-                    if (pregunta.tipo === "deslizador") {
-                        pregunta.minimo = parseFloat(node.getAttribute("minimo")) || 0;
-                        pregunta.maximo = parseFloat(node.getAttribute("maximo")) || 100;
-                        pregunta.paso = parseFloat(node.getAttribute("paso")) || 1;
-                        pregunta.valor_defecto = parseFloat(node.getAttribute("valor_defecto")) || 50;
-                    }
-                    
-                    // Buscar condicionales
-                    const condicionales = node.getElementsByTagName("condicional");
-                    if (condicionales.length > 0) {
-                        pregunta.condicional = [];
-                        for (let cond of condicionales) {
-                            pregunta.condicional.push({
-                                depende: parseInt(cond.getAttribute("depende")),
-                                mostrar_cuando: cond.getAttribute("mostrar_cuando")
-                            });
-                        }
-                    }
-                    
-                    nuevasPreguntas.push(pregunta);
-                }
-                
-                return nuevasPreguntas;
-            } catch (error) {
-                console.error("Error al parsear XML:", error);
-                return [];
-            }
-        }
-
-        // Renderizar formulario
-        function renderizarFormulario() {
-            const form = document.getElementById("dynamicForm");
-            form.innerHTML = "";
-            
-            preguntas.forEach(p => {
-                const div = document.createElement("div");
-                div.className = "form-group";
-                div.id = `pregunta-${p.id}`;
-                
-                const titulo = document.createElement("div");
-                titulo.className = "question-title";
-                titulo.textContent = p.texto + (p.requerida ? " *" : "");
-                div.appendChild(titulo);
-                
-                // Agregar descripción si existe
-                if (p.descripcion) {
-                    const desc = document.createElement("small");
-                    desc.style.color = "#718096";
-                    desc.style.display = "block";
-                    desc.style.marginBottom = "10px";
-                    desc.textContent = p.descripcion;
-                    div.appendChild(desc);
-                }
-                
-                switch(p.tipo) {
-                    case "multiple":
-                        const optionsDiv = document.createElement("div");
-                        optionsDiv.className = "options-group";
-                        
-                        p.opciones.forEach(opcion => {
-                            const label = document.createElement("label");
-                            label.className = "option-label";
-                            
-                            const input = document.createElement("input");
-                            input.type = p.opciones.length > 4 ? "checkbox" : "radio";
-                            input.name = `p${p.id}`;
-                            input.value = opcion;
-                            input.dataset.preguntaId = p.id;
-                            
-                            input.addEventListener("change", () => {
-                                if (p.opciones.length > 4) {
-                                    const seleccionadas = Array.from(document.querySelectorAll(`input[name="p${p.id}"]:checked`))
-                                        .map(cb => cb.value);
-                                    respuestas[p.id] = seleccionadas;
-                                } else {
-                                    respuestas[p.id] = input.value;
-                                }
-                                verificarCondicionales(p.id);
-                            });
-                            
-                            label.appendChild(input);
-                            label.appendChild(document.createTextNode(opcion));
-                            optionsDiv.appendChild(label);
-                        });
-                        
-                        div.appendChild(optionsDiv);
-                        break;
-                        
-                    case "abierta":
-                        if (p.multilinea) {
-                            const textarea = document.createElement("textarea");
-                            textarea.className = "open-input";
-                            textarea.placeholder = p.placeholder || "Escribe tu respuesta...";
-                            textarea.dataset.preguntaId = p.id;
-                            textarea.addEventListener("input", (e) => {
-                                respuestas[p.id] = e.target.value;
-                            });
-                            div.appendChild(textarea);
-                        } else {
-                            const input = document.createElement("input");
-                            input.type = "text";
-                            input.className = "open-input";
-                            input.placeholder = p.placeholder || "Escribe tu respuesta...";
-                            input.dataset.preguntaId = p.id;
-                            input.addEventListener("input", (e) => {
-                                respuestas[p.id] = e.target.value;
-                            });
-                            div.appendChild(input);
-                        }
-                        break;
-                        
-                    case "deslizador":
-                        const sliderDiv = document.createElement("div");
-                        sliderDiv.className = "slider-container";
-                        
-                        const wrapper = document.createElement("div");
-                        wrapper.className = "slider-wrapper";
-                        
-                        const slider = document.createElement("input");
-                        slider.type = "range";
-                        slider.className = "slider";
-                        slider.min = p.minimo;
-                        slider.max = p.maximo;
-                        slider.step = p.paso;
-                        slider.value = p.valor_defecto;
-                        slider.dataset.preguntaId = p.id;
-                        
-                        const valor = document.createElement("span");
-                        valor.className = "slider-value";
-                        valor.textContent = p.valor_defecto;
-                        
-                        slider.addEventListener("input", (e) => {
-                            valor.textContent = e.target.value;
-                            respuestas[p.id] = parseFloat(e.target.value);
-                        });
-                        
-                        wrapper.appendChild(slider);
-                        wrapper.appendChild(valor);
-                        sliderDiv.appendChild(wrapper);
-                        div.appendChild(sliderDiv);
-                        
-                        respuestas[p.id] = p.valor_defecto;
-                        break;
-                }
-                
-                form.appendChild(div);
-            });
-            
-            // Aplicar condicionales
-            preguntas.forEach(p => {
-                if (p.condicional && p.condicional.length > 0) {
-                    const elemento = document.getElementById(`pregunta-${p.id}`);
-                    elemento.classList.add("conditional", "hidden");
-                }
-            });
-            
-            // Mostrar formulario
-            document.getElementById('loadingContainer').style.display = 'none';
-            form.style.display = 'block';
-            document.getElementById('submitBtn').style.display = 'block';
-        }
-
-        // Verificar preguntas condicionales
-        function verificarCondicionales(preguntaId) {
-            preguntas.forEach(p => {
-                if (p.condicional) {
-                    const respuestaPadre = respuestas[preguntaId];
-                    const elemento = document.getElementById(`pregunta-${p.id}`);
-                    
-                    let debeMostrar = false;
-                    if (respuestaPadre) {
-                        if (Array.isArray(p.condicional)) {
-                            debeMostrar = p.condicional.some(cond => 
-                                cond.depende === preguntaId && 
-                                (Array.isArray(respuestaPadre) ? 
-                                    respuestaPadre.includes(cond.mostrar_cuando) : 
-                                    respuestaPadre === cond.mostrar_cuando)
-                            );
-                        } else if (p.condicional.depende === preguntaId) {
-                            debeMostrar = Array.isArray(respuestaPadre) ? 
-                                respuestaPadre.includes(p.condicional.mostrar_cuando) : 
-                                respuestaPadre === p.condicional.mostrar_cuando;
-                        }
-                    }
-                    
-                    if (debeMostrar) {
-                        elemento.classList.remove("hidden");
-                    } else {
-                        elemento.classList.add("hidden");
-                        delete respuestas[p.id];
-                    }
-                }
-            });
-        }
-
-        // Validar formulario
-        function validarFormulario() {
-            for (let p of preguntas) {
-                if (p.requerida) {
-                    const respuesta = respuestas[p.id];
-                    const elemento = document.getElementById(`pregunta-${p.id}`);
-                    
-                    if (!elemento.classList.contains("hidden")) {
-                        if (respuesta === undefined || respuesta === null || respuesta === "" || 
-                            (Array.isArray(respuesta) && respuesta.length === 0)) {
-                            alert(`Por favor, responde: ${p.texto}`);
-                            elemento.scrollIntoView({ behavior: "smooth" });
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
-        }
-
-        // Exportar a Excel
-        function exportarExcel() {
-            const wb = XLSX.utils.book_new();
-            
-            // Hoja de respuestas
-            const respuestasData = Object.entries(respuestas).map(([id, respuesta]) => {
-                const pregunta = preguntas.find(p => p.id === parseInt(id));
-                return [
-                    id,
-                    pregunta ? pregunta.texto : "Desconocida",
-                    Array.isArray(respuesta) ? respuesta.join(", ") : respuesta.toString()
-                ];
-            });
-            respuestasData.unshift(["ID", "Pregunta", "Respuesta"]);
-            
-            const wsRespuestas = XLSX.utils.aoa_to_sheet(respuestasData);
-            XLSX.utils.book_append_sheet(wb, wsRespuestas, "Respuestas");
-            
-            // Hoja de resumen
-            const resumenData = [
-                ["FECHA", new Date().toLocaleString()],
-                ["TOTAL PREGUNTAS", preguntas.length],
-                ["RESPONDIDAS", Object.keys(respuestas).length],
-                [""],
-                ["DETALLE DE RESPUESTAS:"],
-                ...Object.entries(respuestas).map(([id, respuesta]) => {
-                    const pregunta = preguntas.find(p => p.id === parseInt(id));
-                    return [pregunta ? pregunta.texto : "", Array.isArray(respuesta) ? respuesta.join(", ") : respuesta];
-                })
-            ];
-            
-            const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
-            
-            // Guardar archivo
-            const fecha = new Date().toISOString().split("T")[0];
-            XLSX.writeFile(wb, `respuestas_${fecha}.xlsx`);
-        }
-
-        // Inicialización
-        document.addEventListener("DOMContentLoaded", async () => {
-            preguntas = await cargarXML();
-            
-            if (preguntas.length > 0) {
-                renderizarFormulario();
-                
-                document.getElementById("submitBtn").addEventListener("click", () => {
-                    if (validarFormulario()) {
-                        document.getElementById("exportBtn").style.display = "block";
-                        alert("✅ Formulario completado correctamente. Puedes descargar el Excel.");
-                    }
-                });
-                
-                document.getElementById("exportBtn").addEventListener("click", exportarExcel);
-            }
-        });
-    </script>
-</body>
-</html>
+<?xml version="1.0" encoding="UTF-8"?>
+<formulario version="2.0" fecha_creacion="2024-01-15">
+    <!-- =========================================== -->
+    <!-- ARCHIVO DE CONFIGURACIÓN DE PREGUNTAS       -->
+    <!-- =========================================== -->
+    
+    <!-- SECCIÓN 1: INFORMACIÓN BÁSICA -->
+    <pregunta id="101" tipo="multiple" requerida="true">
+        <texto>¿Cuál es tu nivel de estudios?</texto>
+        <descripcion>Selecciona el máximo nivel alcanzado</descripcion>
+        <opcion>Sin estudios</opcion>
+        <opcion>Educación básica</opcion>
+        <opcion>Bachillerato</opcion>
+        <opcion>Formación profesional</opcion>
+        <opcion>Grado universitario</opcion>
+        <opcion>Máster</opcion>
+        <opcion>Doctorado</opcion>
+    </pregunta>
+    
+    <pregunta id="102" tipo="abierta" requerida="true" multilinea="false">
+        <texto>¿Cuál es tu profesión u ocupación actual?</texto>
+        <placeholder>Ej: Desarrollador web, Estudiante, etc.</placeholder>
+    </pregunta>
+    
+    <!-- SECCIÓN 2: EXPERIENCIA TÉCNICA -->
+    <pregunta id="201" tipo="multiple" requerida="true">
+        <texto>¿Qué lenguajes de programación conoces?</texto>
+        <descripcion>Puedes seleccionar múltiples opciones</descripcion>
+        <opcion>JavaScript/TypeScript</opcion>
+        <opcion>Python</opcion>
+        <opcion>Java</opcion>
+        <opcion>C#</opcion>
+        <opcion>PHP</opcion>
+        <opcion>Ruby</opcion>
+        <opcion>Go</opcion>
+        <opcion>Rust</opcion>
+        <opcion>Swift</opcion>
+        <opcion>Kotlin</opcion>
+    </pregunta>
+    
+    <pregunta id="202" tipo="deslizador" requerida="true" minimo="0" maximo="20" paso="1" valor_defecto="3">
+        <texto>Años de experiencia programando</texto>
+        <descripcion>Desliza para indicar tu experiencia</descripcion>
+    </pregunta>
+    
+    <pregunta id="203" tipo="multiple" requerida="true">
+        <texto>¿En qué área te especializas?</texto>
+        <opcion>Frontend</opcion>
+        <opcion>Backend</opcion>
+        <opcion>Full Stack</opcion>
+        <opcion>DevOps</opcion>
+        <opcion>Data Science</opcion>
+        <opcion>Mobile</opcion>
+        <opcion>Seguridad</opcion>
+        <opcion>IA/ML</opcion>
+    </pregunta>
+    
+    <!-- SECCIÓN 3: PREGUNTAS CONDICIONALES -->
+    <pregunta id="301" tipo="multiple" requerida="true">
+        <texto>¿Trabajas actualmente como desarrollador?</texto>
+        <opcion>Sí, tiempo completo</opcion>
+        <opcion>Sí, freelance</opcion>
+        <opcion>No, estoy buscando</opcion>
+        <opcion>No, estoy estudiando</opcion>
+    </pregunta>
+    
+    <!-- Aparece SOLO si trabaja -->
+    <pregunta id="302" tipo="abierta" requerida="false" multilinea="true">
+        <texto>Describe tu trabajo actual</texto>
+        <placeholder>Empresa, tecnologías que usas, responsabilidades...</placeholder>
+        <condicional depende="301" mostrar_cuando="Sí, tiempo completo" />
+        <condicional depende="301" mostrar_cuando="Sí, freelance" />
+    </pregunta>
+    
+    <!-- Aparece SOLO si NO trabaja -->
+    <pregunta id="303" tipo="abierta" requerida="false" multilinea="true">
+        <texto>¿Qué estás haciendo para mejorar tus habilidades?</texto>
+        <placeholder>Cursos, proyectos personales, bootcamps...</placeholder>
+        <condicional depende="301" mostrar_cuando="No, estoy buscando" />
+        <condicional depende="301" mostrar_cuando="No, estoy estudiando" />
+    </pregunta>
+    
+    <!-- SECCIÓN 4: HERRAMIENTAS Y METODOLOGÍAS -->
+    <pregunta id="401" tipo="multiple" requerida="true">
+        <texto>¿Qué frameworks/utilizas regularmente?</texto>
+        <opcion>React</opcion>
+        <opcion>Vue</opcion>
+        <opcion>Angular</opcion>
+        <opcion>Node.js</opcion>
+        <opcion>Django</opcion>
+        <opcion>Laravel</opcion>
+        <opcion>Spring</opcion>
+        <opcion>.NET</opcion>
+    </pregunta>
+    
+    <pregunta id="402" tipo="multiple" requerida="true">
+        <texto>¿Qué bases de datos utilizas?</texto>
+        <opcion>MySQL</opcion>
+        <opcion>PostgreSQL</opcion>
+        <opcion>MongoDB</opcion>
+        <opcion>Redis</opcion>
+        <opcion>SQL Server</opcion>
+        <opcion>Oracle</opcion>
+    </pregunta>
+    
+    <pregunta id="403" tipo="multiple" requerida="true">
+        <texto>¿Qué metodologías de trabajo conoces?</texto>
+        <opcion>Scrum</opcion>
+        <opcion>Kanban</opcion>
+        <opcion>XP</opcion>
+        <opcion>Waterfall</opcion>
+        <opcion>Lean</opcion>
+    </pregunta>
+    
+    <!-- SECCIÓN 5: DESLIZADORES AVANZADOS -->
+    <pregunta id="501" tipo="deslizador" requerida="true" minimo="0" maximo="100" paso="5" valor_defecto="70">
+        <texto>Porcentaje de satisfacción laboral</texto>
+        <descripcion>0 = Nada satisfecho, 100 = Muy satisfecho</descripcion>
+    </pregunta>
+    
+    <pregunta id="502" tipo="deslizador" requerida="true" minimo="0" maximo="12" paso="0.5" valor_defecto="6">
+        <texto>Horas diarias de trabajo efectivo</texto>
+    </pregunta>
+    
+    <pregunta id="503" tipo="deslizador" requerida="true" minimo="1" maximo="10" paso="1" valor_defecto="5">
+        <texto>Nivel de estrés (1 = Bajo, 10 = Alto)</texto>
+    </pregunta>
+    
+    <!-- SECCIÓN 6: PREGUNTAS ABIERTAS FINALES -->
+    <pregunta id="601" tipo="abierta" requerida="false" multilinea="true">
+        <texto>¿Qué tecnología te gustaría aprender en el futuro?</texto>
+        <placeholder>Ej: Inteligencia Artificial, Blockchain, etc.</placeholder>
+    </pregunta>
+    
+    <pregunta id="602" tipo="abierta" requerida="false" multilinea="true">
+        <texto>Comentarios adicionales</texto>
+        <placeholder>Si tienes algo más que añadir...</placeholder>
+    </pregunta>
+    
+    <!-- METADATOS DEL FORMULARIO -->
+    <metadatos>
+        <version>2.0</version>
+        <total_preguntas>15</total_preguntas>
+        <categorias>
+            <categoria id="basica">Información Básica</categoria>
+            <categoria id="tecnica">Experiencia Técnica</categoria>
+            <categoria id="laboral">Situación Laboral</categoria>
+            <categoria id="herramientas">Herramientas</categoria>
+            <categoria id="evaluacion">Autoevaluación</categoria>
+        </categorias>
+        <instrucciones>
+            Completa todas las preguntas requeridas.
+            Las preguntas condicionales aparecerán según tus respuestas.
+        </instrucciones>
+    </metadatos>
+</formulario>
