@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<formulario>
+    <!-- CATEGORÍA: INFORMACIÓN PERSONAL -->
+    
+    <!-- Pregunta de selección múltiple -->
+    <pregunta id="1" tipo="multiple" requerida="true">
+        <texto>¿Qué lenguajes de programación conoces?</texto>
+        <opcion>JavaScript</opcion>
+        <opcion>Python</opcion>
+        <opcion>Java</opcion>
+        <opcion>PHP</opcion>
+        <opcion>Ruby</opcion>
+        <opcion>C++</opcion>
+        <opcion>C#</opcion>
+    </pregunta>
+    
+    <!-- Pregunta de selección única -->
+    <pregunta id="2" tipo="multiple" requerida="true">
+        <texto>¿Cuál es tu nivel de experiencia?</texto>
+        <opcion>Principiante</opcion>
+        <opcion>Intermedio</opcion>
+        <opcion>Avanzado</opcion>
+        <opcion>Experto</opcion>
+    </pregunta>
+    
+    <!-- Pregunta abierta (texto corto) -->
+    <pregunta id="3" tipo="abierta" requerida="true" multilinea="false">
+        <texto>¿Cuál es tu lenguaje de programación favorito?</texto>
+    </pregunta>
+    
+    <!-- Pregunta con deslizador numérico -->
+    <pregunta id="4" tipo="deslizador" requerida="true" minimo="0" maximo="10" paso="1" valor_defecto="5">
+        <texto>Del 0 al 10, ¿cómo calificas tu nivel de programación?</texto>
+    </pregunta>
+    
+    <!-- CATEGORÍA: EXPERIENCIA LABORAL -->
+    
+    <!-- Pregunta abierta (texto largo) -->
+    <pregunta id="5" tipo="abierta" requerida="false" multilinea="true">
+        <texto>Describe tu experiencia laboral en programación</texto>
+    </pregunta>
+    
+    <!-- Pregunta de selección con condicional -->
+    <pregunta id="6" tipo="multiple" requerida="true">
+        <texto>¿Has trabajado con inteligencia artificial?</texto>
+        <opcion>Sí</opcion>
+        <opcion>No</opcion>
+    </pregunta>
+    
+    <!-- Esta pregunta solo aparece si responde "Sí" en la anterior -->
+    <pregunta id="7" tipo="abierta" requerida="false" multilinea="true">
+        <texto>¿Qué proyectos de IA has desarrollado?</texto>
+        <condicional depende="6" mostrar_cuando="Sí" />
+    </pregunta>
+    
+    <!-- CATEGORÍA: HÁBITOS DE TRABAJO -->
+    
+    <!-- Pregunta de selección múltiple (varias opciones) -->
+    <pregunta id="8" tipo="multiple" requerida="true">
+        <texto>¿Qué herramientas usas regularmente?</texto>
+        <opcion>VS Code</opcion>
+        <opcion>Git</opcion>
+        <opcion>Docker</opcion>
+        <opcion>Jira</opcion>
+        <opcion>Slack</opcion>
+        <opcion>Figma</opcion>
+    </pregunta>
+    
+    <!-- Deslizador para horas de trabajo -->
+    <pregunta id="9" tipo="deslizador" requerida="true" minimo="1" maximo="12" paso="0.5" valor_defecto="6">
+        <texto>Horas diarias que dedicas a programar</texto>
+    </pregunta>
+    
+    <!-- Pregunta abierta sobre metodologías -->
+    <pregunta id="10" tipo="abierta" requerida="false" multilinea="false">
+        <texto>¿Qué metodología ágil prefieres?</texto>
+    </pregunta>
+    
+    <!-- CATEGORÍA: FORMACIÓN -->
+    
+    <!-- Pregunta de selección única -->
+    <pregunta id="11" tipo="multiple" requerida="true">
+        <texto>Nivel de estudios</texto>
+        <opcion>Autodidacta</opcion>
+        <opcion>Bootcamp</opcion>
+        <opcion>Universitario</opcion>
+        <opcion>Máster</opcion>
+        <opcion>Doctorado</opcion>
+    </pregunta>
+    
+    <!-- Pregunta con condicional basada en estudios -->
+    <pregunta id="12" tipo="abierta" requerida="false" multilinea="true">
+        <texto>¿Dónde estudiaste?</texto>
+        <condicional depende="11" mostrar_cuando="Bootcamp" />
+        <condicional depende="11" mostrar_cuando="Universitario" />
+        <condicional depende="11" mostrar_cuando="Máster" />
+        <condicional depende="11" mostrar_cuando="Doctorado" />
+    </pregunta>
+    
+    <!-- Otro deslizador para satisfacción -->
+    <pregunta id="13" tipo="deslizador" requerida="true" minimo="0" maximo="100" paso="5" valor_defecto="75">
+        <texto>¿Qué tan satisfecho estás con tu carrera? (0-100)</texto>
+    </pregunta>
+    
+    <!-- Pregunta final abierta -->
+    <pregunta id="14" tipo="abierta" requerida="false" multilinea="true">
+        <texto>Comentarios adicionales o sugerencias</texto>
+    </pregunta>
+</formulario>
