@@ -58,7 +58,6 @@
             margin-bottom: 15px;
         }
 
-        /* Estilos para selección múltiple */
         .options-group {
             display: flex;
             flex-direction: column;
@@ -87,7 +86,6 @@
             cursor: pointer;
         }
 
-        /* Estilos para preguntas abiertas */
         .open-input {
             width: 100%;
             padding: 12px;
@@ -109,7 +107,6 @@
             resize: vertical;
         }
 
-        /* Estilos para deslizadores */
         .slider-container {
             padding: 10px 0;
         }
@@ -147,7 +144,6 @@
             color: #667eea;
         }
 
-        /* Estilos para condicionales */
         .conditional {
             margin-left: 30px;
             padding-left: 20px;
@@ -159,7 +155,6 @@
             display: none;
         }
 
-        /* Botones */
         .actions {
             display: flex;
             gap: 15px;
@@ -200,53 +195,19 @@
             border-color: #667eea;
         }
 
-        /* XML Editor */
-        .xml-editor {
-            margin-top: 30px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
         }
 
-        .xml-editor h3 {
-            margin-bottom: 15px;
-            color: #2d3748;
-        }
-
-        .xml-editor textarea {
-            width: 100%;
-            height: 300px;
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
             padding: 15px;
-            font-family: monospace;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 14px;
-            resize: vertical;
-        }
-
-        .xml-editor textarea:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-
-        .xml-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .btn-xml {
-            padding: 10px 20px;
-            background: #4a5568;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-
-        .btn-xml:hover {
-            background: #2d3748;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
         }
 
         @media (max-width: 600px) {
@@ -269,90 +230,50 @@
     <div class="container">
         <header class="header">
             <h1>📋 Formulario Dinámico</h1>
-            <p>Completa la información y edita las preguntas desde XML</p>
+            <p>Cargando preguntas...</p>
         </header>
 
         <div class="form-container">
-            <form id="dynamicForm">
-                <!-- Las preguntas se cargarán aquí -->
-            </form>
+            <div id="errorContainer" class="error-message" style="display: none;"></div>
+            <div id="loadingContainer" class="loading">⏳ Cargando formulario...</div>
+            <form id="dynamicForm" style="display: none;"></form>
 
             <div class="actions">
-                <button type="button" id="submitBtn" class="btn-primary">Enviar Respuestas</button>
+                <button type="button" id="submitBtn" class="btn-primary" style="display: none;">Enviar Respuestas</button>
                 <button type="button" id="exportBtn" class="btn-secondary" style="display: none;">📥 Descargar Excel</button>
-            </div>
-
-            <!-- Editor XML -->
-            <div class="xml-editor">
-                <h3>📝 Editor de Preguntas (XML)</h3>
-                <textarea id="xmlEditor" placeholder="Pega aquí tu XML..."></textarea>
-                <div class="xml-buttons">
-                    <button type="button" id="loadXmlBtn" class="btn-xml">Cargar desde XML</button>
-                    <button type="button" id="resetXmlBtn" class="btn-xml">Restaurar XML por defecto</button>
-                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // XML por defecto
-        const defaultXML = `<?xml version="1.0" encoding="UTF-8"?>
-<formulario>
-    <!-- Pregunta de selección múltiple -->
-    <pregunta id="1" tipo="multiple" requerida="true">
-        <texto>¿Qué lenguajes de programación conoces?</texto>
-        <opcion>JavaScript</opcion>
-        <opcion>Python</opcion>
-        <opcion>Java</opcion>
-        <opcion>PHP</opcion>
-        <opcion>Ruby</opcion>
-    </pregunta>
-    
-    <!-- Pregunta abierta (texto corto) -->
-    <pregunta id="2" tipo="abierta" requerida="true" multilinea="false">
-        <texto>¿Cuál es tu lenguaje favorito?</texto>
-    </pregunta>
-    
-    <!-- Pregunta con deslizador numérico -->
-    <pregunta id="3" tipo="deslizador" requerida="true" minimo="0" maximo="10" paso="1" valor_defecto="5">
-        <texto>Nivel de experiencia (0-10)</texto>
-    </pregunta>
-    
-    <!-- Pregunta abierta (texto largo) -->
-    <pregunta id="4" tipo="abierta" requerida="false" multilinea="true">
-        <texto>Cuéntanos sobre tu experiencia programando</texto>
-    </pregunta>
-    
-    <!-- Pregunta condicional -->
-    <pregunta id="5" tipo="multiple" requerida="true">
-        <texto>¿Te gustaría trabajar con IA?</texto>
-        <opcion>Sí</opcion>
-        <opcion>No</opcion>
-        <opcion>Tal vez</opcion>
-    </pregunta>
-    
-    <pregunta id="6" tipo="abierta" requerida="false" multilinea="true">
-        <texto>¿Qué área de la IA te interesa?</texto>
-        <condicional depende="5" mostrar_cuando="Sí" />
-    </pregunta>
-    
-    <!-- Otro deslizador -->
-    <pregunta id="7" tipo="deslizador" requerida="true" minimo="1" maximo="12" paso="0.5" valor_defecto="4">
-        <texto>Horas que programas al día</texto>
-    </pregunta>
-</formulario>`;
-
         // Variables globales
         let preguntas = [];
         let respuestas = {};
 
-        // Cargar preguntas desde XML
-        function cargarXML(xmlString) {
+        // Cargar XML desde archivo externo
+        async function cargarXML() {
+            try {
+                const response = await fetch('preguntas.xml');
+                if (!response.ok) {
+                    throw new Error(`Error al cargar XML: ${response.status}`);
+                }
+                const xmlString = await response.text();
+                return parsearXML(xmlString);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('errorContainer').style.display = 'block';
+                document.getElementById('errorContainer').textContent = 'Error al cargar el formulario. Verifica que el archivo preguntas.xml exista.';
+                document.getElementById('loadingContainer').style.display = 'none';
+                return [];
+            }
+        }
+
+        // Parsear XML a objeto JavaScript
+        function parsearXML(xmlString) {
             try {
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlString, "text/xml");
                 
-                // Verificar si hay errores de parseo
                 const parserError = xmlDoc.getElementsByTagName("parsererror");
                 if (parserError.length > 0) {
                     throw new Error("XML inválido");
@@ -366,8 +287,20 @@
                         id: parseInt(node.getAttribute("id")),
                         tipo: node.getAttribute("tipo"),
                         requerida: node.getAttribute("requerida") === "true",
-                        texto: node.getElementsByTagName("texto")[0]?.textContent || ""
+                        texto: node.getElementsByTagName("texto")[0]?.textContent || "Pregunta sin texto"
                     };
+                    
+                    // Descripción (opcional)
+                    const descripcion = node.getElementsByTagName("descripcion")[0];
+                    if (descripcion) {
+                        pregunta.descripcion = descripcion.textContent;
+                    }
+                    
+                    // Placeholder (para preguntas abiertas)
+                    const placeholder = node.getElementsByTagName("placeholder")[0];
+                    if (placeholder) {
+                        pregunta.placeholder = placeholder.textContent;
+                    }
                     
                     if (pregunta.tipo === "multiple") {
                         pregunta.opciones = [];
@@ -388,13 +321,16 @@
                         pregunta.valor_defecto = parseFloat(node.getAttribute("valor_defecto")) || 50;
                     }
                     
-                    // Buscar condicional
-                    const condicional = node.getElementsByTagName("condicional")[0];
-                    if (condicional) {
-                        pregunta.condicional = {
-                            depende: parseInt(condicional.getAttribute("depende")),
-                            mostrar_cuando: condicional.getAttribute("mostrar_cuando")
-                        };
+                    // Buscar condicionales
+                    const condicionales = node.getElementsByTagName("condicional");
+                    if (condicionales.length > 0) {
+                        pregunta.condicional = [];
+                        for (let cond of condicionales) {
+                            pregunta.condicional.push({
+                                depende: parseInt(cond.getAttribute("depende")),
+                                mostrar_cuando: cond.getAttribute("mostrar_cuando")
+                            });
+                        }
                     }
                     
                     nuevasPreguntas.push(pregunta);
@@ -402,9 +338,8 @@
                 
                 return nuevasPreguntas;
             } catch (error) {
-                console.error("Error al cargar XML:", error);
-                alert("Error al cargar el XML. Verifica el formato.");
-                return null;
+                console.error("Error al parsear XML:", error);
+                return [];
             }
         }
 
@@ -412,7 +347,6 @@
         function renderizarFormulario() {
             const form = document.getElementById("dynamicForm");
             form.innerHTML = "";
-            respuestas = {};
             
             preguntas.forEach(p => {
                 const div = document.createElement("div");
@@ -424,6 +358,16 @@
                 titulo.textContent = p.texto + (p.requerida ? " *" : "");
                 div.appendChild(titulo);
                 
+                // Agregar descripción si existe
+                if (p.descripcion) {
+                    const desc = document.createElement("small");
+                    desc.style.color = "#718096";
+                    desc.style.display = "block";
+                    desc.style.marginBottom = "10px";
+                    desc.textContent = p.descripcion;
+                    div.appendChild(desc);
+                }
+                
                 switch(p.tipo) {
                     case "multiple":
                         const optionsDiv = document.createElement("div");
@@ -434,13 +378,13 @@
                             label.className = "option-label";
                             
                             const input = document.createElement("input");
-                            input.type = p.opciones.length > 3 ? "checkbox" : "radio";
+                            input.type = p.opciones.length > 4 ? "checkbox" : "radio";
                             input.name = `p${p.id}`;
                             input.value = opcion;
                             input.dataset.preguntaId = p.id;
                             
                             input.addEventListener("change", () => {
-                                if (p.opciones.length > 3) {
+                                if (p.opciones.length > 4) {
                                     const seleccionadas = Array.from(document.querySelectorAll(`input[name="p${p.id}"]:checked`))
                                         .map(cb => cb.value);
                                     respuestas[p.id] = seleccionadas;
@@ -462,7 +406,7 @@
                         if (p.multilinea) {
                             const textarea = document.createElement("textarea");
                             textarea.className = "open-input";
-                            textarea.placeholder = "Escribe tu respuesta...";
+                            textarea.placeholder = p.placeholder || "Escribe tu respuesta...";
                             textarea.dataset.preguntaId = p.id;
                             textarea.addEventListener("input", (e) => {
                                 respuestas[p.id] = e.target.value;
@@ -472,7 +416,7 @@
                             const input = document.createElement("input");
                             input.type = "text";
                             input.className = "open-input";
-                            input.placeholder = "Escribe tu respuesta...";
+                            input.placeholder = p.placeholder || "Escribe tu respuesta...";
                             input.dataset.preguntaId = p.id;
                             input.addEventListener("input", (e) => {
                                 respuestas[p.id] = e.target.value;
@@ -520,21 +464,42 @@
             
             // Aplicar condicionales
             preguntas.forEach(p => {
-                if (p.condicional) {
+                if (p.condicional && p.condicional.length > 0) {
                     const elemento = document.getElementById(`pregunta-${p.id}`);
                     elemento.classList.add("conditional", "hidden");
                 }
             });
+            
+            // Mostrar formulario
+            document.getElementById('loadingContainer').style.display = 'none';
+            form.style.display = 'block';
+            document.getElementById('submitBtn').style.display = 'block';
         }
 
         // Verificar preguntas condicionales
         function verificarCondicionales(preguntaId) {
             preguntas.forEach(p => {
-                if (p.condicional && p.condicional.depende === preguntaId) {
+                if (p.condicional) {
                     const respuestaPadre = respuestas[preguntaId];
                     const elemento = document.getElementById(`pregunta-${p.id}`);
                     
-                    if (respuestaPadre && respuestaPadre === p.condicional.mostrar_cuando) {
+                    let debeMostrar = false;
+                    if (respuestaPadre) {
+                        if (Array.isArray(p.condicional)) {
+                            debeMostrar = p.condicional.some(cond => 
+                                cond.depende === preguntaId && 
+                                (Array.isArray(respuestaPadre) ? 
+                                    respuestaPadre.includes(cond.mostrar_cuando) : 
+                                    respuestaPadre === cond.mostrar_cuando)
+                            );
+                        } else if (p.condicional.depende === preguntaId) {
+                            debeMostrar = Array.isArray(respuestaPadre) ? 
+                                respuestaPadre.includes(p.condicional.mostrar_cuando) : 
+                                respuestaPadre === p.condicional.mostrar_cuando;
+                        }
+                    }
+                    
+                    if (debeMostrar) {
                         elemento.classList.remove("hidden");
                     } else {
                         elemento.classList.add("hidden");
@@ -551,9 +516,9 @@
                     const respuesta = respuestas[p.id];
                     const elemento = document.getElementById(`pregunta-${p.id}`);
                     
-                    // Solo validar si no está oculta por condición
                     if (!elemento.classList.contains("hidden")) {
-                        if (!respuesta || (Array.isArray(respuesta) && respuesta.length === 0)) {
+                        if (respuesta === undefined || respuesta === null || respuesta === "" || 
+                            (Array.isArray(respuesta) && respuesta.length === 0)) {
                             alert(`Por favor, responde: ${p.texto}`);
                             elemento.scrollIntoView({ behavior: "smooth" });
                             return false;
@@ -603,44 +568,22 @@
             XLSX.writeFile(wb, `respuestas_${fecha}.xlsx`);
         }
 
-        // Inicializar
-        document.addEventListener("DOMContentLoaded", () => {
-            const xmlEditor = document.getElementById("xmlEditor");
-            xmlEditor.value = defaultXML;
+        // Inicialización
+        document.addEventListener("DOMContentLoaded", async () => {
+            preguntas = await cargarXML();
             
-            // Cargar XML por defecto
-            preguntas = cargarXML(defaultXML);
-            renderizarFormulario();
-            
-            // Botón cargar XML
-            document.getElementById("loadXmlBtn").addEventListener("click", () => {
-                const nuevasPreguntas = cargarXML(xmlEditor.value);
-                if (nuevasPreguntas) {
-                    preguntas = nuevasPreguntas;
-                    renderizarFormulario();
-                    document.getElementById("exportBtn").style.display = "none";
-                    alert("Formulario actualizado con éxito");
-                }
-            });
-            
-            // Botón restaurar XML
-            document.getElementById("resetXmlBtn").addEventListener("click", () => {
-                xmlEditor.value = defaultXML;
-                preguntas = cargarXML(defaultXML);
+            if (preguntas.length > 0) {
                 renderizarFormulario();
-                document.getElementById("exportBtn").style.display = "none";
-            });
-            
-            // Botón enviar
-            document.getElementById("submitBtn").addEventListener("click", () => {
-                if (validarFormulario()) {
-                    document.getElementById("exportBtn").style.display = "block";
-                    alert("✅ Formulario completado. Puedes descargar el Excel.");
-                }
-            });
-            
-            // Botón exportar
-            document.getElementById("exportBtn").addEventListener("click", exportarExcel);
+                
+                document.getElementById("submitBtn").addEventListener("click", () => {
+                    if (validarFormulario()) {
+                        document.getElementById("exportBtn").style.display = "block";
+                        alert("✅ Formulario completado correctamente. Puedes descargar el Excel.");
+                    }
+                });
+                
+                document.getElementById("exportBtn").addEventListener("click", exportarExcel);
+            }
         });
     </script>
 </body>
