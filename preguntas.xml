@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <formulario version="2.0" fecha_creacion="2024-01-15">
     <!-- =========================================== -->
-    <!-- ARCHIVO DE CONFIGURACIÓN DE PREGUNTAS       -->
+    <!-- FORMULARIO ESTRUCTURADO POR COLUMNAS        -->
     <!-- =========================================== -->
     
-    <!-- SECCIÓN 1: INFORMACIÓN BÁSICA -->
+    <!-- COLUMNA 1: PREGUNTAS DE SELECCIÓN MÚLTIPLE -->
     <pregunta id="101" tipo="multiple" requerida="true">
         <texto>¿Cuál es tu nivel de estudios?</texto>
-        <descripcion>Selecciona el máximo nivel alcanzado</descripcion>
         <opcion>Sin estudios</opcion>
         <opcion>Educación básica</opcion>
         <opcion>Bachillerato</opcion>
@@ -17,140 +16,160 @@
         <opcion>Doctorado</opcion>
     </pregunta>
     
-    <pregunta id="102" tipo="abierta" requerida="true" multilinea="false">
-        <texto>¿Cuál es tu profesión u ocupación actual?</texto>
-        <placeholder>Ej: Desarrollador web, Estudiante, etc.</placeholder>
+    <pregunta id="102" tipo="multiple" requerida="true">
+        <texto>¿Cuál es tu situación laboral actual?</texto>
+        <opcion>Empleado tiempo completo</opcion>
+        <opcion>Empleado medio tiempo</opcion>
+        <opcion>Autónomo/Freelance</opcion>
+        <opcion>Desempleado</opcion>
+        <opcion>Estudiante</opcion>
+        <opcion>Jubilado</opcion>
     </pregunta>
     
-    <!-- SECCIÓN 2: EXPERIENCIA TÉCNICA -->
-    <pregunta id="201" tipo="multiple" requerida="true">
-        <texto>¿Qué lenguajes de programación conoces?</texto>
-        <descripcion>Puedes seleccionar múltiples opciones</descripcion>
-        <opcion>JavaScript/TypeScript</opcion>
-        <opcion>Python</opcion>
-        <opcion>Java</opcion>
-        <opcion>C#</opcion>
-        <opcion>PHP</opcion>
-        <opcion>Ruby</opcion>
-        <opcion>Go</opcion>
-        <opcion>Rust</opcion>
-        <opcion>Swift</opcion>
-        <opcion>Kotlin</opcion>
+    <pregunta id="103" tipo="multiple" requerida="true">
+        <texto>¿Qué idiomas hablas?</texto>
+        <opcion>Español (nativo)</opcion>
+        <opcion>Inglés básico</opcion>
+        <opcion>Inglés intermedio</opcion>
+        <opcion>Inglés avanzado</opcion>
+        <opcion>Francés</opcion>
+        <opcion>Alemán</opcion>
+        <opcion>Portugués</opcion>
+        <opcion>Italiano</opcion>
     </pregunta>
     
-    <pregunta id="202" tipo="deslizador" requerida="true" minimo="0" maximo="20" paso="1" valor_defecto="3">
-        <texto>Años de experiencia programando</texto>
-        <descripcion>Desliza para indicar tu experiencia</descripcion>
+    <!-- COLUMNA 2: PREGUNTAS ABIERTAS -->
+    <pregunta id="201" tipo="abierta" requerida="true" multilinea="false">
+        <texto>¿Cuál es tu profesión u oficio?</texto>
+        <placeholder>Ej: Desarrollador web, Médico, Profesor...</placeholder>
     </pregunta>
     
-    <pregunta id="203" tipo="multiple" requerida="true">
-        <texto>¿En qué área te especializas?</texto>
-        <opcion>Frontend</opcion>
-        <opcion>Backend</opcion>
-        <opcion>Full Stack</opcion>
-        <opcion>DevOps</opcion>
-        <opcion>Data Science</opcion>
-        <opcion>Mobile</opcion>
-        <opcion>Seguridad</opcion>
-        <opcion>IA/ML</opcion>
+    <pregunta id="202" tipo="abierta" requerida="false" multilinea="true">
+        <texto>Describe brevemente tu experiencia laboral</texto>
+        <placeholder>Cuéntanos sobre tus trabajos anteriores...</placeholder>
     </pregunta>
     
-    <!-- SECCIÓN 3: PREGUNTAS CONDICIONALES -->
-    <pregunta id="301" tipo="multiple" requerida="true">
-        <texto>¿Trabajas actualmente como desarrollador?</texto>
-        <opcion>Sí, tiempo completo</opcion>
-        <opcion>Sí, freelance</opcion>
-        <opcion>No, estoy buscando</opcion>
-        <opcion>No, estoy estudiando</opcion>
+    <pregunta id="203" tipo="abierta" requerida="false" multilinea="false">
+        <texto>¿Cuál es tu mayor logro profesional?</texto>
+        <placeholder>Ej: Proyecto exitoso, ascenso, etc.</placeholder>
     </pregunta>
     
-    <!-- Aparece SOLO si trabaja -->
-    <pregunta id="302" tipo="abierta" requerida="false" multilinea="true">
-        <texto>Describe tu trabajo actual</texto>
-        <placeholder>Empresa, tecnologías que usas, responsabilidades...</placeholder>
-        <condicional depende="301" mostrar_cuando="Sí, tiempo completo" />
-        <condicional depende="301" mostrar_cuando="Sí, freelance" />
+    <pregunta id="204" tipo="abierta" requerida="false" multilinea="true">
+        <texto>¿Qué habilidades te gustaría desarrollar?</texto>
+        <placeholder>Menciona las habilidades que quieres aprender...</placeholder>
     </pregunta>
     
-    <!-- Aparece SOLO si NO trabaja -->
-    <pregunta id="303" tipo="abierta" requerida="false" multilinea="true">
-        <texto>¿Qué estás haciendo para mejorar tus habilidades?</texto>
-        <placeholder>Cursos, proyectos personales, bootcamps...</placeholder>
-        <condicional depende="301" mostrar_cuando="No, estoy buscando" />
-        <condicional depende="301" mostrar_cuando="No, estoy estudiando" />
+    <!-- COLUMNA 3: DESLIZADORES NUMÉRICOS -->
+    <pregunta id="301" tipo="deslizador" requerida="true" minimo="0" maximo="50" paso="1" valor_defecto="5">
+        <texto>Años de experiencia profesional</texto>
     </pregunta>
     
-    <!-- SECCIÓN 4: HERRAMIENTAS Y METODOLOGÍAS -->
+    <pregunta id="302" tipo="deslizador" requerida="true" minimo="18" maximo="80" paso="1" valor_defecto="30">
+        <texto>Edad</texto>
+    </pregunta>
+    
+    <pregunta id="303" tipo="deslizador" requerida="true" minimo="0" maximo="100000" paso="1000" valor_defecto="30000">
+        <texto>Salario anual deseado (en euros)</texto>
+    </pregunta>
+    
+    <pregunta id="304" tipo="deslizador" requerida="true" minimo="0" maximo="100" paso="5" valor_defecto="50">
+        <texto>Nivel de satisfacción laboral (0-100)</texto>
+    </pregunta>
+    
+    <pregunta id="305" tipo="deslizador" requerida="true" minimo="0" maximo="24" paso="0.5" valor_defecto="8">
+        <texto>Horas de trabajo diarias</texto>
+    </pregunta>
+    
+    <!-- COLUMNA 4: PREGUNTAS CONDICIONALES -->
     <pregunta id="401" tipo="multiple" requerida="true">
-        <texto>¿Qué frameworks/utilizas regularmente?</texto>
-        <opcion>React</opcion>
-        <opcion>Vue</opcion>
-        <opcion>Angular</opcion>
-        <opcion>Node.js</opcion>
-        <opcion>Django</opcion>
-        <opcion>Laravel</opcion>
-        <opcion>Spring</opcion>
-        <opcion>.NET</opcion>
+        <texto>¿Tienes título universitario?</texto>
+        <opcion>Sí</opcion>
+        <opcion>No</opcion>
+        <opcion>En curso</opcion>
     </pregunta>
     
-    <pregunta id="402" tipo="multiple" requerida="true">
-        <texto>¿Qué bases de datos utilizas?</texto>
-        <opcion>MySQL</opcion>
-        <opcion>PostgreSQL</opcion>
-        <opcion>MongoDB</opcion>
-        <opcion>Redis</opcion>
-        <opcion>SQL Server</opcion>
-        <opcion>Oracle</opcion>
+    <pregunta id="402" tipo="abierta" requerida="false" multilinea="false">
+        <texto>¿Qué carrera estudiaste o estudias?</texto>
+        <placeholder>Ej: Ingeniería Informática, Medicina...</placeholder>
+        <condicional depende="401" mostrar_cuando="Sí" />
+        <condicional depende="401" mostrar_cuando="En curso" />
     </pregunta>
     
     <pregunta id="403" tipo="multiple" requerida="true">
-        <texto>¿Qué metodologías de trabajo conoces?</texto>
-        <opcion>Scrum</opcion>
-        <opcion>Kanban</opcion>
-        <opcion>XP</opcion>
-        <opcion>Waterfall</opcion>
-        <opcion>Lean</opcion>
+        <texto>¿Tienes experiencia en programación?</texto>
+        <opcion>Sí, profesional</opcion>
+        <opcion>Sí, como hobby</opcion>
+        <opcion>No</opcion>
     </pregunta>
     
-    <!-- SECCIÓN 5: DESLIZADORES AVANZADOS -->
-    <pregunta id="501" tipo="deslizador" requerida="true" minimo="0" maximo="100" paso="5" valor_defecto="70">
-        <texto>Porcentaje de satisfacción laboral</texto>
-        <descripcion>0 = Nada satisfecho, 100 = Muy satisfecho</descripcion>
+    <pregunta id="404" tipo="multiple" requerida="false">
+        <texto>¿Qué lenguajes de programación conoces?</texto>
+        <opcion>Python</opcion>
+        <opcion>JavaScript</opcion>
+        <opcion>Java</opcion>
+        <opcion>C++</opcion>
+        <opcion>PHP</opcion>
+        <opcion>Ruby</opcion>
+        <opcion>Otros</opcion>
+        <condicional depende="403" mostrar_cuando="Sí, profesional" />
+        <condicional depende="403" mostrar_cuando="Sí, como hobby" />
     </pregunta>
     
-    <pregunta id="502" tipo="deslizador" requerida="true" minimo="0" maximo="12" paso="0.5" valor_defecto="6">
-        <texto>Horas diarias de trabajo efectivo</texto>
+    <pregunta id="405" tipo="deslizador" requerida="false" minimo="0" maximo="20" paso="1" valor_defecto="2">
+        <texto>Años de experiencia en programación</texto>
+        <condicional depende="403" mostrar_cuando="Sí, profesional" />
+        <condicional depende="403" mostrar_cuando="Sí, como hobby" />
     </pregunta>
     
-    <pregunta id="503" tipo="deslizador" requerida="true" minimo="1" maximo="10" paso="1" valor_defecto="5">
-        <texto>Nivel de estrés (1 = Bajo, 10 = Alto)</texto>
+    <!-- COLUMNA 5: PREGUNTAS DE OPINIÓN -->
+    <pregunta id="501" tipo="multiple" requerida="true">
+        <texto>¿Recomendarías tu profesión?</texto>
+        <opcion>Sí, totalmente</opcion>
+        <opcion>Sí, con reservas</opcion>
+        <opcion>No estoy seguro</opcion>
+        <opcion>No</opcion>
     </pregunta>
     
-    <!-- SECCIÓN 6: PREGUNTAS ABIERTAS FINALES -->
-    <pregunta id="601" tipo="abierta" requerida="false" multilinea="true">
-        <texto>¿Qué tecnología te gustaría aprender en el futuro?</texto>
-        <placeholder>Ej: Inteligencia Artificial, Blockchain, etc.</placeholder>
+    <pregunta id="502" tipo="abierta" requerida="false" multilinea="true">
+        <texto>¿Por qué?</texto>
+        <placeholder>Explica brevemente tu respuesta...</placeholder>
+        <condicional depende="501" mostrar_cuando="Sí, totalmente" />
+        <condicional depende="501" mostrar_cuando="Sí, con reservas" />
+        <condicional depende="501" mostrar_cuando="No estoy seguro" />
+        <condicional depende="501" mostrar_cuando="No" />
+    </pregunta>
+    
+    <pregunta id="503" tipo="deslizador" requerida="true" minimo="1" maximo="10" paso="1" valor_defecto="7">
+        <texto>Valoración de tu equilibrio vida-trabajo (1-10)</texto>
+    </pregunta>
+    
+    <!-- COLUMNA 6: PREGUNTAS FINALES -->
+    <pregunta id="601" tipo="multiple" requerida="false">
+        <texto>¿Cómo prefieres trabajar?</texto>
+        <opcion>Presencial</opcion>
+        <opcion>Remoto</opcion>
+        <opcion>Híbrido</opcion>
+        <opcion>Sin preferencia</opcion>
     </pregunta>
     
     <pregunta id="602" tipo="abierta" requerida="false" multilinea="true">
         <texto>Comentarios adicionales</texto>
-        <placeholder>Si tienes algo más que añadir...</placeholder>
+        <placeholder>Si quieres añadir algo más...</placeholder>
     </pregunta>
     
     <!-- METADATOS DEL FORMULARIO -->
     <metadatos>
         <version>2.0</version>
-        <total_preguntas>15</total_preguntas>
-        <categorias>
-            <categoria id="basica">Información Básica</categoria>
-            <categoria id="tecnica">Experiencia Técnica</categoria>
-            <categoria id="laboral">Situación Laboral</categoria>
-            <categoria id="herramientas">Herramientas</categoria>
-            <categoria id="evaluacion">Autoevaluación</categoria>
-        </categorias>
+        <total_preguntas>20</total_preguntas>
+        <columnas>
+            <columna nombre="Multiple" cantidad="4" ids="101,102,103,401,403,501,601"/>
+            <columna nombre="Abierta" cantidad="7" ids="201,202,203,204,402,502,602"/>
+            <columna nombre="Deslizador" cantidad="6" ids="301,302,303,304,305,503"/>
+            <columna nombre="Condicional" cantidad="6" ids="402,404,405,502"/>
+        </columnas>
         <instrucciones>
             Completa todas las preguntas requeridas.
-            Las preguntas condicionales aparecerán según tus respuestas.
+            Las preguntas marcadas con * son obligatorias.
         </instrucciones>
     </metadatos>
 </formulario>
