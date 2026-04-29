@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* Pantalla de autenticación */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -72,13 +71,12 @@
             font-size: 0.9rem;
         }
 
-        /* Canvas de dibujo */
         .canvas-container {
             background: #f9fafb;
             border-radius: 1.5rem;
             padding: 1rem;
             margin: 1rem 0;
-            border: 2px dashed #d1d5db;
+            border: 2px solid #d1d5db;
             transition: all 0.3s;
         }
 
@@ -126,11 +124,6 @@
             margin-top: 0.25rem;
         }
 
-        .pattern-example.correct svg path {
-            stroke: #10b981;
-            stroke-width: 3;
-        }
-
         .status-badge {
             background: #f1f3f4;
             padding: 10px 16px;
@@ -138,6 +131,7 @@
             font-size: 0.85rem;
             font-weight: 500;
             margin: 1rem 0;
+            transition: all 0.3s;
         }
 
         .btn-auth {
@@ -168,7 +162,6 @@
             background: #4b5563;
         }
 
-        /* App principal */
         .app-container {
             max-width: 1300px;
             margin: 0 auto;
@@ -214,6 +207,7 @@
             font-size: 0.8rem;
             font-weight: 500;
             color: #92400e;
+            margin-bottom: 1.5rem;
         }
 
         .notes-grid {
@@ -228,7 +222,6 @@
             padding: 1.2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
-            border: 1px solid rgba(0,0,0,0.05);
         }
 
         .note-card:hover {
@@ -271,22 +264,26 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        @media (max-width: 640px) {
-            .auth-card { padding: 1.2rem; }
-            canvas { width: 100% !important; height: auto !important; }
+        .success-animation {
+            animation: pulse 0.5s ease;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); background: #d1fae5; }
+            100% { transform: scale(1); }
         }
     </style>
 </head>
 <body>
 
-<!-- Pantalla de autenticación táctil -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="auth-icon">
             <i class="fas fa-hand-peace"></i>
         </div>
-        <h2>Dibuja la Cruz</h2>
-        <p class="subtitle">Traza una ✝️ en el recuadro para acceder</p>
+        <h2>Dibuja una Cruz ✝️</h2>
+        <p class="subtitle">Traza una cruz en el recuadro para ingresar</p>
 
         <div class="canvas-container" id="canvasContainer">
             <canvas id="drawCanvas" width="400" height="400" style="width:100%; height:auto; max-width:400px; aspect-ratio:1/1"></canvas>
@@ -295,93 +292,126 @@
         <div class="pattern-guide">
             <div class="pattern-example">
                 <svg width="60" height="60" viewBox="0 0 60 60">
-                    <line x1="15" y1="30" x2="45" y2="30" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
-                    <line x1="30" y1="15" x2="30" y2="45" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="10" y1="30" x2="50" y2="30" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="30" y1="10" x2="30" y2="50" stroke="#667eea" stroke-width="3" stroke-linecap="round"/>
+                    <circle cx="30" cy="30" r="3" fill="#667eea"/>
                 </svg>
                 <span>✝️ Cruz</span>
-            </div>
-            <div class="pattern-example correct">
-                <svg width="60" height="60" viewBox="0 0 60 60">
-                    <line x1="15" y1="30" x2="45" y2="30" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
-                    <line x1="30" y1="15" x2="30" y2="45" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
-                </svg>
-                <span style="color:#10b981">✓ Correcto</span>
             </div>
         </div>
 
         <div id="authStatus" class="status-badge">
-            <i class="fas fa-fingerprint"></i> Dibuja una cruz en el recuadro
+            <i class="fas fa-pencil-alt"></i> Dibuja una cruz en el cuadro
         </div>
 
         <button id="clearBtn" class="btn-auth btn-reset">
-            <i class="fas fa-eraser"></i> Limpiar dibujo
+            <i class="fas fa-eraser"></i> Limpiar
         </button>
     </div>
 </div>
 
-<!-- App principal -->
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone · Google Sheets</h1>
         <div class="user-info">
-            <i class="fas fa-check-circle" style="color:#10b981"></i> Autenticado con cruz
+            <i class="fas fa-check-circle" style="color:#10b981"></i> Cruz verificada
         </div>
     </div>
-    <div class="sheet-info" style="margin-bottom: 1.5rem;">
-        <i class="fas fa-table"></i> <span id="sheetStatus">Conectando con Google Sheets...</span>
+    <div class="sheet-info">
+        <i class="fas fa-table"></i> <span id="sheetStatus">Conectando...</span>
     </div>
     <div id="notesContainer" class="notes-grid">
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Autenticación táctil • Dibuja una cruz para acceder • Datos desde Google Sheets
+        🔐 Autenticación por cruz • Dibuja una ✝️ para acceder
     </footer>
 </div>
 
 <script>
-    // ====================================================
-    // CONFIGURACIÓN
-    // ====================================================
-    // ⚠️ REEMPLAZA CON LA URL DE TU APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUW9cTzgoWShaOaZ8vzZGZggd-G1jvEXLMr0jx4S-T-MepSt4EvqK6uJkeDAgzg2pY/exec";
+    // CONFIGURACIÓN - REEMPLAZA CON TU URL DE APPS SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxcmh9XrhGVUthN-Fh1vlrEEPUVUzyUjXe_rC-lre15xwK6DGwo9PBm7ZR-djUZJzND/exec";
     
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
     let drawing = false;
     let points = [];
-    let authCompleted = false;
     
-    // Configurar canvas para dibujo táctil y ratón
+    // Inicializar canvas
     function initCanvas() {
-        // Ajustar tamaño para resolución retina
-        const size = 400;
-        canvas.width = size;
-        canvas.height = size;
+        canvas.width = 400;
+        canvas.height = 400;
         canvas.style.width = "100%";
         canvas.style.height = "auto";
         canvas.style.aspectRatio = "1/1";
         
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        limpiarCanvas();
+        
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
         ctx.lineWidth = 8;
         ctx.strokeStyle = "#667eea";
         
-        // Eventos para ratón
+        // Eventos ratón
         canvas.addEventListener("mousedown", startDrawing);
         canvas.addEventListener("mousemove", draw);
         canvas.addEventListener("mouseup", endDrawing);
         canvas.addEventListener("mouseleave", endDrawing);
         
-        // Eventos para táctil (móvil)
+        // Eventos táctiles
         canvas.addEventListener("touchstart", startDrawingTouch);
         canvas.addEventListener("touchmove", drawTouch);
         canvas.addEventListener("touchend", endDrawing);
         canvas.addEventListener("touchcancel", endDrawing);
     }
     
-    function getCanvasCoords(e) {
+    function startDrawing(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+    }
+    
+    function startDrawingTouch(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+    }
+    
+    function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function drawTouch(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function getCoords(e) {
         const rect = canvas.getBoundingClientRect();
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
@@ -405,128 +435,142 @@
         return { x, y };
     }
     
-    function startDrawing(e) {
-        e.preventDefault();
-        drawing = true;
-        const { x, y } = getCanvasCoords(e);
-        points = [{ x, y }];
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        document.getElementById("canvasContainer").classList.add("active");
-    }
-    
-    function startDrawingTouch(e) {
-        e.preventDefault();
-        drawing = true;
-        const { x, y } = getCanvasCoords(e);
-        points = [{ x, y }];
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        document.getElementById("canvasContainer").classList.add("active");
-    }
-    
-    function draw(e) {
-        if (!drawing) return;
-        e.preventDefault();
-        const { x, y } = getCanvasCoords(e);
-        points.push({ x, y });
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-    
-    function drawTouch(e) {
-        if (!drawing) return;
-        e.preventDefault();
-        const { x, y } = getCanvasCoords(e);
-        points.push({ x, y });
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-    
     function endDrawing() {
         if (!drawing) return;
         drawing = false;
         document.getElementById("canvasContainer").classList.remove("active");
-        verificarCruz();
+        
+        // Analizar el dibujo
+        const resultado = analizarCruz();
+        
+        if (resultado.esCruz) {
+            const statusDiv = document.getElementById("authStatus");
+            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ ¡Cruz detectada! Accediendo...';
+            statusDiv.style.background = "#d1fae5";
+            statusDiv.style.color = "#065f46";
+            statusDiv.classList.add("success-animation");
+            
+            setTimeout(() => {
+                finishAuthenticationSuccess();
+            }, 800);
+        } else {
+            const statusDiv = document.getElementById("authStatus");
+            let mensaje = "✏️ " + resultado.mensaje;
+            statusDiv.innerHTML = `<i class="fas fa-pencil-alt"></i> ${mensaje}`;
+            statusDiv.style.background = "#fef3c7";
+            statusDiv.style.color = "#92400e";
+        }
     }
     
-    // Detectar si el dibujo es una cruz
-    function verificarCruz() {
-        if (points.length < 20) {
-            actualizarEstado("⚠️ Dibuja una cruz completa", "#f1f3f4", "#6b7280");
-            return;
+    function analizarCruz() {
+        if (points.length < 15) {
+            return { esCruz: false, mensaje: "Continúa dibujando la cruz" };
         }
         
-        // Analizar puntos para detectar líneas horizontales y verticales
-        let horizontales = 0;
-        let verticales = 0;
-        
-        // Muestrear puntos para ver dirección
-        for (let i = 10; i < points.length - 10; i += 5) {
-            const p1 = points[i - 5];
-            const p2 = points[i];
-            const p3 = points[i + 5];
-            
-            if (!p1 || !p2 || !p3) continue;
-            
-            const dx1 = p2.x - p1.x;
-            const dy1 = p2.y - p1.y;
-            const dx2 = p3.x - p2.x;
-            const dy2 = p3.y - p2.y;
-            
-            const dir1 = Math.abs(dx1) > Math.abs(dy1) ? "H" : "V";
-            const dir2 = Math.abs(dx2) > Math.abs(dy2) ? "H" : "V";
-            
-            if (dir1 === "H" && dir2 === "H") horizontales++;
-            if (dir1 === "V" && dir2 === "V") verticales++;
+        // Encontrar bounding box del dibujo
+        let minX = canvas.width, maxX = 0, minY = canvas.height, maxY = 0;
+        for (const p of points) {
+            minX = Math.min(minX, p.x);
+            maxX = Math.max(maxX, p.x);
+            minY = Math.min(minY, p.y);
+            maxY = Math.max(maxY, p.y);
         }
         
-        // Verificar que hay suficientes trazos horizontales Y verticales
-        const tieneHorizontal = horizontales > 15;
-        const tieneVertical = verticales > 15;
+        const ancho = maxX - minX;
+        const alto = maxY - minY;
         
-        // También verificar que el dibujo cruza el centro
-        const centroX = canvas.width / 2;
-        const centroY = canvas.height / 2;
+        // Verificar que el dibujo ocupe una porción significativa del canvas
+        if (ancho < canvas.width * 0.3 || alto < canvas.height * 0.3) {
+            return { esCruz: false, mensaje: "Haz la cruz más grande" };
+        }
         
+        // Centro del canvas
+        const centroCanvasX = canvas.width / 2;
+        const centroCanvasY = canvas.height / 2;
+        
+        // Verificar que pasa cerca del centro
         let pasaPorCentro = false;
         for (const p of points) {
-            if (Math.abs(p.x - centroX) < 30 && Math.abs(p.y - centroY) < 30) {
+            const distanciaCentro = Math.hypot(p.x - centroCanvasX, p.y - centroCanvasY);
+            if (distanciaCentro < 50) {
                 pasaPorCentro = true;
                 break;
             }
         }
         
-        if (tieneHorizontal && tieneVertical && pasaPorCentro) {
-            actualizarEstado("✅ ¡Cruz correcta! Autenticación exitosa", "#d1fae5", "#065f46");
-            authCompleted = true;
-            setTimeout(() => {
-                finishAuthenticationSuccess();
-            }, 800);
-        } else {
-            let mensaje = "";
-            if (!tieneHorizontal) mensaje = "✏️ Traza una línea horizontal (─)";
-            else if (!tieneVertical) mensaje = "✏️ Traza una línea vertical (│)";
-            else if (!pasaPorCentro) mensaje = "✏️ Asegúrate que las líneas se crucen en el centro";
-            else mensaje = "✏️ Dibuja una cruz clara (+)";
-            
-            actualizarEstado(mensaje, "#fef3c7", "#92400e");
+        if (!pasaPorCentro) {
+            return { esCruz: false, mensaje: "La cruz debe cruzar el centro" };
         }
-    }
-    
-    function actualizarEstado(mensaje, bgColor, textColor) {
-        const statusDiv = document.getElementById("authStatus");
-        statusDiv.innerHTML = `<i class="fas fa-fingerprint"></i> ${mensaje}`;
-        statusDiv.style.background = bgColor;
-        statusDiv.style.color = textColor;
+        
+        // Dividir puntos en segmentos para detectar líneas horizontales y verticales
+        let segmentos = [];
+        let segmentoActual = [points[0]];
+        
+        for (let i = 1; i < points.length; i++) {
+            const p1 = points[i - 1];
+            const p2 = points[i];
+            const distancia = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+            
+            if (distancia > 15) {
+                if (segmentoActual.length > 3) {
+                    segmentos.push([...segmentoActual]);
+                }
+                segmentoActual = [p2];
+            } else {
+                segmentoActual.push(p2);
+            }
+        }
+        
+        if (segmentoActual.length > 3) {
+            segmentos.push([...segmentoActual]);
+        }
+        
+        // Analizar orientación de cada segmento
+        let horizontales = 0;
+        let verticales = 0;
+        
+        for (const seg of segmentos) {
+            if (seg.length < 5) continue;
+            
+            let sumX = 0, sumY = 0;
+            for (const p of seg) {
+                sumX += p.x;
+                sumY += p.y;
+            }
+            const centroX = sumX / seg.length;
+            const centroY = sumY / seg.length;
+            
+            // Calcular dirección principal
+            let dxTotal = 0, dyTotal = 0;
+            for (let i = 1; i < seg.length; i++) {
+                dxTotal += Math.abs(seg[i].x - seg[i-1].x);
+                dyTotal += Math.abs(seg[i].y - seg[i-1].y);
+            }
+            
+            const esHorizontal = dxTotal > dyTotal * 1.5;
+            const esVertical = dyTotal > dxTotal * 1.5;
+            
+            if (esHorizontal && seg.length > 8) {
+                horizontales++;
+            }
+            if (esVertical && seg.length > 8) {
+                verticales++;
+            }
+        }
+        
+        // Verificar que tiene al menos una línea horizontal Y una vertical
+        const tieneHorizontal = horizontales >= 1;
+        const tieneVertical = verticales >= 1;
+        
+        if (tieneHorizontal && tieneVertical) {
+            return { esCruz: true, mensaje: "¡Cruz correcta!" };
+        } else if (!tieneHorizontal && !tieneVertical) {
+            return { esCruz: false, mensaje: "Dibuja una línea horizontal (─) y una vertical (│)" };
+        } else if (!tieneHorizontal) {
+            return { esCruz: false, mensaje: "Falta la línea horizontal (─)" };
+        } else {
+            return { esCruz: false, mensaje: "Falta la línea vertical (│)" };
+        }
     }
     
     function limpiarCanvas() {
@@ -534,12 +578,14 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         points = [];
         drawing = false;
-        actualizarEstado("✏️ Dibuja una cruz en el recuadro", "#f1f3f4", "#6b7280");
+        
+        document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Dibuja una cruz en el cuadro';
+        document.getElementById("authStatus").style.background = "#f1f3f4";
+        document.getElementById("authStatus").style.color = "#6b7280";
         document.getElementById("canvasContainer").classList.remove("active");
     }
     
     async function finishAuthenticationSuccess() {
-        // Ocultar overlay
         document.getElementById("authOverlay").style.opacity = "0";
         setTimeout(() => {
             document.getElementById("authOverlay").style.display = "none";
@@ -566,26 +612,26 @@
             const data = await response.json();
             
             if (data.success && data.notes && data.notes.length > 0) {
-                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas cargadas desde "${data.sheetName}"`;
+                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas desde "${data.sheetName}"`;
                 renderNotes(data.notes);
             } else {
-                sheetStatusSpan.innerHTML = "📝 Mostrando notas de ejemplo (conecta tu Google Sheets)";
+                sheetStatusSpan.innerHTML = "📝 Notas de ejemplo (conecta Google Sheets)";
                 renderNotes(getDefaultNotes());
             }
         } catch (error) {
             console.error("Error:", error);
-            sheetStatusSpan.innerHTML = "📝 Modo local - Conecta Google Sheets para datos reales";
+            sheetStatusSpan.innerHTML = "📝 Modo local - Conecta tu Google Sheets";
             renderNotes(getDefaultNotes());
         }
     }
     
     function getDefaultNotes() {
         return [
-            { title: "🎉 ¡Autenticación Exitosa!", content: "Has dibujado la cruz correctamente. Esta es tu libreta segura KeepClone." },
-            { title: "📝 Nota de ejemplo", content: "Puedes conectar tu Google Sheets agregando columnas 'Title' y 'Content'." },
-            { title: "🖌️ Cómo funciona", content: "La autenticación detecta los trazos horizontales y verticales que forman una cruz en el centro." },
-            { title: "✨ Ventajas", content: "✓ No necesita cámara ✓ Funciona en táctil y ratón ✓ 100% privado" },
-            { title: "🔧 Configuración", content: "Crea una hoja con 'Title' y 'Content', luego despliega Apps Script con la URL correcta." }
+            { title: "🎉 ¡Bienvenido a KeepClone!", content: "Has dibujado la cruz correctamente. Esta es tu libreta segura." },
+            { title: "📝 Nota de ejemplo 1", content: "Puedes conectar tu Google Sheets agregando columnas 'Title' y 'Content'." },
+            { title: "📝 Nota de ejemplo 2", content: "La autenticación por cruz es rápida, simple y no requiere permisos especiales." },
+            { title: "📝 Nota de ejemplo 3", content: "Dibuja una cruz (─ y │) que se cruce en el centro del recuadro." },
+            { title: "🔧 Configuración", content: "Crea una hoja con 'Title' y 'Content', despliega Apps Script y actualiza la URL." }
         ];
     }
     
@@ -593,7 +639,7 @@
         const container = document.getElementById("notesContainer");
         
         if (!notes || notes.length === 0) {
-            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas disponibles</div>`;
+            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas</div>`;
             return;
         }
         
@@ -610,12 +656,12 @@
     
     function escapeHtml(str) {
         if (!str) return "";
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;');
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
     
     // Inicializar
