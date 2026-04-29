@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KeepClone · Acceso Seguro</title>
+    <title>KeepClone · Acceso con Cara Feliz</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -105,6 +106,26 @@
             font-weight: 500;
             margin: 1rem 0;
             transition: all 0.3s;
+        }
+
+        .guia-box {
+            background: #e8f0fe;
+            padding: 12px;
+            border-radius: 1rem;
+            margin: 10px 0;
+            font-size: 0.85rem;
+            color: #1a73e8;
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .guia-box i {
+            margin-right: 8px;
         }
 
         .btn-validar {
@@ -416,9 +437,9 @@
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="auth-icon">
-            <i class="fas fa-lock"></i>
+            <i class="fas fa-smile-wink"></i>
         </div>
-        <h2>Acceso Seguro</h2>
+        <h2>Bienvenido</h2>
         <p class="subtitle">Realiza la acción requerida</p>
 
         <div class="canvas-container" id="canvasContainer">
@@ -427,6 +448,10 @@
 
         <div id="authStatus" class="status-badge">
             <i class="fas fa-shield-alt"></i> Esperando validación...
+        </div>
+
+        <div id="guiaBox" class="guia-box">
+            <i class="fas fa-lightbulb"></i> Consejo: Dibuja una cara feliz en el recuadro (círculo, dos ojos y una sonrisa)
         </div>
 
         <button id="validarBtn" class="btn-validar">
@@ -482,6 +507,7 @@
     
     let notas = [];
     let editingId = null;
+    let intentosFallidos = 0;
     
     const NOTAS_EJEMPLO = [
         { id: "nota1", title: "📌 Bienvenido", content: "Acceso autorizado correctamente." },
@@ -635,7 +661,7 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN SUPER FLEXIBLE
+    // AUTENTICACIÓN CARA FELIZ
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
@@ -741,15 +767,27 @@
         document.getElementById("canvasContainer").classList.remove("active");
     }
     
+    function mostrarGuia() {
+        const guiaBox = document.getElementById("guiaBox");
+        guiaBox.style.display = "block";
+        setTimeout(() => {
+            guiaBox.style.display = "none";
+        }, 5000);
+    }
+    
     function validarDibujo() {
         if (authCompleted) return;
         
-        if (points.length < 20) {
+        if (points.length < 30) {
+            intentosFallidos++;
+            if (intentosFallidos >= 1) {
+                mostrarGuia();
+            }
             mostrarDenegado();
             return;
         }
         
-        const autorizado = verificarSIUltraFlexible();
+        const autorizado = verificarCaraFeliz();
         
         if (autorizado) {
             authCompleted = true;
@@ -766,6 +804,10 @@
                 }, 500);
             }, 800);
         } else {
+            intentosFallidos++;
+            if (intentosFallidos >= 1) {
+                mostrarGuia();
+            }
             mostrarDenegado();
         }
     }
@@ -781,98 +823,43 @@
         }, 1500);
     }
     
-    function verificarSIUltraFlexible() {
-        // Obtener bounding box completa
-        let minX = canvas.width, maxX = 0, minY = canvas.height, maxY = 0;
+    function verificarCaraFeliz() {
+        // Buscar círculo (cabeza)
+        let centroX = 0, centroY = 0;
         for (const p of points) {
-            minX = Math.min(minX, p.x);
-            maxX = Math.max(maxX, p.x);
-            minY = Math.min(minY, p.y);
-            maxY = Math.max(maxY, p.y);
+            centroX += p.x;
+            centroY += p.y;
+        }
+        centroX /= points.length;
+        centroY /= points.length;
+        
+        // Calcular distancias al centro
+        let distancias = [];
+        for (const p of points) {
+            distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
         }
         
-        const anchoTotal = maxX - minX;
+        let radioPromedio = distancias.reduce((a, b) => a + b, 0) / distancias.length;
+        let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
+        let coeficiente = variacion / radioPromedio;
         
-        // Tamaño mínimo razonable
-        if (anchoTotal < canvas.width * 0.25) return false;
+        const tieneCirculo = coeficiente < 0.45 && radioPromedio > 50;
         
-        // Dividir en dos zonas: izquierda (S) y derecha (I)
-        const mitadX = (minX + maxX) / 2;
+        // Buscar ojos (dos puntos en la parte superior)
+        let puntosSuperiores = points.filter(p => p.y < centroY - 10);
+        let tieneOjos = puntosSuperiores.length >= 2;
         
-        let puntosIzquierda = points.filter(p => p.x < mitadX);
-        let puntosDerecha = points.filter(p => p.x > mitadX);
+        // Buscar sonrisa (curva en la parte inferior)
+        let puntosInferiores = points.filter(p => p.y > centroY + 10);
+        let tieneSonrisa = puntosInferiores.length >= 5;
         
-        // Cada lado debe tener al menos 6 puntos
-        if (puntosIzquierda.length < 6 || puntosDerecha.length < 6) return false;
+        // Una cara feliz necesita círculo y al menos uno de los otros elementos
+        const resultado = tieneCirculo && (tieneOjos || tieneSonrisa);
         
-        // ============================================
-        // DETECTAR 'S' - MUY FLEXIBLE
-        // ============================================
-        // Una S se caracteriza por tener movimientos horizontales y verticales
-        let movHorizontalS = 0, movVerticalS = 0;
-        puntosIzquierda.sort((a, b) => a.y - b.y);
+        // Debug
+        console.log("Círculo: " + tieneCirculo + " | Ojos: " + tieneOjos + " | Sonrisa: " + tieneSonrisa);
         
-        for (let i = 1; i < puntosIzquierda.length; i++) {
-            movHorizontalS += Math.abs(puntosIzquierda[i].x - puntosIzquierda[i-1].x);
-            movVerticalS += Math.abs(puntosIzquierda[i].y - puntosIzquierda[i-1].y);
-        }
-        
-        // Tiene ambos tipos de movimiento
-        const tienesMovimientoAmbiente = movHorizontalS > 10 && movVerticalS > 10;
-        
-        // Altura de la S
-        let alturaS = 0;
-        if (puntosIzquierda.length > 0) {
-            let minYS = canvas.height, maxYS = 0;
-            for (const p of puntosIzquierda) {
-                minYS = Math.min(minYS, p.y);
-                maxYS = Math.max(maxYS, p.y);
-            }
-            alturaS = maxYS - minYS;
-        }
-        
-        const sTieneAltura = alturaS > canvas.height * 0.2;
-        
-        // ============================================
-        // DETECTAR 'I' - MUY FLEXIBLE
-        // ============================================
-        let movHorizontalI = 0, movVerticalI = 0;
-        puntosDerecha.sort((a, b) => a.y - b.y);
-        
-        for (let i = 1; i < puntosDerecha.length; i++) {
-            movHorizontalI += Math.abs(puntosDerecha[i].x - puntosDerecha[i-1].x);
-            movVerticalI += Math.abs(puntosDerecha[i].y - puntosDerecha[i-1].y);
-        }
-        
-        // La I debe ser principalmente vertical
-        const esVertical = movVerticalI > movHorizontalI;
-        
-        // Altura de la I
-        let alturaI = 0;
-        if (puntosDerecha.length > 0) {
-            let minYI = canvas.height, maxYI = 0;
-            for (const p of puntosDerecha) {
-                minYI = Math.min(minYI, p.y);
-                maxYI = Math.max(maxYI, p.y);
-            }
-            alturaI = maxYI - minYI;
-        }
-        
-        const iTieneAltura = alturaI > canvas.height * 0.2;
-        
-        // ============================================
-        // RESULTADO - BASTANTE FLEXIBLE
-        // ============================================
-        
-        // Consola para debug (útil para ajustar)
-        console.log("S: horizontal=" + Math.round(movHorizontalS) + " vertical=" + Math.round(movVerticalS) + " altura=" + Math.round(alturaS));
-        console.log("I: horizontal=" + Math.round(movHorizontalI) + " vertical=" + Math.round(movVerticalI) + " esVertical=" + esVertical + " altura=" + Math.round(alturaI));
-        
-        // Condiciones muy flexibles
-        const sValida = tienesMovimientoAmbiente && sTieneAltura;
-        const iValida = esVertical && iTieneAltura;
-        
-        return sValida && iValida;
+        return resultado;
     }
     
     function limpiarCanvas() {
@@ -880,10 +867,14 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         points = [];
         drawing = false;
+        intentosFallidos = 0;
         
         const statusDiv = document.getElementById("authStatus");
         statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando validación...';
         statusDiv.className = "status-badge";
+        
+        const guiaBox = document.getElementById("guiaBox");
+        guiaBox.style.display = "none";
     }
     
     // Eventos UI
