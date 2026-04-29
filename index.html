@@ -36,7 +36,7 @@
 
         .auth-card {
             background: white;
-            max-width: 500px;
+            max-width: 550px;
             width: 90%;
             border-radius: 2rem;
             padding: 2rem;
@@ -88,7 +88,7 @@
         canvas {
             display: block;
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
             margin: 0 auto;
             background: white;
             border-radius: 1rem;
@@ -408,27 +408,6 @@
             background: #d1fae5;
             color: #065f46;
         }
-
-        .input-container {
-            margin: 1rem 0;
-        }
-
-        .password-input {
-            width: 100%;
-            padding: 14px;
-            font-size: 1.2rem;
-            text-align: center;
-            border: 2px solid #e5e7eb;
-            border-radius: 1rem;
-            outline: none;
-            transition: all 0.3s;
-            letter-spacing: 4px;
-        }
-
-        .password-input:focus {
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102,126,234,0.2);
-        }
     </style>
 </head>
 <body>
@@ -440,10 +419,10 @@
             <i class="fas fa-lock"></i>
         </div>
         <h2>Acceso Seguro</h2>
-        <p class="subtitle">Ingresa la clave de acceso</p>
+        <p class="subtitle">Realiza la acción requerida</p>
 
-        <div class="input-container">
-            <input type="text" id="claveInput" class="password-input" placeholder="_____" maxlength="2" autocomplete="off" style="text-transform:uppercase; text-align:center; font-size:2rem; letter-spacing:8px;">
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="drawCanvas" width="400" height="300"></canvas>
         </div>
 
         <div id="authStatus" class="status-badge">
@@ -455,7 +434,7 @@
         </button>
 
         <button id="clearBtn" class="btn-auth btn-reset">
-            <i class="fas fa-undo-alt"></i> Limpiar
+            <i class="fas fa-undo-alt"></i> Limpiar dibujo
         </button>
     </div>
 </div>
@@ -656,23 +635,128 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CON PALABRA "SI"
-    // VALIDACIÓN CON BOTÓN
+    // AUTENTICACIÓN DIBUJANDO LA PALABRA "SI"
     // ============================================
     
+    let canvas = document.getElementById("drawCanvas");
+    let ctx = canvas.getContext("2d");
+    let drawing = false;
+    let points = [];
     let authCompleted = false;
     
-    const CLAVE_CORRECTA = "SI";
+    function initCanvas() {
+        canvas.width = 400;
+        canvas.height = 300;
+        
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Dibujar línea guía tenue (opcional, ayuda a centrar)
+        ctx.beginPath();
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        ctx.setLineDash([]);
+        
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "#667eea";
+        
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", endDrawing);
+        canvas.addEventListener("mouseleave", endDrawing);
+        
+        canvas.addEventListener("touchstart", startDrawingTouch);
+        canvas.addEventListener("touchmove", drawTouch);
+        canvas.addEventListener("touchend", endDrawing);
+        canvas.addEventListener("touchcancel", endDrawing);
+    }
     
-    function validarAcceso() {
+    function startDrawing(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+    }
+    
+    function startDrawingTouch(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+    }
+    
+    function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function drawTouch(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function getCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        let clientX, clientY;
+        
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        let x = (clientX - rect.left) * scaleX;
+        let y = (clientY - rect.top) * scaleY;
+        
+        x = Math.min(Math.max(0, x), canvas.width);
+        y = Math.min(Math.max(0, y), canvas.height);
+        
+        return { x, y };
+    }
+    
+    function endDrawing() {
+        if (!drawing) return;
+        drawing = false;
+        document.getElementById("canvasContainer").classList.remove("active");
+    }
+    
+    function validarDibujo() {
         if (authCompleted) return;
         
-        const inputElement = document.getElementById("claveInput");
-        const claveIngresada = inputElement.value.trim().toUpperCase();
-        const statusDiv = document.getElementById("authStatus");
+        const autorizado = verificarPalabraSI();
         
-        if (claveIngresada === CLAVE_CORRECTA) {
+        if (autorizado) {
             authCompleted = true;
+            const statusDiv = document.getElementById("authStatus");
             statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ACCESO AUTORIZADO';
             statusDiv.className = "status-badge acceso-autorizado";
             
@@ -685,42 +769,125 @@
                 }, 500);
             }, 800);
         } else {
+            const statusDiv = document.getElementById("authStatus");
             statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> ACCESO DENEGADO';
             statusDiv.className = "status-badge acceso-denegado";
             
             setTimeout(() => {
-                limpiarInput();
                 statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando validación...';
                 statusDiv.className = "status-badge";
             }, 1500);
         }
     }
     
-    function limpiarInput() {
-        document.getElementById("claveInput").value = "";
-        document.getElementById("claveInput").focus();
+    function verificarPalabraSI() {
+        if (points.length < 40) return false;
+        
+        // Obtener bounding box del dibujo completo
+        let minX = canvas.width, maxX = 0, minY = canvas.height, maxY = 0;
+        for (const p of points) {
+            minX = Math.min(minX, p.x);
+            maxX = Math.max(maxX, p.x);
+            minY = Math.min(minY, p.y);
+            maxY = Math.max(maxY, p.y);
+        }
+        
+        const anchoTotal = maxX - minX;
+        const altoTotal = maxY - minY;
+        
+        // Verificar tamaño suficiente
+        if (anchoTotal < canvas.width * 0.4) return false;
+        
+        // Dividir el ancho en dos mitades (S e I)
+        const mitadX = (minX + maxX) / 2;
+        
+        // Puntos de la izquierda (S) y derecha (I)
+        let puntosIzquierda = points.filter(p => p.x < mitadX);
+        let puntosDerecha = points.filter(p => p.x > mitadX);
+        
+        if (puntosIzquierda.length < 20 || puntosDerecha.length < 20) return false;
+        
+        // ============================================
+        // VERIFICAR 'S' (izquierda) - forma de serpiente
+        // ============================================
+        let minYIzq = canvas.height, maxYIzq = 0;
+        for (const p of puntosIzquierda) {
+            minYIzq = Math.min(minYIzq, p.y);
+            maxYIzq = Math.max(maxYIzq, p.y);
+        }
+        
+        const altoIzq = maxYIzq - minYIzq;
+        if (altoIzq < canvas.height * 0.3) return false;
+        
+        // Verificar que tiene curvas (sube y baja)
+        let cambiosDireccion = 0;
+        let direccionAnterior = 0;
+        
+        puntosIzquierda.sort((a, b) => a.x - b.x);
+        
+        for (let i = 10; i < puntosIzquierda.length; i++) {
+            const dy = puntosIzquierda[i].y - puntosIzquierda[i-5].y;
+            const direccion = dy > 0 ? 1 : -1;
+            if (direccion !== direccionAnterior && direccionAnterior !== 0) {
+                cambiosDireccion++;
+            }
+            direccionAnterior = direccion;
+        }
+        
+        const tieneCurvas = cambiosDireccion >= 2;
+        
+        // ============================================
+        // VERIFICAR 'I' (derecha) - línea vertical
+        // ============================================
+        let minYDerecha = canvas.height, maxYDerecha = 0;
+        for (const p of puntosDerecha) {
+            minYDerecha = Math.min(minYDerecha, p.y);
+            maxYDerecha = Math.max(maxYDerecha, p.y);
+        }
+        
+        const altoDer = maxYDerecha - minYDerecha;
+        if (altoDer < canvas.height * 0.3) return false;
+        
+        // Verificar que la 'I' es mayormente vertical
+        let sumaHorizontal = 0, sumaVertical = 0;
+        puntosDerecha.sort((a, b) => a.y - b.y);
+        
+        for (let i = 1; i < puntosDerecha.length; i++) {
+            sumaHorizontal += Math.abs(puntosDerecha[i].x - puntosDerecha[i-1].x);
+            sumaVertical += Math.abs(puntosDerecha[i].y - puntosDerecha[i-1].y);
+        }
+        
+        const esVertical = sumaVertical > sumaHorizontal * 2;
+        
+        // ============================================
+        // RESULTADO
+        // ============================================
+        return tieneCurvas && esVertical;
     }
     
-    function limpiarTodo() {
-        if (authCompleted) return;
-        document.getElementById("claveInput").value = "";
-        document.getElementById("claveInput").focus();
+    function limpiarCanvas() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Dibujar línea guía tenue
+        ctx.beginPath();
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 1;
+        ctx.setLineDash([5, 5]);
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        ctx.setLineDash([]);
+        
+        points = [];
+        drawing = false;
+        
         const statusDiv = document.getElementById("authStatus");
         statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando validación...';
         statusDiv.className = "status-badge";
     }
     
-    // Evento para Enter en el input
-    document.getElementById("claveInput").addEventListener("keypress", function(e) {
-        if (e.key === "Enter") {
-            e.preventDefault();
-            validarAcceso();
-        }
-    });
-    
     // Eventos UI
-    document.getElementById("validarBtn").addEventListener("click", validarAcceso);
-    document.getElementById("clearBtn").addEventListener("click", limpiarTodo);
+    document.getElementById("validarBtn").addEventListener("click", validarDibujo);
+    document.getElementById("clearBtn").addEventListener("click", limpiarCanvas);
     document.getElementById("openModalBtn").addEventListener("click", abrirModalNueva);
     document.getElementById("cancelModalBtn").addEventListener("click", cerrarModal);
     document.getElementById("saveNoteBtn").addEventListener("click", guardarNotaModal);
@@ -729,10 +896,8 @@
         if (e.target === document.getElementById("noteModal")) cerrarModal();
     });
     
-    // Enfocar el input al cargar
-    setTimeout(() => {
-        document.getElementById("claveInput").focus();
-    }, 100);
+    // Iniciar canvas
+    initCanvas();
 </script>
 </body>
 </html>
