@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
-<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KeepClone · Acceso con Cara Feliz</title>
+    <title>KeepClone</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -37,7 +36,7 @@
 
         .auth-card {
             background: white;
-            max-width: 650px;
+            max-width: 600px;
             width: 90%;
             border-radius: 2rem;
             padding: 2rem;
@@ -49,27 +48,6 @@
         @keyframes fadeUp {
             from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
-        }
-
-        .auth-icon {
-            font-size: 3rem;
-            color: #667eea;
-            margin-bottom: 1rem;
-        }
-
-        h2 {
-            font-size: 1.8rem;
-            margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-        }
-
-        .subtitle {
-            color: #6b7280;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
         }
 
         .canvas-container {
@@ -89,7 +67,7 @@
         canvas {
             display: block;
             width: 100%;
-            max-width: 550px;
+            max-width: 500px;
             margin: 0 auto;
             background: white;
             border-radius: 1rem;
@@ -98,81 +76,43 @@
             touch-action: none;
         }
 
-        .status-badge {
-            background: #f1f3f4;
-            padding: 12px 20px;
-            border-radius: 60px;
-            font-size: 1rem;
-            font-weight: 500;
-            margin: 1rem 0;
-            transition: all 0.3s;
-        }
-
-        .guia-box {
-            background: #e8f0fe;
-            padding: 12px;
-            border-radius: 1rem;
-            margin: 10px 0;
-            font-size: 0.85rem;
-            color: #1a73e8;
-            display: none;
-            animation: slideDown 0.3s ease;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .guia-box i {
-            margin-right: 8px;
-        }
-
-        .btn-validar {
-            background: linear-gradient(135deg, #10b981, #059669);
-            border: none;
-            color: white;
-            font-weight: 600;
-            padding: 14px 24px;
-            border-radius: 40px;
-            cursor: pointer;
-            font-size: 1rem;
-            margin-top: 8px;
-            width: 100%;
-            transition: all 0.2s;
-        }
-
-        .btn-validar:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(16,185,129,0.4);
-        }
-
-        .btn-auth {
+        .btn-candado {
             background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
             color: white;
-            font-weight: 600;
-            padding: 14px 24px;
-            border-radius: 40px;
+            font-size: 2rem;
+            padding: 15px;
+            border-radius: 60px;
             cursor: pointer;
-            font-size: 1rem;
-            margin-top: 12px;
-            width: 100%;
+            width: 80px;
+            height: 80px;
+            margin-top: 20px;
             transition: all 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
-        .btn-auth:hover {
-            transform: scale(1.02);
-            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        .btn-candado:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 28px rgba(102,126,234,0.4);
         }
 
         .btn-reset {
             background: #6b7280;
-            margin-top: 8px;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            padding: 12px;
+            border-radius: 50px;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            margin-top: 10px;
+            transition: all 0.2s;
         }
 
         .btn-reset:hover {
             background: #4b5563;
+            transform: scale(1.05);
         }
 
         .app-container {
@@ -414,8 +354,6 @@
         }
 
         .acceso-denegado {
-            background: #fee2e2;
-            color: #dc2626;
             animation: shake 0.3s ease;
         }
 
@@ -425,9 +363,12 @@
             75% { transform: translateX(5px); }
         }
 
-        .acceso-autorizado {
-            background: #d1fae5;
-            color: #065f46;
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
         }
     </style>
 </head>
@@ -436,31 +377,18 @@
 <!-- Pantalla de autenticación -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
-        <div class="auth-icon">
-            <i class="fas fa-smile-wink"></i>
-        </div>
-        <h2>Bienvenido</h2>
-        <p class="subtitle">Realiza la acción requerida</p>
-
         <div class="canvas-container" id="canvasContainer">
-            <canvas id="drawCanvas" width="550" height="300"></canvas>
+            <canvas id="drawCanvas" width="500" height="300"></canvas>
         </div>
 
-        <div id="authStatus" class="status-badge">
-            <i class="fas fa-shield-alt"></i> Esperando validación...
+        <div class="button-group">
+            <button id="validarBtn" class="btn-candado">
+                <i class="fas fa-lock"></i>
+            </button>
+            <button id="clearBtn" class="btn-reset">
+                <i class="fas fa-trash-alt"></i>
+            </button>
         </div>
-
-        <div id="guiaBox" class="guia-box">
-            <i class="fas fa-lightbulb"></i> Consejo: Dibuja una cara feliz en el recuadro (círculo, dos ojos y una sonrisa)
-        </div>
-
-        <button id="validarBtn" class="btn-validar">
-            <i class="fas fa-check-circle"></i> Validar acceso
-        </button>
-
-        <button id="clearBtn" class="btn-auth btn-reset">
-            <i class="fas fa-undo-alt"></i> Limpiar dibujo
-        </button>
     </div>
 </div>
 
@@ -469,11 +397,11 @@
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone</h1>
         <div class="user-info">
-            <i class="fas fa-check-circle" style="color:#10b981"></i> Acceso autorizado
+            <i class="fas fa-check-circle" style="color:#10b981"></i>
         </div>
     </div>
     <div class="info-bar">
-        <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas</span>
+        <span><i class="fas fa-database"></i> <span id="noteCount">0</span></span>
         <button id="openModalBtn" class="btn-add">
             <i class="fas fa-plus"></i> Nueva nota
         </button>
@@ -482,7 +410,7 @@
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Sistema de autorización seguro
+        🔐
     </footer>
 </div>
 
@@ -507,12 +435,11 @@
     
     let notas = [];
     let editingId = null;
-    let intentosFallidos = 0;
     
     const NOTAS_EJEMPLO = [
         { id: "nota1", title: "📌 Bienvenido", content: "Acceso autorizado correctamente." },
         { id: "nota2", title: "📝 Nota de ejemplo", content: "Puedes editar o eliminar esta nota." },
-        { id: "nota3", title: "➕ Crear notas", content: "Usa el botón 'Nueva nota' para agregar contenido." }
+        { id: "nota3", title: "➕ Crear notas", content: "Usa el botón '+' para agregar contenido." }
     ];
     
     function cargarNotas() {
@@ -546,7 +473,7 @@
         notas.unshift(nuevaNota);
         guardarNotas();
         renderizarNotas();
-        mostrarToast("✅ Nota agregada");
+        mostrarToast("✅");
     }
     
     function editarNota(id, newTitle, newContent) {
@@ -556,16 +483,16 @@
             notas[index].content = newContent || "";
             guardarNotas();
             renderizarNotas();
-            mostrarToast("✏️ Nota editada");
+            mostrarToast("✏️");
         }
     }
     
     function eliminarNota(id) {
-        if (confirm("¿Eliminar esta nota?")) {
+        if (confirm("¿Eliminar?")) {
             notas = notas.filter(n => n.id !== id);
             guardarNotas();
             renderizarNotas();
-            mostrarToast("🗑️ Nota eliminada");
+            mostrarToast("🗑️");
         }
     }
     
@@ -577,9 +504,8 @@
             container.innerHTML = `
                 <div style="background:white; border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
                     <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                    <p style="color: #6b7280;">No hay notas</p>
                     <button class="btn-add" style="margin-top: 1rem;" onclick="document.getElementById('openModalBtn').click()">
-                        <i class="fas fa-plus"></i> Crear nota
+                        <i class="fas fa-plus"></i>
                     </button>
                 </div>
             `;
@@ -592,10 +518,10 @@
                 <div class="note-content">${escapeHtml(nota.content)}</div>
                 <div class="note-actions">
                     <button class="btn-edit" onclick="abrirModalEditar('${nota.id}')">
-                        <i class="fas fa-edit"></i> Editar
+                        <i class="fas fa-edit"></i>
                     </button>
                     <button class="btn-delete" onclick="eliminarNota('${nota.id}')">
-                        <i class="fas fa-trash-alt"></i> Eliminar
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </div>
@@ -606,7 +532,7 @@
         const nota = notas.find(n => n.id === id);
         if (nota) {
             editingId = id;
-            document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar nota';
+            document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i>';
             document.getElementById("noteTitle").value = nota.title;
             document.getElementById("noteContent").value = nota.content;
             document.getElementById("editingId").value = id;
@@ -616,7 +542,7 @@
     
     function abrirModalNueva() {
         editingId = null;
-        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Nueva nota';
+        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i>';
         document.getElementById("noteTitle").value = "";
         document.getElementById("noteContent").value = "";
         document.getElementById("editingId").value = "";
@@ -646,7 +572,7 @@
         toast.className = 'toast';
         toast.innerHTML = mensaje;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => toast.remove(), 2000);
     }
     
     function escapeHtml(str) {
@@ -661,7 +587,7 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CARA FELIZ
+    // AUTENTICACIÓN CARA FELIZ - SIN TEXTOS
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
@@ -671,7 +597,7 @@
     let authCompleted = false;
     
     function initCanvas() {
-        canvas.width = 550;
+        canvas.width = 500;
         canvas.height = 300;
         
         ctx.fillStyle = "white";
@@ -767,23 +693,11 @@
         document.getElementById("canvasContainer").classList.remove("active");
     }
     
-    function mostrarGuia() {
-        const guiaBox = document.getElementById("guiaBox");
-        guiaBox.style.display = "block";
-        setTimeout(() => {
-            guiaBox.style.display = "none";
-        }, 5000);
-    }
-    
     function validarDibujo() {
         if (authCompleted) return;
         
         if (points.length < 30) {
-            intentosFallidos++;
-            if (intentosFallidos >= 1) {
-                mostrarGuia();
-            }
-            mostrarDenegado();
+            animarDenegado();
             return;
         }
         
@@ -791,10 +705,6 @@
         
         if (autorizado) {
             authCompleted = true;
-            const statusDiv = document.getElementById("authStatus");
-            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ACCESO AUTORIZADO';
-            statusDiv.className = "status-badge acceso-autorizado";
-            
             setTimeout(() => {
                 document.getElementById("authOverlay").style.opacity = "0";
                 setTimeout(() => {
@@ -802,29 +712,22 @@
                     document.getElementById("appMain").style.display = "block";
                     cargarNotas();
                 }, 500);
-            }, 800);
+            }, 300);
         } else {
-            intentosFallidos++;
-            if (intentosFallidos >= 1) {
-                mostrarGuia();
-            }
-            mostrarDenegado();
+            animarDenegado();
         }
     }
     
-    function mostrarDenegado() {
-        const statusDiv = document.getElementById("authStatus");
-        statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> ACCESO DENEGADO';
-        statusDiv.className = "status-badge acceso-denegado";
-        
+    function animarDenegado() {
+        const btn = document.getElementById("validarBtn");
+        btn.classList.add("acceso-denegado");
         setTimeout(() => {
-            statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando validación...';
-            statusDiv.className = "status-badge";
-        }, 1500);
+            btn.classList.remove("acceso-denegado");
+        }, 300);
     }
     
     function verificarCaraFeliz() {
-        // Buscar círculo (cabeza)
+        // Centro del dibujo
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -833,7 +736,7 @@
         centroX /= points.length;
         centroY /= points.length;
         
-        // Calcular distancias al centro
+        // Distancias al centro
         let distancias = [];
         for (const p of points) {
             distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
@@ -843,23 +746,17 @@
         let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
         let coeficiente = variacion / radioPromedio;
         
-        const tieneCirculo = coeficiente < 0.45 && radioPromedio > 50;
+        const tieneCirculo = coeficiente < 0.45 && radioPromedio > 40;
         
-        // Buscar ojos (dos puntos en la parte superior)
-        let puntosSuperiores = points.filter(p => p.y < centroY - 10);
+        // Ojos (puntos arriba)
+        let puntosSuperiores = points.filter(p => p.y < centroY - 15);
         let tieneOjos = puntosSuperiores.length >= 2;
         
-        // Buscar sonrisa (curva en la parte inferior)
-        let puntosInferiores = points.filter(p => p.y > centroY + 10);
+        // Sonrisa (curva abajo)
+        let puntosInferiores = points.filter(p => p.y > centroY + 15);
         let tieneSonrisa = puntosInferiores.length >= 5;
         
-        // Una cara feliz necesita círculo y al menos uno de los otros elementos
-        const resultado = tieneCirculo && (tieneOjos || tieneSonrisa);
-        
-        // Debug
-        console.log("Círculo: " + tieneCirculo + " | Ojos: " + tieneOjos + " | Sonrisa: " + tieneSonrisa);
-        
-        return resultado;
+        return tieneCirculo && (tieneOjos || tieneSonrisa);
     }
     
     function limpiarCanvas() {
@@ -867,17 +764,9 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         points = [];
         drawing = false;
-        intentosFallidos = 0;
-        
-        const statusDiv = document.getElementById("authStatus");
-        statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando validación...';
-        statusDiv.className = "status-badge";
-        
-        const guiaBox = document.getElementById("guiaBox");
-        guiaBox.style.display = "none";
     }
     
-    // Eventos UI
+    // Eventos
     document.getElementById("validarBtn").addEventListener("click", validarDibujo);
     document.getElementById("clearBtn").addEventListener("click", limpiarCanvas);
     document.getElementById("openModalBtn").addEventListener("click", abrirModalNueva);
@@ -888,7 +777,6 @@
         if (e.target === document.getElementById("noteModal")) cerrarModal();
     });
     
-    // Iniciar canvas
     initCanvas();
 </script>
 </body>
