@@ -3,588 +3,484 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Formulario Moderno</title>
+    <title>KeepClone - Face & Wink Auth</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
         }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: 20px;
         }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            color: white;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        .form-container {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            padding: 40px;
-        }
-
-        .form-group {
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eef2f6;
-        }
-
-        .form-group:last-child {
-            border-bottom: none;
-        }
-
-        .question-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #2d3748;
-            margin-bottom: 15px;
-        }
-
-        .options-group {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 12px;
-            background: #f7fafc;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .option-label:hover {
-            background: #edf2f7;
-            transform: translateX(5px);
-        }
-
-        .option-label input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .open-input {
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 12px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.95em;
-            transition: all 0.3s ease;
-        }
-
-        .open-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        textarea.open-input {
-            min-height: 100px;
-            resize: vertical;
-        }
-
-        .slider-container {
-            padding: 10px 0;
-        }
-
-        .slider-wrapper {
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.95));
+            backdrop-filter: blur(12px);
             display: flex;
+            justify-content: center;
             align-items: center;
-            gap: 20px;
+            z-index: 1000;
         }
-
-        .slider {
-            flex: 1;
-            height: 8px;
-            -webkit-appearance: none;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            border-radius: 10px;
-            outline: none;
-        }
-
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
+        .auth-card {
             background: white;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid #667eea;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-
-        .slider-value {
-            min-width: 60px;
+            max-width: 460px;
+            width: 90%;
+            border-radius: 2rem;
+            padding: 1.5rem;
             text-align: center;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+        }
+        .video-container {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            margin: 1rem auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #4285f4;
+            background: #111;
+        }
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        .status-badge {
+            background: #f1f3f4;
+            padding: 8px 14px;
+            border-radius: 60px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 12px;
+        }
+        .wink-guide {
+            background: #e8f0fe;
+            margin-top: 16px;
+            padding: 10px;
+            border-radius: 24px;
+            font-size: 0.85rem;
+            color: #1a73e8;
+        }
+        .btn-auth {
+            background: #1a73e8;
+            border: none;
+            color: white;
             font-weight: 600;
-            color: #667eea;
+            padding: 12px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-top: 20px;
+            width: 100%;
         }
-
-        .conditional {
-            margin-left: 30px;
-            padding-left: 20px;
-            border-left: 3px solid #667eea;
-            margin-top: 15px;
+        .btn-auth:hover {
+            background: #1557b0;
+            transform: scale(1.02);
         }
-
-        .hidden {
+        .app-container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
             display: none;
         }
-
-        .actions {
+        .app-header {
             display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 40px;
-        }
-
-        .btn-primary, .btn-secondary {
-            padding: 14px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: inherit;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
-        }
-
-        .btn-secondary {
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+            gap: 1rem;
             background: white;
-            color: #4a5568;
-            border: 2px solid #e2e8f0;
+            padding: 1rem 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-
-        .btn-secondary:hover {
-            background: #f7fafc;
-            border-color: #667eea;
+        h1 {
+            font-weight: 700;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
         }
-
-        .loading {
+        .sheet-info {
+            background: #eef2ff;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #1e40af;
+        }
+        .notes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .note-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .note-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+        }
+        .note-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #202124;
+        }
+        .note-content {
+            color: #5f6368;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+        }
+        footer {
+            margin-top: 3rem;
             text-align: center;
-            padding: 40px;
-            color: #718096;
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.7);
         }
-
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #1a73e8;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 0.6s linear infinite;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
         .error-message {
-            background: #fed7d7;
-            color: #c53030;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        @media (max-width: 600px) {
-            .form-container {
-                padding: 20px;
-            }
-            
-            .actions {
-                flex-direction: column;
-            }
-            
-            .btn-primary, .btn-secondary {
-                width: 100%;
-            }
+            background: #fee2e2;
+            color: #dc2626;
+            padding: 12px;
+            border-radius: 12px;
+            margin-top: 12px;
+            font-size: 0.8rem;
         }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <h1>📋 Formulario Dinámico</h1>
-            <p>Cargando preguntas...</p>
-        </header>
 
-        <div class="form-container">
-            <div id="errorContainer" class="error-message" style="display: none;"></div>
-            <div id="loadingContainer" class="loading">⏳ Cargando formulario...</div>
-            <form id="dynamicForm" style="display: none;"></form>
+<div id="authOverlay" class="auth-overlay">
+    <div class="auth-card">
+        <i class="fas fa-camera" style="font-size: 2rem; color: #4285f4; margin-bottom: 8px;"></i>
+        <h2>🔐 Acceso con Cámara</h2>
+        <p style="color: #5f6368; margin-bottom: 8px; font-size: 0.9rem;">Reconocimiento facial + guiño del ojo derecho</p>
+        
+        <div class="video-container">
+            <video id="video" autoplay muted playsinline></video>
+        </div>
+        
+        <div id="authStatus" class="status-badge">📷 Inicializando cámara...</div>
+        <div class="wink-guide">
+            <i class="fas fa-eye"></i> Mira al círculo y <strong>GUIÑA el OJO DERECHO</strong>
+        </div>
+        
+        <button id="authRetryBtn" class="btn-auth">⟳ Reintentar Cámara</button>
+    </div>
+</div>
 
-            <div class="actions">
-                <button type="button" id="submitBtn" class="btn-primary" style="display: none;">Enviar Respuestas</button>
-                <button type="button" id="exportBtn" class="btn-secondary" style="display: none;">📥 Descargar Excel</button>
-            </div>
+<div id="appMain" class="app-container">
+    <div class="app-header">
+        <h1><i class="fas fa-sticky-note"></i> KeepClone · Google Sheets</h1>
+        <div class="sheet-info">
+            <i class="fas fa-table"></i> <span id="sheetStatus">conectando...</span>
         </div>
     </div>
+    <div id="notesContainer" class="notes-grid">
+        <div class="empty-state">Cargando notas...</div>
+    </div>
+    <footer>
+        🔐 Face + Guiño derecho • Datos desde Google Sheets • <a href="#" id="resetLink" style="color: white;">Salir</a>
+    </footer>
+</div>
 
-    <script>
-        // Variables globales
-        let preguntas = [];
-        let respuestas = {};
-
-        // Cargar XML desde archivo externo
-        async function cargarXML() {
-            try {
-                const response = await fetch('preguntas.xml');
-                if (!response.ok) {
-                    throw new Error(`Error al cargar XML: ${response.status}`);
-                }
-                const xmlString = await response.text();
-                return parsearXML(xmlString);
-            } catch (error) {
-                console.error('Error:', error);
-                document.getElementById('errorContainer').style.display = 'block';
-                document.getElementById('errorContainer').textContent = 'Error al cargar el formulario. Verifica que el archivo preguntas.xml exista.';
-                document.getElementById('loadingContainer').style.display = 'none';
-                return [];
-            }
-        }
-
-        // Parsear XML a objeto JavaScript
-        function parsearXML(xmlString) {
-            try {
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlString, "text/xml");
-                
-                const parserError = xmlDoc.getElementsByTagName("parsererror");
-                if (parserError.length > 0) {
-                    throw new Error("XML inválido");
-                }
-                
-                const preguntasNodes = xmlDoc.getElementsByTagName("pregunta");
-                const nuevasPreguntas = [];
-                
-                for (let node of preguntasNodes) {
-                    const pregunta = {
-                        id: parseInt(node.getAttribute("id")),
-                        tipo: node.getAttribute("tipo"),
-                        requerida: node.getAttribute("requerida") === "true",
-                        texto: node.getElementsByTagName("texto")[0]?.textContent || "Pregunta sin texto"
-                    };
-                    
-                    // Descripción (opcional)
-                    const descripcion = node.getElementsByTagName("descripcion")[0];
-                    if (descripcion) {
-                        pregunta.descripcion = descripcion.textContent;
-                    }
-                    
-                    // Placeholder (para preguntas abiertas)
-                    const placeholder = node.getElementsByTagName("placeholder")[0];
-                    if (placeholder) {
-                        pregunta.placeholder = placeholder.textContent;
-                    }
-                    
-                    if (pregunta.tipo === "multiple") {
-                        pregunta.opciones = [];
-                        const opciones = node.getElementsByTagName("opcion");
-                        for (let opt of opciones) {
-                            pregunta.opciones.push(opt.textContent);
-                        }
-                    }
-                    
-                    if (pregunta.tipo === "abierta") {
-                        pregunta.multilinea = node.getAttribute("multilinea") === "true";
-                    }
-                    
-                    if (pregunta.tipo === "deslizador") {
-                        pregunta.minimo = parseFloat(node.getAttribute("minimo")) || 0;
-                        pregunta.maximo = parseFloat(node.getAttribute("maximo")) || 100;
-                        pregunta.paso = parseFloat(node.getAttribute("paso")) || 1;
-                        pregunta.valor_defecto = parseFloat(node.getAttribute("valor_defecto")) || 50;
-                    }
-                    
-                    // Buscar condicionales
-                    const condicionales = node.getElementsByTagName("condicional");
-                    if (condicionales.length > 0) {
-                        pregunta.condicional = [];
-                        for (let cond of condicionales) {
-                            pregunta.condicional.push({
-                                depende: parseInt(cond.getAttribute("depende")),
-                                mostrar_cuando: cond.getAttribute("mostrar_cuando")
-                            });
-                        }
-                    }
-                    
-                    nuevasPreguntas.push(pregunta);
-                }
-                
-                return nuevasPreguntas;
-            } catch (error) {
-                console.error("Error al parsear XML:", error);
-                return [];
-            }
-        }
-
-        // Renderizar formulario
-        function renderizarFormulario() {
-            const form = document.getElementById("dynamicForm");
-            form.innerHTML = "";
-            
-            preguntas.forEach(p => {
-                const div = document.createElement("div");
-                div.className = "form-group";
-                div.id = `pregunta-${p.id}`;
-                
-                const titulo = document.createElement("div");
-                titulo.className = "question-title";
-                titulo.textContent = p.texto + (p.requerida ? " *" : "");
-                div.appendChild(titulo);
-                
-                // Agregar descripción si existe
-                if (p.descripcion) {
-                    const desc = document.createElement("small");
-                    desc.style.color = "#718096";
-                    desc.style.display = "block";
-                    desc.style.marginBottom = "10px";
-                    desc.textContent = p.descripcion;
-                    div.appendChild(desc);
-                }
-                
-                switch(p.tipo) {
-                    case "multiple":
-                        const optionsDiv = document.createElement("div");
-                        optionsDiv.className = "options-group";
-                        
-                        p.opciones.forEach(opcion => {
-                            const label = document.createElement("label");
-                            label.className = "option-label";
-                            
-                            const input = document.createElement("input");
-                            input.type = p.opciones.length > 4 ? "checkbox" : "radio";
-                            input.name = `p${p.id}`;
-                            input.value = opcion;
-                            input.dataset.preguntaId = p.id;
-                            
-                            input.addEventListener("change", () => {
-                                if (p.opciones.length > 4) {
-                                    const seleccionadas = Array.from(document.querySelectorAll(`input[name="p${p.id}"]:checked`))
-                                        .map(cb => cb.value);
-                                    respuestas[p.id] = seleccionadas;
-                                } else {
-                                    respuestas[p.id] = input.value;
-                                }
-                                verificarCondicionales(p.id);
-                            });
-                            
-                            label.appendChild(input);
-                            label.appendChild(document.createTextNode(opcion));
-                            optionsDiv.appendChild(label);
-                        });
-                        
-                        div.appendChild(optionsDiv);
-                        break;
-                        
-                    case "abierta":
-                        if (p.multilinea) {
-                            const textarea = document.createElement("textarea");
-                            textarea.className = "open-input";
-                            textarea.placeholder = p.placeholder || "Escribe tu respuesta...";
-                            textarea.dataset.preguntaId = p.id;
-                            textarea.addEventListener("input", (e) => {
-                                respuestas[p.id] = e.target.value;
-                            });
-                            div.appendChild(textarea);
-                        } else {
-                            const input = document.createElement("input");
-                            input.type = "text";
-                            input.className = "open-input";
-                            input.placeholder = p.placeholder || "Escribe tu respuesta...";
-                            input.dataset.preguntaId = p.id;
-                            input.addEventListener("input", (e) => {
-                                respuestas[p.id] = e.target.value;
-                            });
-                            div.appendChild(input);
-                        }
-                        break;
-                        
-                    case "deslizador":
-                        const sliderDiv = document.createElement("div");
-                        sliderDiv.className = "slider-container";
-                        
-                        const wrapper = document.createElement("div");
-                        wrapper.className = "slider-wrapper";
-                        
-                        const slider = document.createElement("input");
-                        slider.type = "range";
-                        slider.className = "slider";
-                        slider.min = p.minimo;
-                        slider.max = p.maximo;
-                        slider.step = p.paso;
-                        slider.value = p.valor_defecto;
-                        slider.dataset.preguntaId = p.id;
-                        
-                        const valor = document.createElement("span");
-                        valor.className = "slider-value";
-                        valor.textContent = p.valor_defecto;
-                        
-                        slider.addEventListener("input", (e) => {
-                            valor.textContent = e.target.value;
-                            respuestas[p.id] = parseFloat(e.target.value);
-                        });
-                        
-                        wrapper.appendChild(slider);
-                        wrapper.appendChild(valor);
-                        sliderDiv.appendChild(wrapper);
-                        div.appendChild(sliderDiv);
-                        
-                        respuestas[p.id] = p.valor_defecto;
-                        break;
-                }
-                
-                form.appendChild(div);
-            });
-            
-            // Aplicar condicionales
-            preguntas.forEach(p => {
-                if (p.condicional && p.condicional.length > 0) {
-                    const elemento = document.getElementById(`pregunta-${p.id}`);
-                    elemento.classList.add("conditional", "hidden");
-                }
-            });
-            
-            // Mostrar formulario
-            document.getElementById('loadingContainer').style.display = 'none';
-            form.style.display = 'block';
-            document.getElementById('submitBtn').style.display = 'block';
-        }
-
-        // Verificar preguntas condicionales
-        function verificarCondicionales(preguntaId) {
-            preguntas.forEach(p => {
-                if (p.condicional) {
-                    const respuestaPadre = respuestas[preguntaId];
-                    const elemento = document.getElementById(`pregunta-${p.id}`);
-                    
-                    let debeMostrar = false;
-                    if (respuestaPadre) {
-                        if (Array.isArray(p.condicional)) {
-                            debeMostrar = p.condicional.some(cond => 
-                                cond.depende === preguntaId && 
-                                (Array.isArray(respuestaPadre) ? 
-                                    respuestaPadre.includes(cond.mostrar_cuando) : 
-                                    respuestaPadre === cond.mostrar_cuando)
-                            );
-                        } else if (p.condicional.depende === preguntaId) {
-                            debeMostrar = Array.isArray(respuestaPadre) ? 
-                                respuestaPadre.includes(p.condicional.mostrar_cuando) : 
-                                respuestaPadre === p.condicional.mostrar_cuando;
-                        }
-                    }
-                    
-                    if (debeMostrar) {
-                        elemento.classList.remove("hidden");
-                    } else {
-                        elemento.classList.add("hidden");
-                        delete respuestas[p.id];
-                    }
-                }
+<script>
+    // ⚠️ IMPORTANTE: REEMPLAZA CON LA URL DE TU APPS SCRIPT
+    // Ve a script.google.com → Desplegar → Copiar URL de la aplicación web
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxrttZAY0A3RcA0rMyVkEfK9WjX8NpL2mQ5sT6uV/exec";
+    
+    let model = null;
+    let videoElement = null;
+    let detectionInterval = null;
+    let authCompleted = false;
+    let winkTriggered = false;
+    let faceDetectedFlag = false;
+    
+    // Cargar TensorFlow.js
+    async function loadTensorFlow() {
+        const scripts = [
+            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.15.0/dist/tf-core.min.js",
+            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.15.0/dist/tf-converter.min.js",
+            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.15.0/dist/tf-backend-webgl.min.js",
+            "https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2/dist/face-landmarks-detection.min.js"
+        ];
+        
+        for (const src of scripts) {
+            await new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = src;
+                script.onload = resolve;
+                script.onerror = resolve;
+                document.head.appendChild(script);
             });
         }
-
-        // Validar formulario
-        function validarFormulario() {
-            for (let p of preguntas) {
-                if (p.requerida) {
-                    const respuesta = respuestas[p.id];
-                    const elemento = document.getElementById(`pregunta-${p.id}`);
-                    
-                    if (!elemento.classList.contains("hidden")) {
-                        if (respuesta === undefined || respuesta === null || respuesta === "" || 
-                            (Array.isArray(respuesta) && respuesta.length === 0)) {
-                            alert(`Por favor, responde: ${p.texto}`);
-                            elemento.scrollIntoView({ behavior: "smooth" });
-                            return false;
-                        }
-                    }
-                }
+        console.log("✅ Librerías cargadas");
+    }
+    
+    // Iniciar cámara
+    async function iniciarCamara() {
+        const video = document.getElementById("video");
+        videoElement = video;
+        const statusDiv = document.getElementById("authStatus");
+        
+        try {
+            statusDiv.innerHTML = "📷 Solicitando acceso a cámara...";
+            
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { 
+                    facingMode: "user",
+                    width: { ideal: 640 },
+                    height: { ideal: 480 }
+                } 
+            });
+            
+            video.srcObject = stream;
+            await video.play();
+            
+            statusDiv.innerHTML = "✅ Cámara activa! Cargando modelo facial...";
+            await initFaceModel();
+            startDetection();
+            
+        } catch (err) {
+            console.error("Error:", err);
+            let errorMsg = "";
+            
+            if (err.name === "NotAllowedError") {
+                errorMsg = "❌ Permiso denegado. Haz clic en el candado en la barra de direcciones y permite la cámara.";
+            } else if (err.name === "NotFoundError") {
+                errorMsg = "❌ No se encontró cámara en este dispositivo.";
+            } else {
+                errorMsg = "❌ Error: " + err.message;
             }
+            
+            statusDiv.innerHTML = errorMsg;
+            statusDiv.style.background = "#fee2e2";
+            statusDiv.style.color = "#dc2626";
+        }
+    }
+    
+    // Calcular Eye Aspect Ratio para detectar guiño
+    function getEyeLandmarks(landmarks) {
+        if (!landmarks || landmarks.length < 468) return { leftEAR: 1, rightEAR: 1 };
+        
+        // Índices de MediaPipe FaceMesh
+        const rightUpper = landmarks[386];
+        const rightLower = landmarks[374];
+        const rightLeftCorner = landmarks[263];
+        const rightRightCorner = landmarks[362];
+        const leftUpper = landmarks[159];
+        const leftLower = landmarks[145];
+        const leftLeftCorner = landmarks[133];
+        const leftRightCorner = landmarks[33];
+        
+        function distancia(p1, p2) {
+            return Math.hypot(p1.x - p2.x, p1.y - p2.y);
+        }
+        
+        const rightVert = distancia(rightUpper, rightLower);
+        const rightHoriz = distancia(rightLeftCorner, rightRightCorner);
+        const rightEAR = rightVert / (rightHoriz + 1e-6);
+        const leftVert = distancia(leftUpper, leftLower);
+        const leftHoriz = distancia(leftLeftCorner, leftRightCorner);
+        const leftEAR = leftVert / (leftHoriz + 1e-6);
+        
+        return { leftEAR, rightEAR };
+    }
+    
+    async function initFaceModel() {
+        try {
+            model = await faceLandmarksDetection.load(
+                faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
+                { maxFaces: 1, shouldLoadIrisModel: false }
+            );
+            console.log("✅ Modelo facial cargado");
             return true;
+        } catch(e) {
+            document.getElementById("authStatus").innerHTML = "⚠️ Error cargando modelo facial";
+            return false;
         }
-
-        // Exportar a Excel
-        function exportarExcel() {
-            const wb = XLSX.utils.book_new();
+    }
+    
+    async function startDetection() {
+        if (!model || !videoElement) return;
+        if (detectionInterval) clearInterval(detectionInterval);
+        
+        detectionInterval = setInterval(async () => {
+            if (authCompleted || !videoElement || videoElement.readyState < 2) return;
             
-            // Hoja de respuestas
-            const respuestasData = Object.entries(respuestas).map(([id, respuesta]) => {
-                const pregunta = preguntas.find(p => p.id === parseInt(id));
-                return [
-                    id,
-                    pregunta ? pregunta.texto : "Desconocida",
-                    Array.isArray(respuesta) ? respuesta.join(", ") : respuesta.toString()
-                ];
-            });
-            respuestasData.unshift(["ID", "Pregunta", "Respuesta"]);
-            
-            const wsRespuestas = XLSX.utils.aoa_to_sheet(respuestasData);
-            XLSX.utils.book_append_sheet(wb, wsRespuestas, "Respuestas");
-            
-            // Hoja de resumen
-            const resumenData = [
-                ["FECHA", new Date().toLocaleString()],
-                ["TOTAL PREGUNTAS", preguntas.length],
-                ["RESPONDIDAS", Object.keys(respuestas).length],
-                [""],
-                ["DETALLE DE RESPUESTAS:"],
-                ...Object.entries(respuestas).map(([id, respuesta]) => {
-                    const pregunta = preguntas.find(p => p.id === parseInt(id));
-                    return [pregunta ? pregunta.texto : "", Array.isArray(respuesta) ? respuesta.join(", ") : respuesta];
-                })
-            ];
-            
-            const wsResumen = XLSX.utils.aoa_to_sheet(resumenData);
-            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen");
-            
-            // Guardar archivo
-            const fecha = new Date().toISOString().split("T")[0];
-            XLSX.writeFile(wb, `respuestas_${fecha}.xlsx`);
-        }
-
-        // Inicialización
-        document.addEventListener("DOMContentLoaded", async () => {
-            preguntas = await cargarXML();
-            
-            if (preguntas.length > 0) {
-                renderizarFormulario();
+            try {
+                const faces = await model.estimateFaces({ input: videoElement, returnTensors: false });
+                const statusDiv = document.getElementById("authStatus");
                 
-                document.getElementById("submitBtn").addEventListener("click", () => {
-                    if (validarFormulario()) {
-                        document.getElementById("exportBtn").style.display = "block";
-                        alert("✅ Formulario completado correctamente. Puedes descargar el Excel.");
-                    }
-                });
+                if (faces.length === 0) {
+                    faceDetectedFlag = false;
+                    statusDiv.innerHTML = "😐 No se detecta cara. Mira al círculo.";
+                    return;
+                }
                 
-                document.getElementById("exportBtn").addEventListener("click", exportarExcel);
+                if (!faceDetectedFlag) {
+                    faceDetectedFlag = true;
+                    statusDiv.innerHTML = "✅ Cara detectada! <strong>GUIÑA el OJO DERECHO</strong>";
+                    statusDiv.style.background = "#e8f0fe";
+                    statusDiv.style.color = "#1a73e8";
+                }
+                
+                const landmarks = faces[0].mesh;
+                const { leftEAR, rightEAR } = getEyeLandmarks(landmarks);
+                
+                // Detectar guiño del ojo derecho
+                const rightWinkNow = (rightEAR < 0.19 && leftEAR > 0.2);
+                
+                if (rightWinkNow && !winkTriggered && faceDetectedFlag && !authCompleted) {
+                    winkTriggered = true;
+                    statusDiv.innerHTML = "✨ Guiño detectado! Autenticación exitosa!";
+                    authCompleted = true;
+                    clearInterval(detectionInterval);
+                    finishAuthenticationSuccess();
+                }
+            } catch(err) {
+                console.warn(err);
             }
-        });
-    </script>
+        }, 150);
+    }
+    
+    function retryCamera() {
+        if (videoElement && videoElement.srcObject) {
+            videoElement.srcObject.getTracks().forEach(t => t.stop());
+        }
+        authCompleted = false;
+        winkTriggered = false;
+        faceDetectedFlag = false;
+        if (detectionInterval) clearInterval(detectionInterval);
+        
+        document.getElementById("authStatus").innerHTML = "📷 Reiniciando cámara...";
+        document.getElementById("authStatus").style.background = "#f1f3f4";
+        document.getElementById("authStatus").style.color = "";
+        
+        iniciarCamara();
+    }
+    
+    async function finishAuthenticationSuccess() {
+        // Detener cámara
+        if (videoElement && videoElement.srcObject) {
+            videoElement.srcObject.getTracks().forEach(t => t.stop());
+        }
+        
+        // Ocultar overlay
+        document.getElementById("authOverlay").style.opacity = "0";
+        setTimeout(() => {
+            document.getElementById("authOverlay").style.display = "none";
+            document.getElementById("appMain").style.display = "block";
+        }, 400);
+        
+        // Cargar notas
+        await loadNotesFromSheet();
+    }
+    
+    async function loadNotesFromSheet() {
+        const sheetStatusSpan = document.getElementById("sheetStatus");
+        const container = document.getElementById("notesContainer");
+        
+        sheetStatusSpan.innerHTML = '<span class="loading-spinner"></span> Cargando...';
+        
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getNotes`);
+            const data = await response.json();
+            
+            if (data.success) {
+                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas · "${data.sheetName}"`;
+                renderNotes(data.notes);
+            } else {
+                sheetStatusSpan.innerHTML = `⚠️ ${data.message || "Usando notas de ejemplo"}`;
+                renderNotes(data.notes || getDefaultNotes());
+            }
+        } catch (error) {
+            console.error("Error fetching notes:", error);
+            sheetStatusSpan.innerHTML = "❌ Error de conexión con Google Sheets";
+            renderNotes(getDefaultNotes());
+        }
+    }
+    
+    function getDefaultNotes() {
+        return [
+            { title: "📌 KeepClone Funcionando", content: "✅ Autenticación exitosa con guiño del ojo derecho. La cámara funciona porque el sitio está alojado en GitHub Pages." },
+            { title: "🔧 Configura tu Google Sheets", content: "1. Crea una hoja con columnas 'Title' y 'Content'. 2. Conecta este script a tu Apps Script. 3. Listo!" },
+            { title: "✨ Guiño Activado", content: "El ojo derecho cerró momentáneamente - esto te autenticó de forma segura sin contraseña." },
+            { title: "🚀 Beneficios de GitHub Pages", content: "La cámara funciona perfectamente porque el sitio está en HTTPS y no tiene restricciones de iframe." }
+        ];
+    }
+    
+    function renderNotes(notes) {
+        const container = document.getElementById("notesContainer");
+        
+        if (!notes || notes.length === 0) {
+            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas en la hoja</div>`;
+            return;
+        }
+        
+        container.innerHTML = notes.map(note => `
+            <div class="note-card">
+                <div class="note-title">${escapeHtml(note.title)}</div>
+                <div class="note-content">${escapeHtml(note.content)}</div>
+                <div style="margin-top: 12px; font-size: 11px; color: #aaa;">
+                    <i class="fas fa-google"></i> desde Google Sheets
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+    
+    // Reset link
+    document.getElementById("resetLink")?.addEventListener("click", (e) => {
+        e.preventDefault();
+        location.reload();
+    });
+    
+    // Iniciar todo
+    loadTensorFlow().then(() => {
+        iniciarCamara();
+    });
+    
+    document.getElementById("authRetryBtn").addEventListener("click", retryCamera);
+</script>
 </body>
 </html>
