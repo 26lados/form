@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KeepClone · Circulo + Google Sheets</title>
+    <title>KeepClone · Notas con XML</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -195,7 +195,7 @@
             color: #1e40af;
         }
 
-        .sheet-info {
+        .info-bar {
             background: #fef3c7;
             padding: 8px 16px;
             border-radius: 40px;
@@ -229,7 +229,7 @@
 
         .notes-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 1.5rem;
         }
 
@@ -252,6 +252,7 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: #202124;
+            word-break: break-word;
         }
 
         .note-content {
@@ -259,9 +260,45 @@
             font-size: 0.9rem;
             line-height: 1.5;
             white-space: pre-wrap;
+            word-break: break-word;
+            margin-bottom: 1rem;
         }
 
-        /* Modal para agregar nota */
+        .note-actions {
+            display: flex;
+            gap: 0.8rem;
+            justify-content: flex-end;
+            border-top: 1px solid #e5e7eb;
+            padding-top: 0.8rem;
+        }
+
+        .note-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: all 0.2s;
+        }
+
+        .btn-edit {
+            color: #3b82f6;
+        }
+
+        .btn-edit:hover {
+            background: #eff6ff;
+        }
+
+        .btn-delete {
+            color: #ef4444;
+        }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+        }
+
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -350,16 +387,6 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .success-animation {
-            animation: pulse 0.5s ease;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); background: #d1fae5; }
-            100% { transform: scale(1); }
-        }
-
         .toast {
             position: fixed;
             bottom: 30px;
@@ -377,6 +404,11 @@
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            .auth-card { padding: 1.2rem; }
+            .notes-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -417,13 +449,13 @@
 <!-- App principal -->
 <div id="appMain" class="app-container">
     <div class="app-header">
-        <h1><i class="fas fa-sticky-note"></i> KeepClone · Google Sheets</h1>
+        <h1><i class="fas fa-sticky-note"></i> KeepClone · Notas XML</h1>
         <div class="user-info">
             <i class="fas fa-check-circle" style="color:#10b981"></i> Círculo verificado
         </div>
     </div>
-    <div class="sheet-info">
-        <span><i class="fas fa-table"></i> <span id="sheetStatus">Conectando...</span></span>
+    <div class="info-bar">
+        <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas guardadas</span>
         <button id="openModalBtn" class="btn-add">
             <i class="fas fa-plus"></i> Nueva nota
         </button>
@@ -432,16 +464,17 @@
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Autenticación por círculo • Las notas se guardan en Google Sheets
+        🔐 Autenticación por círculo • Las notas se guardan en XML • Puedes editar y eliminar
     </footer>
 </div>
 
-<!-- Modal para agregar nota -->
+<!-- Modal para agregar/editar nota -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
-        <h3><i class="fas fa-plus-circle"></i> Nueva nota</h3>
+        <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva nota</h3>
         <input type="text" id="noteTitle" placeholder="Título de la nota" maxlength="100">
         <textarea id="noteContent" placeholder="Contenido de la nota..."></textarea>
+        <input type="hidden" id="editingId" value="">
         <div class="modal-buttons">
             <button class="btn-cancel" id="cancelModalBtn">Cancelar</button>
             <button class="btn-save" id="saveNoteBtn">Guardar nota</button>
@@ -450,16 +483,214 @@
 </div>
 
 <script>
-    // CONFIGURACIÓN - REEMPLAZA CON LA URL DE TU APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwQNXtZmtUclsKwzOsCzC42YH_KI3xBTjBfhkMe4CFdH0MzcxmI--GemxvJ0hElEMoK/exec";
+    // ============================================
+    // GESTIÓN DE NOTAS CON XML (localStorage)
+    // ============================================
     
-    // Variables del canvas
+    let notas = [];
+    let editingId = null;
+    
+    // Notas de ejemplo en formato XML (simulado)
+    const NOTAS_EJEMPLO = [
+        { id: "nota1", title: "📌 Bienvenido a KeepClone", content: "Dibuja un círculo para acceder a tus notas.\n\nLas notas se guardan automáticamente en XML (localStorage).\n\n✅ Puedes editar\n✅ Puedes eliminar\n✅ Siempre estarán aquí" },
+        { id: "nota2", title: "✨ Cómo dibujar el círculo", content: "1. Usa tu dedo o ratón\n2. Traza un círculo en el recuadro\n3. Debe ser redondo y centrado\n4. ¡Autenticación exitosa!" },
+        { id: "nota3", title: "📝 Ejemplo de nota", content: "Esta es una nota de ejemplo. Puedes:\n\n• Editar el contenido\n• Eliminar esta nota\n• Crear nuevas notas\n\n¡Todas se guardan automáticamente!" },
+        { id: "nota4", title: "💡 Tips", content: "• El círculo debe ser continuo\n• Cerca del centro del recuadro\n• Tamaño adecuado (ni muy pequeño ni muy grande)\n• Si fallas, usa el botón 'Limpiar'" }
+    ];
+    
+    // Cargar notas desde localStorage (XML simulado)
+    function cargarNotasXML() {
+        const guardado = localStorage.getItem('keepclone_notas_xml');
+        
+        if (guardado) {
+            notas = JSON.parse(guardado);
+        } else {
+            // Cargar notas de ejemplo
+            notas = [...NOTAS_EJEMPLO];
+            guardarNotasXML();
+        }
+        
+        renderizarNotas();
+        actualizarContador();
+    }
+    
+    // Guardar notas en localStorage (como XML simulado)
+    function guardarNotasXML() {
+        localStorage.setItem('keepclone_notas_xml', JSON.stringify(notas));
+        actualizarContador();
+    }
+    
+    // Exportar a formato XML (simulado)
+    function exportarXML() {
+        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
+        xml += '<notas>\n';
+        notas.forEach(nota => {
+            xml += `  <nota id="${nota.id}">\n`;
+            xml += `    <title>${escapeXML(nota.title)}</title>\n`;
+            xml += `    <content>${escapeXML(nota.content)}</content>\n`;
+            xml += `  </nota>\n`;
+        });
+        xml += '</notas>';
+        return xml;
+    }
+    
+    function escapeXML(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
+    }
+    
+    function actualizarContador() {
+        const countSpan = document.getElementById("noteCount");
+        if (countSpan) countSpan.textContent = notas.length;
+    }
+    
+    // Agregar nueva nota
+    function agregarNota(title, content) {
+        const nuevaNota = {
+            id: Date.now().toString(),
+            title: title || "Sin título",
+            content: content || ""
+        };
+        notas.unshift(nuevaNota);
+        guardarNotasXML();
+        renderizarNotas();
+        mostrarToast("✅ Nota agregada correctamente");
+    }
+    
+    // Editar nota
+    function editarNota(id, newTitle, newContent) {
+        const index = notas.findIndex(n => n.id === id);
+        if (index !== -1) {
+            notas[index].title = newTitle || "Sin título";
+            notas[index].content = newContent || "";
+            guardarNotasXML();
+            renderizarNotas();
+            mostrarToast("✏️ Nota editada correctamente");
+        }
+    }
+    
+    // Eliminar nota
+    function eliminarNota(id) {
+        if (confirm("¿Eliminar esta nota?")) {
+            notas = notas.filter(n => n.id !== id);
+            guardarNotasXML();
+            renderizarNotas();
+            mostrarToast("🗑️ Nota eliminada");
+        }
+    }
+    
+    function renderizarNotas() {
+        const container = document.getElementById("notesContainer");
+        
+        if (!container) return;
+        
+        if (notas.length === 0) {
+            container.innerHTML = `
+                <div style="background:white; border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
+                    <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                    <p style="color: #6b7280;">No hay notas aún</p>
+                    <button class="btn-add" style="margin-top: 1rem;" onclick="document.getElementById('openModalBtn').click()">
+                        <i class="fas fa-plus"></i> Crear tu primera nota
+                    </button>
+                </div>
+            `;
+            return;
+        }
+        
+        container.innerHTML = notas.map(nota => `
+            <div class="note-card">
+                <div class="note-title">${escapeHtml(nota.title)}</div>
+                <div class="note-content">${escapeHtml(nota.content)}</div>
+                <div class="note-actions">
+                    <button class="btn-edit" onclick="abrirModalEditar('${nota.id}')">
+                        <i class="fas fa-edit"></i> Editar
+                    </button>
+                    <button class="btn-delete" onclick="eliminarNota('${nota.id}')">
+                        <i class="fas fa-trash-alt"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+    
+    function abrirModalEditar(id) {
+        const nota = notas.find(n => n.id === id);
+        if (nota) {
+            editingId = id;
+            document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar nota';
+            document.getElementById("noteTitle").value = nota.title;
+            document.getElementById("noteContent").value = nota.content;
+            document.getElementById("editingId").value = id;
+            document.getElementById("noteModal").style.display = "flex";
+        }
+    }
+    
+    function abrirModalNueva() {
+        editingId = null;
+        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Nueva nota';
+        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteContent").value = "";
+        document.getElementById("editingId").value = "";
+        document.getElementById("noteModal").style.display = "flex";
+    }
+    
+    function guardarNotaModal() {
+        const title = document.getElementById("noteTitle").value.trim();
+        const content = document.getElementById("noteContent").value.trim();
+        const editId = document.getElementById("editingId").value;
+        
+        if (!title && !content) {
+            mostrarToast("⚠️ Escribe al menos un título o contenido");
+            return;
+        }
+        
+        if (editId) {
+            editarNota(editId, title || "Sin título", content);
+        } else {
+            agregarNota(title || "Sin título", content);
+        }
+        
+        cerrarModal();
+    }
+    
+    function cerrarModal() {
+        document.getElementById("noteModal").style.display = "none";
+    }
+    
+    function mostrarToast(mensaje) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = mensaje;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/\n/g, '<br>');
+    }
+    
+    // ============================================
+    // AUTENTICACIÓN CON CÍRCULO
+    // ============================================
+    
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
     let drawing = false;
     let points = [];
+    let authCompleted = false;
     
-    // Inicializar canvas para autenticación
     function initCanvas() {
         canvas.width = 400;
         canvas.height = 400;
@@ -467,7 +698,7 @@
         canvas.style.height = "auto";
         canvas.style.aspectRatio = "1/1";
         
-        limpiarCanvas();
+        limpiarCanvasAuth();
         
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -556,34 +787,42 @@
     }
     
     function endDrawing() {
-        if (!drawing) return;
+        if (!drawing || authCompleted) return;
         drawing = false;
         document.getElementById("canvasContainer").classList.remove("active");
         
-        const resultado = analizarCirculo();
+        if (points.length < 30) {
+            document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Sigue dibujando el círculo';
+            document.getElementById("authStatus").style.background = "#fef3c7";
+            return;
+        }
         
-        if (resultado.esCirculo) {
+        const esCirculo = detectarCirculo();
+        
+        if (esCirculo) {
+            authCompleted = true;
             const statusDiv = document.getElementById("authStatus");
             statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ ¡Círculo detectado! Accediendo...';
             statusDiv.style.background = "#d1fae5";
             statusDiv.style.color = "#065f46";
             
             setTimeout(() => {
-                finishAuthenticationSuccess();
-            }, 800);
+                document.getElementById("authOverlay").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("authOverlay").style.display = "none";
+                    document.getElementById("appMain").style.display = "block";
+                    cargarNotasXML();
+                }, 500);
+            }, 500);
         } else {
-            const statusDiv = document.getElementById("authStatus");
-            statusDiv.innerHTML = `<i class="fas fa-pencil-alt"></i> ${resultado.mensaje}`;
-            statusDiv.style.background = "#fef3c7";
-            statusDiv.style.color = "#92400e";
+            document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Intenta de nuevo. Dibuja un círculo redondo y centrado';
+            document.getElementById("authStatus").style.background = "#fee2e2";
+            document.getElementById("authStatus").style.color = "#dc2626";
+            points = [];
         }
     }
     
-    function analizarCirculo() {
-        if (points.length < 30) {
-            return { esCirculo: false, mensaje: "Continúa dibujando el círculo" };
-        }
-        
+    function detectarCirculo() {
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -594,11 +833,9 @@
         
         const centroCanvasX = canvas.width / 2;
         const centroCanvasY = canvas.height / 2;
-        const distanciaCentroCanvas = Math.hypot(centroX - centroCanvasX, centroY - centroCanvasY);
+        const distanciaCentro = Math.hypot(centroX - centroCanvasX, centroY - centroCanvasY);
         
-        if (distanciaCentroCanvas > canvas.width * 0.25) {
-            return { esCirculo: false, mensaje: "Centra el círculo en el recuadro" };
-        }
+        if (distanciaCentro > canvas.width * 0.25) return false;
         
         let distancias = [];
         for (const p of points) {
@@ -607,38 +844,14 @@
         
         let radioPromedio = distancias.reduce((a, b) => a + b, 0) / distancias.length;
         let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
-        let coeficienteVariacion = variacion / radioPromedio;
+        let coeficiente = variacion / radioPromedio;
         
-        let angulos = [];
-        for (const p of points) {
-            let angulo = Math.atan2(p.y - centroY, p.x - centroX);
-            if (angulo < 0) angulo += 2 * Math.PI;
-            angulos.push(angulo);
-        }
-        angulos.sort((a, b) => a - b);
+        if (radioPromedio < canvas.width * 0.15 || radioPromedio > canvas.width * 0.45) return false;
         
-        let cobertura = 0;
-        for (let i = 0; i < angulos.length - 1; i++) {
-            let diferencia = angulos[i + 1] - angulos[i];
-            if (diferencia < 0.5) cobertura += diferencia;
-        }
-        let ultimaDiferencia = (2 * Math.PI - angulos[angulos.length - 1] + angulos[0]);
-        if (ultimaDiferencia < 0.5) cobertura += ultimaDiferencia;
-        
-        let porcentajeCobertura = cobertura / (2 * Math.PI);
-        
-        if (coeficienteVariacion < 0.25 && porcentajeCobertura > 0.6) {
-            return { esCirculo: true, mensaje: "¡Círculo correcto!" };
-        } else if (coeficienteVariacion > 0.4) {
-            return { esCirculo: false, mensaje: "Dibuja un círculo más redondo" };
-        } else if (porcentajeCobertura < 0.6) {
-            return { esCirculo: false, mensaje: "Completa el círculo" };
-        }
-        
-        return { esCirculo: false, mensaje: "Sigue dibujando" };
+        return coeficiente < 0.28;
     }
     
-    function limpiarCanvas() {
+    function limpiarCanvasAuth() {
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         points = [];
@@ -646,7 +859,7 @@
         
         const centro = canvas.width / 2;
         ctx.beginPath();
-        ctx.arc(centro, centro, 120, 0, 2 * Math.PI);
+        ctx.arc(centro, centro, 130, 0, 2 * Math.PI);
         ctx.strokeStyle = "#e2e8f0";
         ctx.lineWidth = 2;
         ctx.setLineDash([8, 8]);
@@ -658,154 +871,18 @@
         document.getElementById("authStatus").style.color = "#6b7280";
     }
     
-    async function finishAuthenticationSuccess() {
-        document.getElementById("authOverlay").style.opacity = "0";
-        setTimeout(() => {
-            document.getElementById("authOverlay").style.display = "none";
-            document.getElementById("appMain").style.display = "block";
-        }, 500);
-        
-        await cargarNotas();
-    }
+    // Eventos UI
+    document.getElementById("clearBtn").addEventListener("click", limpiarCanvasAuth);
+    document.getElementById("openModalBtn").addEventListener("click", abrirModalNueva);
+    document.getElementById("cancelModalBtn").addEventListener("click", cerrarModal);
+    document.getElementById("saveNoteBtn").addEventListener("click", guardarNotaModal);
     
-    // ============================================
-    // FUNCIONES DE GOOGLE SHEETS (Leer y Escribir)
-    // ============================================
-    
-    async function cargarNotas() {
-        const sheetStatusSpan = document.getElementById("sheetStatus");
-        const container = document.getElementById("notesContainer");
-        
-        sheetStatusSpan.innerHTML = '<span class="loading-spinner"></span> Cargando...';
-        
-        try {
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=getNotes`);
-            const data = await response.json();
-            
-            if (data.success && data.notes && data.notes.length > 0) {
-                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas en Google Sheets`;
-                renderNotas(data.notes);
-            } else {
-                sheetStatusSpan.innerHTML = "📝 Conectado a Google Sheets";
-                renderNotas(data.notes || getNotasEjemplo());
-            }
-        } catch (error) {
-            console.error("Error:", error);
-            sheetStatusSpan.innerHTML = "📝 Modo local";
-            renderNotas(getNotasEjemplo());
-        }
-    }
-    
-    async function agregarNota(title, content) {
-        const sheetStatusSpan = document.getElementById("sheetStatus");
-        
-        try {
-            const response = await fetch(APPS_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'addNote',
-                    title: title,
-                    content: content
-                })
-            });
-            
-            mostrarToast("✅ Nota guardada en Google Sheets");
-            await cargarNotas();
-            
-        } catch (error) {
-            console.error("Error:", error);
-            mostrarToast("❌ Error al guardar. Revisa la conexión.");
-        }
-    }
-    
-    function mostrarToast(mensaje) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = mensaje;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
-    }
-    
-    function getNotasEjemplo() {
-        return [
-            { title: "📌 Bienvenido", content: "Dibuja un círculo para acceder. Tus notas se guardan en Google Sheets", fromSheet: false },
-            { title: "➕ Agregar notas", content: "Usa el botón '+ Nueva nota' para crear notas. Se guardan automáticamente.", fromSheet: false }
-        ];
-    }
-    
-    function renderNotas(notes) {
-        const container = document.getElementById("notesContainer");
-        
-        if (!notes || notes.length === 0) {
-            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas. ¡Crea tu primera nota!</div>`;
-            return;
-        }
-        
-        container.innerHTML = notes.map(note => `
-            <div class="note-card">
-                <div class="note-title">${escapeHtml(note.title)}</div>
-                <div class="note-content">${escapeHtml(note.content)}</div>
-                <div style="margin-top: 12px; font-size: 11px; color: #aaa;">
-                    <i class="fas fa-google"></i> ${note.fromSheet ? 'Google Sheets' : 'Ejemplo'}
-                </div>
-            </div>
-        `).join('');
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
-    }
-    
-    // Modal para agregar nota
-    const modal = document.getElementById("noteModal");
-    const openModalBtn = document.getElementById("openModalBtn");
-    const cancelModalBtn = document.getElementById("cancelModalBtn");
-    const saveNoteBtn = document.getElementById("saveNoteBtn");
-    
-    openModalBtn.addEventListener("click", () => {
-        document.getElementById("noteTitle").value = "";
-        document.getElementById("noteContent").value = "";
-        modal.style.display = "flex";
+    document.getElementById("noteModal").addEventListener("click", (e) => {
+        if (e.target === document.getElementById("noteModal")) cerrarModal();
     });
     
-    cancelModalBtn.addEventListener("click", () => {
-        modal.style.display = "none";
-    });
-    
-    saveNoteBtn.addEventListener("click", async () => {
-        const title = document.getElementById("noteTitle").value.trim();
-        const content = document.getElementById("noteContent").value.trim();
-        
-        if (!title && !content) {
-            mostrarToast("⚠️ Escribe al menos un título o contenido");
-            return;
-        }
-        
-        saveNoteBtn.disabled = true;
-        saveNoteBtn.innerHTML = '<span class="loading-spinner"></span> Guardando...';
-        
-        await agregarNota(title || "Sin título", content);
-        
-        saveNoteBtn.disabled = false;
-        saveNoteBtn.innerHTML = 'Guardar nota';
-        modal.style.display = "none";
-    });
-    
-    modal.addEventListener("click", (e) => {
-        if (e.target === modal) modal.style.display = "none";
-    });
-    
-    // Inicializar
+    // Iniciar
     initCanvas();
-    document.getElementById("clearBtn").addEventListener("click", limpiarCanvas);
 </script>
 </body>
 </html>
