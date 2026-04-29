@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KeepClone · Notas con XML</title>
+    <title>KeepClone · Acceso Seguro</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -19,7 +19,6 @@
             min-height: 100vh;
         }
 
-        /* Pantalla de autenticación */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -37,10 +36,10 @@
 
         .auth-card {
             background: white;
-            max-width: 550px;
+            max-width: 500px;
             width: 90%;
             border-radius: 2rem;
-            padding: 1.8rem;
+            padding: 2rem;
             text-align: center;
             box-shadow: 0 30px 50px rgba(0,0,0,0.4);
             animation: fadeUp 0.4s ease;
@@ -89,7 +88,7 @@
         canvas {
             display: block;
             width: 100%;
-            max-width: 400px;
+            max-width: 350px;
             margin: 0 auto;
             background: white;
             border-radius: 1rem;
@@ -98,31 +97,11 @@
             touch-action: none;
         }
 
-        .pattern-guide {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 1rem 0;
-            padding: 0.8rem;
-            background: #f3f4f6;
-            border-radius: 1rem;
-        }
-
-        .pattern-example {
-            text-align: center;
-            flex: 1;
-        }
-
-        .pattern-example svg {
-            width: 60px;
-            height: 60px;
-        }
-
         .status-badge {
             background: #f1f3f4;
-            padding: 10px 16px;
+            padding: 12px 20px;
             border-radius: 60px;
-            font-size: 0.85rem;
+            font-size: 1rem;
             font-weight: 500;
             margin: 1rem 0;
             transition: all 0.3s;
@@ -156,7 +135,6 @@
             background: #4b5563;
         }
 
-        /* App principal */
         .app-container {
             max-width: 1300px;
             margin: 0 auto;
@@ -239,7 +217,6 @@
             padding: 1.2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
-            position: relative;
         }
 
         .note-card:hover {
@@ -298,7 +275,6 @@
             background: #fef2f2;
         }
 
-        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -373,20 +349,6 @@
             color: rgba(255,255,255,0.7);
         }
 
-        .loading-spinner {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid #667eea;
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.6s linear infinite;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
-
         .toast {
             position: fixed;
             bottom: 30px;
@@ -410,6 +372,23 @@
             .auth-card { padding: 1.2rem; }
             .notes-grid { grid-template-columns: 1fr; }
         }
+
+        .acceso-denegado {
+            background: #fee2e2;
+            color: #dc2626;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .acceso-autorizado {
+            background: #d1fae5;
+            color: #065f46;
+        }
     </style>
 </head>
 <body>
@@ -418,30 +397,21 @@
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="auth-icon">
-            <i class="fas fa-circle"></i>
+            <i class="fas fa-lock"></i>
         </div>
-        <h2>Dibuja un Círculo ⭕</h2>
-        <p class="subtitle">Traza un círculo en el recuadro para ingresar</p>
+        <h2>Acceso Seguro</h2>
+        <p class="subtitle">Realiza la acción requerida</p>
 
         <div class="canvas-container" id="canvasContainer">
-            <canvas id="drawCanvas" width="400" height="400" style="width:100%; height:auto; max-width:400px; aspect-ratio:1/1"></canvas>
-        </div>
-
-        <div class="pattern-guide">
-            <div class="pattern-example">
-                <svg width="60" height="60" viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="20" stroke="#667eea" stroke-width="3" fill="none"/>
-                </svg>
-                <span>⭕ Círculo</span>
-            </div>
+            <canvas id="drawCanvas" width="350" height="350"></canvas>
         </div>
 
         <div id="authStatus" class="status-badge">
-            <i class="fas fa-pencil-alt"></i> Dibuja un círculo en el cuadro
+            <i class="fas fa-shield-alt"></i> Esperando autorización...
         </div>
 
         <button id="clearBtn" class="btn-auth btn-reset">
-            <i class="fas fa-eraser"></i> Limpiar
+            <i class="fas fa-undo-alt"></i> Reintentar
         </button>
     </div>
 </div>
@@ -449,13 +419,13 @@
 <!-- App principal -->
 <div id="appMain" class="app-container">
     <div class="app-header">
-        <h1><i class="fas fa-sticky-note"></i> KeepClone · Notas XML</h1>
+        <h1><i class="fas fa-sticky-note"></i> KeepClone</h1>
         <div class="user-info">
-            <i class="fas fa-check-circle" style="color:#10b981"></i> Círculo verificado
+            <i class="fas fa-check-circle" style="color:#10b981"></i> Acceso autorizado
         </div>
     </div>
     <div class="info-bar">
-        <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas guardadas</span>
+        <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas</span>
         <button id="openModalBtn" class="btn-add">
             <i class="fas fa-plus"></i> Nueva nota
         </button>
@@ -464,7 +434,7 @@
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Autenticación por círculo • Las notas se guardan en XML • Puedes editar y eliminar
+        🔐 Sistema de autorización seguro
     </footer>
 </div>
 
@@ -472,76 +442,45 @@
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva nota</h3>
-        <input type="text" id="noteTitle" placeholder="Título de la nota" maxlength="100">
-        <textarea id="noteContent" placeholder="Contenido de la nota..."></textarea>
+        <input type="text" id="noteTitle" placeholder="Título" maxlength="100">
+        <textarea id="noteContent" placeholder="Contenido"></textarea>
         <input type="hidden" id="editingId" value="">
         <div class="modal-buttons">
             <button class="btn-cancel" id="cancelModalBtn">Cancelar</button>
-            <button class="btn-save" id="saveNoteBtn">Guardar nota</button>
+            <button class="btn-save" id="saveNoteBtn">Guardar</button>
         </div>
     </div>
 </div>
 
 <script>
     // ============================================
-    // GESTIÓN DE NOTAS CON XML (localStorage)
+    // GESTIÓN DE NOTAS
     // ============================================
     
     let notas = [];
     let editingId = null;
     
-    // Notas de ejemplo en formato XML (simulado)
     const NOTAS_EJEMPLO = [
-        { id: "nota1", title: "📌 Bienvenido a KeepClone", content: "Dibuja un círculo para acceder a tus notas.\n\nLas notas se guardan automáticamente en XML (localStorage).\n\n✅ Puedes editar\n✅ Puedes eliminar\n✅ Siempre estarán aquí" },
-        { id: "nota2", title: "✨ Cómo dibujar el círculo", content: "1. Usa tu dedo o ratón\n2. Traza una bola en el recuadro\n3. Debe ser redondo y centrado\n4. ¡Autenticación exitosa!" },
-        { id: "nota3", title: "📝 Ejemplo de nota", content: "Esta es una nota de ejemplo. Puedes:\n\n• Editar el contenido\n• Eliminar esta nota\n• Crear nuevas notas\n\n¡Todas se guardan automáticamente!" },
-        { id: "nota4", title: "💡 Tips", content: "• El círculo debe ser continuo\n• Cerca del centro del recuadro\n• Tamaño adecuado (ni muy pequeño ni muy grande)\n• Si fallas, usa el botón 'Limpiar'" }
+        { id: "nota1", title: "📌 Bienvenido", content: "Acceso autorizado correctamente." },
+        { id: "nota2", title: "📝 Nota de ejemplo", content: "Puedes editar o eliminar esta nota." },
+        { id: "nota3", title: "➕ Crear notas", content: "Usa el botón 'Nueva nota' para agregar contenido." }
     ];
     
-    // Cargar notas desde localStorage (XML simulado)
-    function cargarNotasXML() {
-        const guardado = localStorage.getItem('keepclone_notas_xml');
-        
+    function cargarNotas() {
+        const guardado = localStorage.getItem('keepclone_notas');
         if (guardado) {
             notas = JSON.parse(guardado);
         } else {
-            // Cargar notas de ejemplo
             notas = [...NOTAS_EJEMPLO];
-            guardarNotasXML();
+            guardarNotas();
         }
-        
         renderizarNotas();
         actualizarContador();
     }
     
-    // Guardar notas en localStorage (como XML simulado)
-    function guardarNotasXML() {
-        localStorage.setItem('keepclone_notas_xml', JSON.stringify(notas));
+    function guardarNotas() {
+        localStorage.setItem('keepclone_notas', JSON.stringify(notas));
         actualizarContador();
-    }
-    
-    // Exportar a formato XML (simulado)
-    function exportarXML() {
-        let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
-        xml += '<notas>\n';
-        notas.forEach(nota => {
-            xml += `  <nota id="${nota.id}">\n`;
-            xml += `    <title>${escapeXML(nota.title)}</title>\n`;
-            xml += `    <content>${escapeXML(nota.content)}</content>\n`;
-            xml += `  </nota>\n`;
-        });
-        xml += '</notas>';
-        return xml;
-    }
-    
-    function escapeXML(str) {
-        if (!str) return "";
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
     }
     
     function actualizarContador() {
@@ -549,7 +488,6 @@
         if (countSpan) countSpan.textContent = notas.length;
     }
     
-    // Agregar nueva nota
     function agregarNota(title, content) {
         const nuevaNota = {
             id: Date.now().toString(),
@@ -557,28 +495,26 @@
             content: content || ""
         };
         notas.unshift(nuevaNota);
-        guardarNotasXML();
+        guardarNotas();
         renderizarNotas();
-        mostrarToast("✅ Nota agregada correctamente");
+        mostrarToast("✅ Nota agregada");
     }
     
-    // Editar nota
     function editarNota(id, newTitle, newContent) {
         const index = notas.findIndex(n => n.id === id);
         if (index !== -1) {
             notas[index].title = newTitle || "Sin título";
             notas[index].content = newContent || "";
-            guardarNotasXML();
+            guardarNotas();
             renderizarNotas();
-            mostrarToast("✏️ Nota editada correctamente");
+            mostrarToast("✏️ Nota editada");
         }
     }
     
-    // Eliminar nota
     function eliminarNota(id) {
         if (confirm("¿Eliminar esta nota?")) {
             notas = notas.filter(n => n.id !== id);
-            guardarNotasXML();
+            guardarNotas();
             renderizarNotas();
             mostrarToast("🗑️ Nota eliminada");
         }
@@ -586,16 +522,15 @@
     
     function renderizarNotas() {
         const container = document.getElementById("notesContainer");
-        
         if (!container) return;
         
         if (notas.length === 0) {
             container.innerHTML = `
                 <div style="background:white; border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
                     <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                    <p style="color: #6b7280;">No hay notas aún</p>
+                    <p style="color: #6b7280;">No hay notas</p>
                     <button class="btn-add" style="margin-top: 1rem;" onclick="document.getElementById('openModalBtn').click()">
-                        <i class="fas fa-plus"></i> Crear tu primera nota
+                        <i class="fas fa-plus"></i> Crear nota
                     </button>
                 </div>
             `;
@@ -644,11 +579,6 @@
         const content = document.getElementById("noteContent").value.trim();
         const editId = document.getElementById("editingId").value;
         
-        if (!title && !content) {
-            mostrarToast("⚠️ Escribe al menos un título o contenido");
-            return;
-        }
-        
         if (editId) {
             editarNota(editId, title || "Sin título", content);
         } else {
@@ -682,7 +612,7 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CON CÍRCULO
+    // AUTENTICACIÓN - SOLO AUTORIZADO/DENEGADO
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
@@ -692,13 +622,11 @@
     let authCompleted = false;
     
     function initCanvas() {
-        canvas.width = 400;
-        canvas.height = 400;
-        canvas.style.width = "100%";
-        canvas.style.height = "auto";
-        canvas.style.aspectRatio = "1/1";
+        canvas.width = 350;
+        canvas.height = 350;
         
-        limpiarCanvasAuth();
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
@@ -723,7 +651,6 @@
         points = [{ x, y }];
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x, y);
         ctx.stroke();
         document.getElementById("canvasContainer").classList.add("active");
     }
@@ -735,7 +662,6 @@
         points = [{ x, y }];
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x, y);
         ctx.stroke();
         document.getElementById("canvasContainer").classList.add("active");
     }
@@ -791,38 +717,38 @@
         drawing = false;
         document.getElementById("canvasContainer").classList.remove("active");
         
-        if (points.length < 30) {
-            document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Sigue dibujando el círculo';
-            document.getElementById("authStatus").style.background = "#fef3c7";
-            return;
-        }
+        const autorizado = verificarAutorizacion();
         
-        const esCirculo = detectarCirculo();
-        
-        if (esCirculo) {
+        if (autorizado) {
             authCompleted = true;
             const statusDiv = document.getElementById("authStatus");
-            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ ¡Círculo detectado! Accediendo...';
-            statusDiv.style.background = "#d1fae5";
-            statusDiv.style.color = "#065f46";
+            statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ACCESO AUTORIZADO';
+            statusDiv.className = "status-badge acceso-autorizado";
             
             setTimeout(() => {
                 document.getElementById("authOverlay").style.opacity = "0";
                 setTimeout(() => {
                     document.getElementById("authOverlay").style.display = "none";
                     document.getElementById("appMain").style.display = "block";
-                    cargarNotasXML();
+                    cargarNotas();
                 }, 500);
-            }, 500);
+            }, 800);
         } else {
-            document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Intenta de nuevo. Dibuja un círculo redondo y centrado';
-            document.getElementById("authStatus").style.background = "#fee2e2";
-            document.getElementById("authStatus").style.color = "#dc2626";
-            points = [];
+            const statusDiv = document.getElementById("authStatus");
+            statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> ACCESO DENEGADO';
+            statusDiv.className = "status-badge acceso-denegado";
+            
+            setTimeout(() => {
+                limpiarCanvasAuth();
+                statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando autorización...';
+                statusDiv.className = "status-badge";
+            }, 1500);
         }
     }
     
-    function detectarCirculo() {
+    function verificarAutorizacion() {
+        if (points.length < 40) return false;
+        
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -848,7 +774,7 @@
         
         if (radioPromedio < canvas.width * 0.15 || radioPromedio > canvas.width * 0.45) return false;
         
-        return coeficiente < 0.28;
+        return coeficiente < 0.3;
     }
     
     function limpiarCanvasAuth() {
@@ -857,18 +783,9 @@
         points = [];
         drawing = false;
         
-        const centro = canvas.width / 2;
-        ctx.beginPath();
-        ctx.arc(centro, centro, 130, 0, 2 * Math.PI);
-        ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([8, 8]);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        
-        document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Dibuja un círculo en el cuadro';
-        document.getElementById("authStatus").style.background = "#f1f3f4";
-        document.getElementById("authStatus").style.color = "#6b7280";
+        const statusDiv = document.getElementById("authStatus");
+        statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando autorización...';
+        statusDiv.className = "status-badge";
     }
     
     // Eventos UI
