@@ -36,7 +36,7 @@
 
         .auth-card {
             background: white;
-            max-width: 550px;
+            max-width: 600px;
             width: 90%;
             border-radius: 2rem;
             padding: 2rem;
@@ -88,7 +88,7 @@
         canvas {
             display: block;
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             margin: 0 auto;
             background: white;
             border-radius: 1rem;
@@ -422,7 +422,7 @@
         <p class="subtitle">Realiza la acción requerida</p>
 
         <div class="canvas-container" id="canvasContainer">
-            <canvas id="drawCanvas" width="400" height="300"></canvas>
+            <canvas id="drawCanvas" width="500" height="300"></canvas>
         </div>
 
         <div id="authStatus" class="status-badge">
@@ -635,7 +635,7 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN DIBUJANDO LA PALABRA "SI"
+    // AUTENTICACIÓN DIBUJANDO "SI" (FLEXIBLE)
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
@@ -645,23 +645,15 @@
     let authCompleted = false;
     
     function initCanvas() {
-        canvas.width = 400;
+        canvas.width = 500;
         canvas.height = 300;
         
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Dibujar línea guía tenue (opcional, ayuda a centrar)
-        ctx.beginPath();
-        ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]);
-        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-        ctx.setLineDash([]);
-        
         ctx.lineCap = "round";
         ctx.lineJoin = "round";
-        ctx.lineWidth = 8;
+        ctx.lineWidth = 6;
         ctx.strokeStyle = "#667eea";
         
         canvas.addEventListener("mousedown", startDrawing);
@@ -752,7 +744,18 @@
     function validarDibujo() {
         if (authCompleted) return;
         
-        const autorizado = verificarPalabraSI();
+        if (points.length < 30) {
+            const statusDiv = document.getElementById("authStatus");
+            statusDiv.innerHTML = '<i class="fas fa-times-circle"></i> ACCESO DENEGADO';
+            statusDiv.className = "status-badge acceso-denegado";
+            setTimeout(() => {
+                statusDiv.innerHTML = '<i class="fas fa-shield-alt"></i> Esperando validación...';
+                statusDiv.className = "status-badge";
+            }, 1500);
+            return;
+        }
+        
+        const autorizado = verificarPalabraSIFlexible();
         
         if (autorizado) {
             authCompleted = true;
@@ -780,10 +783,10 @@
         }
     }
     
-    function verificarPalabraSI() {
+    function verificarPalabraSIFlexible() {
         if (points.length < 40) return false;
         
-        // Obtener bounding box del dibujo completo
+        // Obtener bounding box
         let minX = canvas.width, maxX = 0, minY = canvas.height, maxY = 0;
         for (const p of points) {
             minX = Math.min(minX, p.x);
@@ -795,88 +798,87 @@
         const anchoTotal = maxX - minX;
         const altoTotal = maxY - minY;
         
-        // Verificar tamaño suficiente
-        if (anchoTotal < canvas.width * 0.4) return false;
+        // Verificar que el dibujo ocupa al menos 40% del ancho
+        if (anchoTotal < canvas.width * 0.35) return false;
         
-        // Dividir el ancho en dos mitades (S e I)
+        // Dividir en dos mitades (izquierda = S, derecha = I)
         const mitadX = (minX + maxX) / 2;
         
-        // Puntos de la izquierda (S) y derecha (I)
         let puntosIzquierda = points.filter(p => p.x < mitadX);
         let puntosDerecha = points.filter(p => p.x > mitadX);
         
-        if (puntosIzquierda.length < 20 || puntosDerecha.length < 20) return false;
+        // Debe haber puntos en ambos lados
+        if (puntosIzquierda.length < 15 || puntosDerecha.length < 15) return false;
         
         // ============================================
-        // VERIFICAR 'S' (izquierda) - forma de serpiente
+        // VERIFICAR 'S' (FLEXIBLE)
         // ============================================
-        let minYIzq = canvas.height, maxYIzq = 0;
-        for (const p of puntosIzquierda) {
-            minYIzq = Math.min(minYIzq, p.y);
-            maxYIzq = Math.max(maxYIzq, p.y);
-        }
+        let tieneSCorrecta = false;
         
-        const altoIzq = maxYIzq - minYIzq;
-        if (altoIzq < canvas.height * 0.3) return false;
-        
-        // Verificar que tiene curvas (sube y baja)
-        let cambiosDireccion = 0;
-        let direccionAnterior = 0;
-        
+        // Ordenar por X
         puntosIzquierda.sort((a, b) => a.x - b.x);
         
-        for (let i = 10; i < puntosIzquierda.length; i++) {
+        // Verificar cambios de dirección en Y (para detectar curvas)
+        let cambiosY = 0;
+        let ultimaDireccion = 0;
+        
+        for (let i = 5; i < puntosIzquierda.length; i++) {
             const dy = puntosIzquierda[i].y - puntosIzquierda[i-5].y;
-            const direccion = dy > 0 ? 1 : -1;
-            if (direccion !== direccionAnterior && direccionAnterior !== 0) {
-                cambiosDireccion++;
+            const direccion = dy > 0 ? 1 : (dy < 0 ? -1 : 0);
+            if (direccion !== 0 && direccion !== ultimaDireccion && ultimaDireccion !== 0) {
+                cambiosY++;
             }
-            direccionAnterior = direccion;
+            if (direccion !== 0) ultimaDireccion = direccion;
         }
         
-        const tieneCurvas = cambiosDireccion >= 2;
+        // Una S tiene al menos 2 cambios de dirección (sube, baja, sube)
+        tieneSCorrecta = cambiosY >= 2;
         
         // ============================================
-        // VERIFICAR 'I' (derecha) - línea vertical
+        // VERIFICAR 'I' (FLEXIBLE)
         // ============================================
-        let minYDerecha = canvas.height, maxYDerecha = 0;
-        for (const p of puntosDerecha) {
-            minYDerecha = Math.min(minYDerecha, p.y);
-            maxYDerecha = Math.max(maxYDerecha, p.y);
-        }
+        let tieneICorrecta = false;
         
-        const altoDer = maxYDerecha - minYDerecha;
-        if (altoDer < canvas.height * 0.3) return false;
-        
-        // Verificar que la 'I' es mayormente vertical
-        let sumaHorizontal = 0, sumaVertical = 0;
+        // Ordenar por Y
         puntosDerecha.sort((a, b) => a.y - b.y);
         
+        // Calcular relación vertical/horizontal
+        let movHorizontal = 0;
+        let movVertical = 0;
+        
         for (let i = 1; i < puntosDerecha.length; i++) {
-            sumaHorizontal += Math.abs(puntosDerecha[i].x - puntosDerecha[i-1].x);
-            sumaVertical += Math.abs(puntosDerecha[i].y - puntosDerecha[i-1].y);
+            movHorizontal += Math.abs(puntosDerecha[i].x - puntosDerecha[i-1].x);
+            movVertical += Math.abs(puntosDerecha[i].y - puntosDerecha[i-1].y);
         }
         
-        const esVertical = sumaVertical > sumaHorizontal * 2;
+        // Es vertical si el movimiento vertical es al menos 2 veces el horizontal
+        const esVertical = movVertical > movHorizontal * 1.5;
+        
+        // Verificar altura de la I
+        let minYDer = canvas.height, maxYDer = 0;
+        for (const p of puntosDerecha) {
+            minYDer = Math.min(minYDer, p.y);
+            maxYDer = Math.max(maxYDer, p.y);
+        }
+        
+        const alturaI = maxYDer - minYDer;
+        const alturaOK = alturaI > canvas.height * 0.25;
+        
+        tieneICorrecta = esVertical && alturaOK;
         
         // ============================================
-        // RESULTADO
+        // RESULTADO FLEXIBLE
         // ============================================
-        return tieneCurvas && esVertical;
+        
+        // Para debug (opcional - ver en consola)
+        console.log("S: cambios=" + cambiosY + " | I: vertical=" + esVertical + " altura=" + Math.round(alturaI));
+        
+        return tieneSCorrecta && tieneICorrecta;
     }
     
     function limpiarCanvas() {
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Dibujar línea guía tenue
-        ctx.beginPath();
-        ctx.strokeStyle = "#e2e8f0";
-        ctx.lineWidth = 1;
-        ctx.setLineDash([5, 5]);
-        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-        ctx.setLineDash([]);
-        
         points = [];
         drawing = false;
         
