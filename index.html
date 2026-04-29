@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KeepClone · Autenticación con Círculo</title>
+    <title>KeepClone · Circulo + Google Sheets</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -19,6 +19,7 @@
             min-height: 100vh;
         }
 
+        /* Pantalla de autenticación */
         .auth-overlay {
             position: fixed;
             top: 0;
@@ -117,13 +118,6 @@
             height: 60px;
         }
 
-        .pattern-example span {
-            font-size: 0.7rem;
-            color: #6b7280;
-            display: block;
-            margin-top: 0.25rem;
-        }
-
         .status-badge {
             background: #f1f3f4;
             padding: 10px 16px;
@@ -162,6 +156,7 @@
             background: #4b5563;
         }
 
+        /* App principal */
         .app-container {
             max-width: 1300px;
             margin: 0 auto;
@@ -208,6 +203,28 @@
             font-weight: 500;
             color: #92400e;
             margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .btn-add:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
         }
 
         .notes-grid {
@@ -222,6 +239,7 @@
             padding: 1.2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
+            position: relative;
         }
 
         .note-card:hover {
@@ -241,6 +259,74 @@
             font-size: 0.9rem;
             line-height: 1.5;
             white-space: pre-wrap;
+        }
+
+        /* Modal para agregar nota */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .modal-content textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #f3f4f6;
+            color: #6b7280;
         }
 
         footer {
@@ -274,18 +360,29 @@
             100% { transform: scale(1); }
         }
 
-        /* Círculo de guía en el canvas */
-        .guide-circle {
-            position: absolute;
-            border: 2px dashed #cbd5e1;
-            border-radius: 50%;
-            pointer-events: none;
-            transition: all 0.3s;
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            z-index: 3000;
+            animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateX(-50%) translateY(20px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
     </style>
 </head>
 <body>
 
+<!-- Pantalla de autenticación -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="auth-icon">
@@ -301,15 +398,9 @@
         <div class="pattern-guide">
             <div class="pattern-example">
                 <svg width="60" height="60" viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="20" stroke="#667eea" stroke-width="3" fill="none" stroke-linecap="round"/>
+                    <circle cx="30" cy="30" r="20" stroke="#667eea" stroke-width="3" fill="none"/>
                 </svg>
                 <span>⭕ Círculo</span>
-            </div>
-            <div class="pattern-example">
-                <svg width="60" height="60" viewBox="0 0 60 60">
-                    <circle cx="30" cy="30" r="20" stroke="#10b981" stroke-width="3" fill="none" stroke-dasharray="4 4"/>
-                </svg>
-                <span style="color:#10b981">✓ Correcto</span>
             </div>
         </div>
 
@@ -323,6 +414,7 @@
     </div>
 </div>
 
+<!-- App principal -->
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone · Google Sheets</h1>
@@ -331,26 +423,43 @@
         </div>
     </div>
     <div class="sheet-info">
-        <i class="fas fa-table"></i> <span id="sheetStatus">Conectando...</span>
+        <span><i class="fas fa-table"></i> <span id="sheetStatus">Conectando...</span></span>
+        <button id="openModalBtn" class="btn-add">
+            <i class="fas fa-plus"></i> Nueva nota
+        </button>
     </div>
     <div id="notesContainer" class="notes-grid">
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Autenticación por círculo • Dibuja un ⭕ para acceder
+        🔐 Autenticación por círculo • Las notas se guardan en Google Sheets
     </footer>
 </div>
 
+<!-- Modal para agregar nota -->
+<div id="noteModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-plus-circle"></i> Nueva nota</h3>
+        <input type="text" id="noteTitle" placeholder="Título de la nota" maxlength="100">
+        <textarea id="noteContent" placeholder="Contenido de la nota..."></textarea>
+        <div class="modal-buttons">
+            <button class="btn-cancel" id="cancelModalBtn">Cancelar</button>
+            <button class="btn-save" id="saveNoteBtn">Guardar nota</button>
+        </div>
+    </div>
+</div>
+
 <script>
-    // CONFIGURACIÓN - REEMPLAZA CON TU URL DE APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwqje0I0guta5Z4eVNOZrIsIGivDz4T_FW_F6KxRO-G1x8mb1oXIUkIvp4mx35FlN5o6g/exec";
+    // CONFIGURACIÓN - REEMPLAZA CON LA URL DE TU APPS SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/TU_URL_AQUI/exec";
     
+    // Variables del canvas
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
     let drawing = false;
     let points = [];
     
-    // Inicializar canvas
+    // Inicializar canvas para autenticación
     function initCanvas() {
         canvas.width = 400;
         canvas.height = 400;
@@ -365,13 +474,11 @@
         ctx.lineWidth = 6;
         ctx.strokeStyle = "#667eea";
         
-        // Eventos ratón
         canvas.addEventListener("mousedown", startDrawing);
         canvas.addEventListener("mousemove", draw);
         canvas.addEventListener("mouseup", endDrawing);
         canvas.addEventListener("mouseleave", endDrawing);
         
-        // Eventos táctiles
         canvas.addEventListener("touchstart", startDrawingTouch);
         canvas.addEventListener("touchmove", drawTouch);
         canvas.addEventListener("touchend", endDrawing);
@@ -453,7 +560,6 @@
         drawing = false;
         document.getElementById("canvasContainer").classList.remove("active");
         
-        // Analizar si es un círculo
         const resultado = analizarCirculo();
         
         if (resultado.esCirculo) {
@@ -461,15 +567,13 @@
             statusDiv.innerHTML = '<i class="fas fa-check-circle"></i> ✅ ¡Círculo detectado! Accediendo...';
             statusDiv.style.background = "#d1fae5";
             statusDiv.style.color = "#065f46";
-            statusDiv.classList.add("success-animation");
             
             setTimeout(() => {
                 finishAuthenticationSuccess();
             }, 800);
         } else {
             const statusDiv = document.getElementById("authStatus");
-            let mensaje = "✏️ " + resultado.mensaje;
-            statusDiv.innerHTML = `<i class="fas fa-pencil-alt"></i> ${mensaje}`;
+            statusDiv.innerHTML = `<i class="fas fa-pencil-alt"></i> ${resultado.mensaje}`;
             statusDiv.style.background = "#fef3c7";
             statusDiv.style.color = "#92400e";
         }
@@ -477,10 +581,9 @@
     
     function analizarCirculo() {
         if (points.length < 30) {
-            return { esCirculo: false, mensaje: "Continúa dibujando el círculo (usa más puntos)" };
+            return { esCirculo: false, mensaje: "Continúa dibujando el círculo" };
         }
         
-        // Calcular centro promedio
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -489,7 +592,6 @@
         centroX /= points.length;
         centroY /= points.length;
         
-        // Verificar que el centro está cerca del centro del canvas
         const centroCanvasX = canvas.width / 2;
         const centroCanvasY = canvas.height / 2;
         const distanciaCentroCanvas = Math.hypot(centroX - centroCanvasX, centroY - centroCanvasY);
@@ -498,35 +600,16 @@
             return { esCirculo: false, mensaje: "Centra el círculo en el recuadro" };
         }
         
-        // Calcular distancias desde el centro a cada punto
         let distancias = [];
         for (const p of points) {
-            const dist = Math.hypot(p.x - centroX, p.y - centroY);
-            distancias.push(dist);
+            distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
         }
         
-        // Calcular radio promedio
-        let radioPromedio = 0;
-        for (const d of distancias) {
-            radioPromedio += d;
-        }
-        radioPromedio /= distancias.length;
+        let radioPromedio = distancias.reduce((a, b) => a + b, 0) / distancias.length;
+        let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
+        let coeficienteVariacion = variacion / radioPromedio;
         
-        // Calcular variación de las distancias (qué tan circular es)
-        let variacion = 0;
-        for (const d of distancias) {
-            variacion += Math.abs(d - radioPromedio);
-        }
-        variacion /= distancias.length;
-        
-        // Coeficiente de variación (menor es más circular)
-        const coeficienteVariacion = variacion / radioPromedio;
-        
-        // Verificar tamaño del círculo (no muy pequeño ni muy grande)
-        const tamanioValido = radioPromedio > canvas.width * 0.15 && radioPromedio < canvas.width * 0.45;
-        
-        // Cobertura: qué porcentaje del círculo está dibujado
-        const angulos = [];
+        let angulos = [];
         for (const p of points) {
             let angulo = Math.atan2(p.y - centroY, p.x - centroX);
             if (angulo < 0) angulo += 2 * Math.PI;
@@ -537,54 +620,22 @@
         let cobertura = 0;
         for (let i = 0; i < angulos.length - 1; i++) {
             let diferencia = angulos[i + 1] - angulos[i];
-            if (diferencia < 0.5) {
-                cobertura += diferencia;
-            }
+            if (diferencia < 0.5) cobertura += diferencia;
         }
-        // Agregar la vuelta completa
         let ultimaDiferencia = (2 * Math.PI - angulos[angulos.length - 1] + angulos[0]);
-        if (ultimaDiferencia < 0.5) {
-            cobertura += ultimaDiferencia;
-        }
+        if (ultimaDiferencia < 0.5) cobertura += ultimaDiferencia;
         
-        const porcentajeCobertura = cobertura / (2 * Math.PI);
+        let porcentajeCobertura = cobertura / (2 * Math.PI);
         
-        // Detectar si es circular
-        const esCircular = coeficienteVariacion < 0.25;
-        const tieneBuenaCobertura = porcentajeCobertura > 0.6;
-        const circuloCompleto = esCircular && tieneBuenaCobertura && tamanioValido;
-        
-        // Depuración (para consola)
-        console.log({
-            puntos: points.length,
-            radioPromedio: radioPromedio.toFixed(1),
-            variacion: variacion.toFixed(1),
-            coeficiente: coeficienteVariacion.toFixed(3),
-            cobertura: (porcentajeCobertura * 100).toFixed(1) + "%",
-            tamanioValido: tamanioValido,
-            esCircular: esCircular,
-            tieneBuenaCobertura: tieneBuenaCobertura
-        });
-        
-        if (circuloCompleto) {
+        if (coeficienteVariacion < 0.25 && porcentajeCobertura > 0.6) {
             return { esCirculo: true, mensaje: "¡Círculo correcto!" };
-        } else if (!esCircular) {
-            if (coeficienteVariacion < 0.4) {
-                return { esCirculo: false, mensaje: "Intenta hacer el círculo más redondo" };
-            } else {
-                return { esCirculo: false, mensaje: "Traza un círculo, no otra forma" };
-            }
-        } else if (!tieneBuenaCobertura) {
-            return { esCirculo: false, mensaje: "Completa el círculo (cierra el trazo)" };
-        } else if (!tamanioValido) {
-            if (radioPromedio < canvas.width * 0.15) {
-                return { esCirculo: false, mensaje: "Haz el círculo más grande" };
-            } else {
-                return { esCirculo: false, mensaje: "Haz el círculo más pequeño" };
-            }
+        } else if (coeficienteVariacion > 0.4) {
+            return { esCirculo: false, mensaje: "Dibuja un círculo más redondo" };
+        } else if (porcentajeCobertura < 0.6) {
+            return { esCirculo: false, mensaje: "Completa el círculo" };
         }
         
-        return { esCirculo: false, mensaje: "Sigue dibujando el círculo" };
+        return { esCirculo: false, mensaje: "Sigue dibujando" };
     }
     
     function limpiarCanvas() {
@@ -593,7 +644,6 @@
         points = [];
         drawing = false;
         
-        // Dibujar círculo guía tenue
         const centro = canvas.width / 2;
         ctx.beginPath();
         ctx.arc(centro, centro, 120, 0, 2 * Math.PI);
@@ -606,7 +656,6 @@
         document.getElementById("authStatus").innerHTML = '<i class="fas fa-pencil-alt"></i> Dibuja un círculo en el cuadro';
         document.getElementById("authStatus").style.background = "#f1f3f4";
         document.getElementById("authStatus").style.color = "#6b7280";
-        document.getElementById("canvasContainer").classList.remove("active");
     }
     
     async function finishAuthenticationSuccess() {
@@ -616,54 +665,81 @@
             document.getElementById("appMain").style.display = "block";
         }, 500);
         
-        await loadNotesFromSheet();
+        await cargarNotas();
     }
     
-    async function loadNotesFromSheet() {
+    // ============================================
+    // FUNCIONES DE GOOGLE SHEETS (Leer y Escribir)
+    // ============================================
+    
+    async function cargarNotas() {
         const sheetStatusSpan = document.getElementById("sheetStatus");
         const container = document.getElementById("notesContainer");
         
-        sheetStatusSpan.innerHTML = '<span class="loading-spinner"></span> Cargando notas...';
+        sheetStatusSpan.innerHTML = '<span class="loading-spinner"></span> Cargando...';
         
         try {
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=getNotes`, {
-                mode: 'cors',
-                headers: { 'Accept': 'application/json' }
-            });
-            
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getNotes`);
             const data = await response.json();
             
             if (data.success && data.notes && data.notes.length > 0) {
-                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas desde "${data.sheetName}"`;
-                renderNotes(data.notes);
+                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas en Google Sheets`;
+                renderNotas(data.notes);
             } else {
-                sheetStatusSpan.innerHTML = "📝 Notas de ejemplo (conecta Google Sheets)";
-                renderNotes(getDefaultNotes());
+                sheetStatusSpan.innerHTML = "📝 Conectado a Google Sheets";
+                renderNotas(data.notes || getNotasEjemplo());
             }
         } catch (error) {
             console.error("Error:", error);
-            sheetStatusSpan.innerHTML = "📝 Modo local - Conecta tu Google Sheets";
-            renderNotes(getDefaultNotes());
+            sheetStatusSpan.innerHTML = "📝 Modo local";
+            renderNotas(getNotasEjemplo());
         }
     }
     
-    function getDefaultNotes() {
+    async function agregarNota(title, content) {
+        const sheetStatusSpan = document.getElementById("sheetStatus");
+        
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'addNote',
+                    title: title,
+                    content: content
+                })
+            });
+            
+            mostrarToast("✅ Nota guardada en Google Sheets");
+            await cargarNotas();
+            
+        } catch (error) {
+            console.error("Error:", error);
+            mostrarToast("❌ Error al guardar. Revisa la conexión.");
+        }
+    }
+    
+    function mostrarToast(mensaje) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = mensaje;
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+    
+    function getNotasEjemplo() {
         return [
-            { title: "🎉 ¡Bienvenido a KeepClone!", content: "Has dibujado el círculo correctamente. Esta es tu libreta segura." },
-            { title: "⭕ Autenticación por círculo", content: "Dibujar un círculo es fácil, rápido y funciona en cualquier dispositivo táctil." },
-            { title: "📝 Nota de ejemplo 1", content: "Puedes conectar tu Google Sheets agregando columnas 'Title' y 'Content'." },
-            { title: "📝 Nota de ejemplo 2", content: "El círculo debe ser redondo, estar centrado y tener buen tamaño." },
-            { title: "🔧 Configuración", content: "Crea una hoja con 'Title' y 'Content', despliega Apps Script y actualiza la URL." }
+            { title: "📌 Bienvenido", content: "Dibuja un círculo para acceder. Tus notas se guardan en Google Sheets", fromSheet: false },
+            { title: "➕ Agregar notas", content: "Usa el botón '+ Nueva nota' para crear notas. Se guardan automáticamente.", fromSheet: false }
         ];
     }
     
-    function renderNotes(notes) {
+    function renderNotas(notes) {
         const container = document.getElementById("notesContainer");
         
         if (!notes || notes.length === 0) {
-            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas</div>`;
+            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas. ¡Crea tu primera nota!</div>`;
             return;
         }
         
@@ -687,6 +763,45 @@
             return m;
         });
     }
+    
+    // Modal para agregar nota
+    const modal = document.getElementById("noteModal");
+    const openModalBtn = document.getElementById("openModalBtn");
+    const cancelModalBtn = document.getElementById("cancelModalBtn");
+    const saveNoteBtn = document.getElementById("saveNoteBtn");
+    
+    openModalBtn.addEventListener("click", () => {
+        document.getElementById("noteTitle").value = "";
+        document.getElementById("noteContent").value = "";
+        modal.style.display = "flex";
+    });
+    
+    cancelModalBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+    
+    saveNoteBtn.addEventListener("click", async () => {
+        const title = document.getElementById("noteTitle").value.trim();
+        const content = document.getElementById("noteContent").value.trim();
+        
+        if (!title && !content) {
+            mostrarToast("⚠️ Escribe al menos un título o contenido");
+            return;
+        }
+        
+        saveNoteBtn.disabled = true;
+        saveNoteBtn.innerHTML = '<span class="loading-spinner"></span> Guardando...';
+        
+        await agregarNota(title || "Sin título", content);
+        
+        saveNoteBtn.disabled = false;
+        saveNoteBtn.innerHTML = 'Guardar nota';
+        modal.style.display = "none";
+    });
+    
+    modal.addEventListener("click", (e) => {
+        if (e.target === modal) modal.style.display = "none";
+    });
     
     // Inicializar
     initCanvas();
