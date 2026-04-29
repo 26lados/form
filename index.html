@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>KeepClone</title>
+    <title>KeepClone · Notas</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
@@ -144,15 +144,6 @@
             color: transparent;
         }
 
-        .user-info {
-            background: #eef2ff;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            font-weight: 500;
-            color: #1e40af;
-        }
-
         .info-bar {
             background: #fef3c7;
             padding: 8px 16px;
@@ -197,6 +188,7 @@
             padding: 1.2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
+            position: relative;
         }
 
         .note-card:hover {
@@ -204,12 +196,34 @@
             box-shadow: 0 12px 24px rgba(0,0,0,0.12);
         }
 
+        .note-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            background: #e5e7eb;
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        .note-badge.local {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .note-badge.sheet {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
         .note-title {
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
+            margin-top: 0.5rem;
             color: #202124;
             word-break: break-word;
+            padding-right: 60px;
         }
 
         .note-content {
@@ -280,6 +294,17 @@
         .modal-content h3 {
             margin-bottom: 1rem;
             font-size: 1.5rem;
+        }
+
+        .modal-content select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            font-family: 'Inter', sans-serif;
+            background: white;
         }
 
         .modal-content input,
@@ -370,6 +395,20 @@
             align-items: center;
             margin-top: 15px;
         }
+
+        .tipo-nota {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            justify-content: center;
+        }
+
+        .tipo-nota label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -380,7 +419,6 @@
         <div class="canvas-container" id="canvasContainer">
             <canvas id="drawCanvas" width="500" height="300"></canvas>
         </div>
-
         <div class="button-group">
             <button id="validarBtn" class="btn-candado">
                 <i class="fas fa-lock"></i>
@@ -396,12 +434,9 @@
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone</h1>
-        <div class="user-info">
-            <i class="fas fa-check-circle" style="color:#10b981"></i>
-        </div>
     </div>
     <div class="info-bar">
-        <span><i class="fas fa-database"></i> <span id="noteCount">0</span></span>
+        <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas</span>
         <button id="openModalBtn" class="btn-add">
             <i class="fas fa-plus"></i> Nueva nota
         </button>
@@ -418,9 +453,20 @@
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva nota</h3>
+        
+        <div class="tipo-nota">
+            <label>
+                <input type="radio" name="tipoNota" value="local" checked> 📁 Local (XML)
+            </label>
+            <label>
+                <input type="radio" name="tipoNota" value="sheet"> 🌐 Google Sheets
+            </label>
+        </div>
+        
         <input type="text" id="noteTitle" placeholder="Título" maxlength="100">
         <textarea id="noteContent" placeholder="Contenido"></textarea>
         <input type="hidden" id="editingId" value="">
+        <input type="hidden" id="editingType" value="">
         <div class="modal-buttons">
             <button class="btn-cancel" id="cancelModalBtn">Cancelar</button>
             <button class="btn-save" id="saveNoteBtn">Guardar</button>
@@ -430,70 +476,197 @@
 
 <script>
     // ============================================
-    // GESTIÓN DE NOTAS
+    // CONFIGURACIÓN
     // ============================================
+    
+    // 🔴 REEMPLAZA CON LA URL DE TU APPS SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxEvXIfyF6DcbD5G41mOC-im1thUjPz5zkJXabW3JhxtCjGNk0ht4YxOM-9ch4IEFPHmg/exec";
+    
+    // Nota local fija en XML (simulado)
+    const NOTA_XML_FIJA = {
+        id: "local_fija_001",
+        title: "📌 Nota Local XML",
+        content: "Esta es una nota fija guardada localmente. No se sincroniza con Google Sheets.\n\n✏️ Puedes editarla\n🗑️ Puedes eliminarla\n💾 Se guarda en tu navegador",
+        type: "local",
+        fromSheet: false,
+        fija: true
+    };
     
     let notas = [];
     let editingId = null;
+    let editingType = null;
+    let authCompleted = false;
     
-    const NOTAS_EJEMPLO = [
-        { id: "nota1", title: "📌 Bienvenido", content: "Acceso autorizado correctamente." },
-        { id: "nota2", title: "📝 Nota de ejemplo", content: "Puedes editar o eliminar esta nota." },
-        { id: "nota3", title: "➕ Crear notas", content: "Usa el botón '+' para agregar contenido." }
-    ];
+    // ============================================
+    // GESTIÓN DE NOTAS LOCALES (XML simulado)
+    // ============================================
     
-    function cargarNotas() {
-        const guardado = localStorage.getItem('keepclone_notas');
+    function cargarNotasLocales() {
+        const guardado = localStorage.getItem('keepclone_notas_locales');
+        let locales = [];
+        
         if (guardado) {
-            notas = JSON.parse(guardado);
-        } else {
-            notas = [...NOTAS_EJEMPLO];
-            guardarNotas();
+            locales = JSON.parse(guardado);
         }
+        
+        // Asegurar que la nota fija existe
+        const existeFija = locales.some(n => n.id === NOTA_XML_FIJA.id);
+        if (!existeFija) {
+            locales.unshift({ ...NOTA_XML_FIJA });
+        }
+        
+        guardarNotasLocales(locales);
+        return locales;
+    }
+    
+    function guardarNotasLocales(locales) {
+        localStorage.setItem('keepclone_notas_locales', JSON.stringify(locales));
+    }
+    
+    function agregarNotaLocal(title, content) {
+        const locales = cargarNotasLocales();
+        const nuevaNota = {
+            id: "local_" + Date.now(),
+            title: title || "Sin título",
+            content: content || "",
+            type: "local",
+            fromSheet: false
+        };
+        locales.push(nuevaNota);
+        guardarNotasLocales(locales);
+        return nuevaNota;
+    }
+    
+    function editarNotaLocal(id, newTitle, newContent) {
+        const locales = cargarNotasLocales();
+        const index = locales.findIndex(n => n.id === id);
+        if (index !== -1 && !locales[index].fija) {
+            locales[index].title = newTitle || "Sin título";
+            locales[index].content = newContent || "";
+            guardarNotasLocales(locales);
+            return true;
+        } else if (index !== -1 && locales[index].fija) {
+            // La nota fija no se puede editar
+            return false;
+        }
+        return false;
+    }
+    
+    function eliminarNotaLocal(id) {
+        const locales = cargarNotasLocales();
+        const nota = locales.find(n => n.id === id);
+        if (nota && !nota.fija) {
+            const nuevas = locales.filter(n => n.id !== id);
+            guardarNotasLocales(nuevas);
+            return true;
+        }
+        return false;
+    }
+    
+    // ============================================
+    // GESTIÓN DE NOTAS DE GOOGLE SHEETS
+    // ============================================
+    
+    async function cargarNotasSheets() {
+        try {
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getSheetsNotes`);
+            const data = await response.json();
+            
+            if (data.success && data.notes) {
+                return data.notes;
+            }
+            return [];
+        } catch (error) {
+            console.error("Error cargando Sheets:", error);
+            return [];
+        }
+    }
+    
+    async function agregarNotaSheet(title, content) {
+        try {
+            const response = await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'addSheetNote',
+                    title: title,
+                    content: content
+                })
+            });
+            
+            const data = await response.json();
+            return data.success;
+        } catch (error) {
+            console.error("Error:", error);
+            return false;
+        }
+    }
+    
+    // ============================================
+    // CARGAR Y RENDERIZAR TODAS LAS NOTAS
+    // ============================================
+    
+    async function cargarTodasLasNotas() {
+        const locales = cargarNotasLocales();
+        const sheets = await cargarNotasSheets();
+        
+        notas = [...locales, ...sheets];
         renderizarNotas();
         actualizarContador();
     }
     
-    function guardarNotas() {
-        localStorage.setItem('keepclone_notas', JSON.stringify(notas));
-        actualizarContador();
+    async function agregarNota(title, content, tipo) {
+        if (tipo === "local") {
+            agregarNotaLocal(title, content);
+            mostrarToast("✅ Nota local guardada");
+        } else {
+            const exito = await agregarNotaSheet(title, content);
+            if (exito) {
+                mostrarToast("✅ Nota guardada en Google Sheets");
+            } else {
+                mostrarToast("❌ Error al guardar en Sheets");
+                return;
+            }
+        }
+        await cargarTodasLasNotas();
+    }
+    
+    async function editarNota(id, tipo, newTitle, newContent) {
+        if (tipo === "local") {
+            const exito = editarNotaLocal(id, newTitle, newContent);
+            if (exito) {
+                mostrarToast("✏️ Nota local editada");
+            } else {
+                mostrarToast("⚠️ No se puede editar la nota fija");
+            }
+        } else {
+            // Las notas de Sheets se editan directamente en la hoja
+            mostrarToast("📝 Edita las notas de Sheets directamente en Google Sheets");
+            return;
+        }
+        await cargarTodasLasNotas();
+    }
+    
+    async function eliminarNota(id, tipo) {
+        if (tipo === "local") {
+            const exito = eliminarNotaLocal(id);
+            if (exito) {
+                mostrarToast("🗑️ Nota local eliminada");
+            } else {
+                mostrarToast("⚠️ No se puede eliminar la nota fija");
+                return;
+            }
+        } else {
+            mostrarToast("📝 Elimina notas de Sheets desde Google Sheets");
+            return;
+        }
+        await cargarTodasLasNotas();
     }
     
     function actualizarContador() {
         const countSpan = document.getElementById("noteCount");
         if (countSpan) countSpan.textContent = notas.length;
-    }
-    
-    function agregarNota(title, content) {
-        const nuevaNota = {
-            id: Date.now().toString(),
-            title: title || "Sin título",
-            content: content || ""
-        };
-        notas.unshift(nuevaNota);
-        guardarNotas();
-        renderizarNotas();
-        mostrarToast("✅");
-    }
-    
-    function editarNota(id, newTitle, newContent) {
-        const index = notas.findIndex(n => n.id === id);
-        if (index !== -1) {
-            notas[index].title = newTitle || "Sin título";
-            notas[index].content = newContent || "";
-            guardarNotas();
-            renderizarNotas();
-            mostrarToast("✏️");
-        }
-    }
-    
-    function eliminarNota(id) {
-        if (confirm("¿Eliminar?")) {
-            notas = notas.filter(n => n.id !== id);
-            guardarNotas();
-            renderizarNotas();
-            mostrarToast("🗑️");
-        }
     }
     
     function renderizarNotas() {
@@ -505,7 +678,7 @@
                 <div style="background:white; border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
                     <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
                     <button class="btn-add" style="margin-top: 1rem;" onclick="document.getElementById('openModalBtn').click()">
-                        <i class="fas fa-plus"></i>
+                        <i class="fas fa-plus"></i> Crear nota
                     </button>
                 </div>
             `;
@@ -514,13 +687,16 @@
         
         container.innerHTML = notas.map(nota => `
             <div class="note-card">
+                <div class="note-badge ${nota.fromSheet ? 'sheet' : 'local'}">
+                    ${nota.fromSheet ? '🌐 Sheets' : '📁 Local'}
+                </div>
                 <div class="note-title">${escapeHtml(nota.title)}</div>
                 <div class="note-content">${escapeHtml(nota.content)}</div>
                 <div class="note-actions">
-                    <button class="btn-edit" onclick="abrirModalEditar('${nota.id}')">
+                    <button class="btn-edit" onclick="abrirModalEditar('${nota.id}', '${nota.type || (nota.fromSheet ? 'sheet' : 'local')}', '${escapeHtml(nota.title)}', '${escapeHtml(nota.content)}')">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="btn-delete" onclick="eliminarNota('${nota.id}')">
+                    <button class="btn-delete" onclick="eliminarNota('${nota.id}', '${nota.type || (nota.fromSheet ? 'sheet' : 'local')}')">
                         <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
@@ -528,36 +704,60 @@
         `).join('');
     }
     
-    function abrirModalEditar(id) {
-        const nota = notas.find(n => n.id === id);
-        if (nota) {
-            editingId = id;
-            document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i>';
-            document.getElementById("noteTitle").value = nota.title;
-            document.getElementById("noteContent").value = nota.content;
-            document.getElementById("editingId").value = id;
-            document.getElementById("noteModal").style.display = "flex";
+    function abrirModalEditar(id, tipo, title, content) {
+        editingId = id;
+        editingType = tipo;
+        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar nota';
+        document.getElementById("noteTitle").value = title;
+        document.getElementById("noteContent").value = content;
+        
+        // Seleccionar el tipo correcto en el radio
+        const radioLocal = document.querySelector('input[value="local"]');
+        const radioSheet = document.querySelector('input[value="sheet"]');
+        if (tipo === "local") {
+            radioLocal.checked = true;
+            radioSheet.checked = false;
+        } else {
+            radioLocal.checked = false;
+            radioSheet.checked = true;
         }
+        
+        document.getElementById("editingId").value = id;
+        document.getElementById("editingType").value = tipo;
+        document.getElementById("noteModal").style.display = "flex";
     }
     
     function abrirModalNueva() {
         editingId = null;
-        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i>';
+        editingType = null;
+        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Nueva nota';
         document.getElementById("noteTitle").value = "";
         document.getElementById("noteContent").value = "";
         document.getElementById("editingId").value = "";
+        document.getElementById("editingType").value = "";
+        
+        // Default a local
+        document.querySelector('input[value="local"]').checked = true;
+        
         document.getElementById("noteModal").style.display = "flex";
     }
     
-    function guardarNotaModal() {
+    async function guardarNotaModal() {
         const title = document.getElementById("noteTitle").value.trim();
         const content = document.getElementById("noteContent").value.trim();
         const editId = document.getElementById("editingId").value;
+        const editType = document.getElementById("editingType").value;
+        const tipoSeleccionado = document.querySelector('input[name="tipoNota"]:checked').value;
+        
+        if (!title && !content) {
+            mostrarToast("⚠️ Escribe título o contenido");
+            return;
+        }
         
         if (editId) {
-            editarNota(editId, title || "Sin título", content);
+            await editarNota(editId, editType, title || "Sin título", content);
         } else {
-            agregarNota(title || "Sin título", content);
+            await agregarNota(title || "Sin título", content, tipoSeleccionado);
         }
         
         cerrarModal();
@@ -587,14 +787,13 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CARA FELIZ - SIN TEXTOS
+    // AUTENTICACIÓN CARA FELIZ
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
     let drawing = false;
     let points = [];
-    let authCompleted = false;
     
     function initCanvas() {
         canvas.width = 500;
@@ -710,7 +909,7 @@
                 setTimeout(() => {
                     document.getElementById("authOverlay").style.display = "none";
                     document.getElementById("appMain").style.display = "block";
-                    cargarNotas();
+                    cargarTodasLasNotas();
                 }, 500);
             }, 300);
         } else {
@@ -727,7 +926,6 @@
     }
     
     function verificarCaraFeliz() {
-        // Centro del dibujo
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -736,7 +934,6 @@
         centroX /= points.length;
         centroY /= points.length;
         
-        // Distancias al centro
         let distancias = [];
         for (const p of points) {
             distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
@@ -748,11 +945,9 @@
         
         const tieneCirculo = coeficiente < 0.45 && radioPromedio > 40;
         
-        // Ojos (puntos arriba)
         let puntosSuperiores = points.filter(p => p.y < centroY - 15);
         let tieneOjos = puntosSuperiores.length >= 2;
         
-        // Sonrisa (curva abajo)
         let puntosInferiores = points.filter(p => p.y > centroY + 15);
         let tieneSonrisa = puntosInferiores.length >= 5;
         
