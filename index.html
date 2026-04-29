@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KeepClone - Face & Wink Auth</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>KeepClone · Autenticación con Cruz</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * {
@@ -13,87 +13,169 @@
             box-sizing: border-box;
             font-family: 'Inter', sans-serif;
         }
+
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
         }
+
+        /* Pantalla de autenticación */
         .auth-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.95));
-            backdrop-filter: blur(12px);
+            background: linear-gradient(135deg, rgba(0,0,0,0.92), rgba(0,0,0,0.96));
+            backdrop-filter: blur(8px);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            transition: opacity 0.5s ease;
         }
+
         .auth-card {
             background: white;
-            max-width: 460px;
+            max-width: 550px;
             width: 90%;
             border-radius: 2rem;
-            padding: 1.5rem;
+            padding: 1.8rem;
             text-align: center;
-            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.4);
+            animation: fadeUp 0.4s ease;
         }
-        .video-container {
-            position: relative;
-            width: 240px;
-            height: 240px;
-            margin: 1rem auto;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 3px solid #4285f4;
-            background: #111;
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        video {
+
+        .auth-icon {
+            font-size: 3rem;
+            color: #667eea;
+            margin-bottom: 1rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        /* Canvas de dibujo */
+        .canvas-container {
+            background: #f9fafb;
+            border-radius: 1.5rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s;
+        }
+
+        .canvas-container.active {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        canvas {
+            display: block;
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1);
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            cursor: crosshair;
+            touch-action: none;
         }
+
+        .pattern-guide {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 0.8rem;
+            background: #f3f4f6;
+            border-radius: 1rem;
+        }
+
+        .pattern-example {
+            text-align: center;
+            flex: 1;
+        }
+
+        .pattern-example svg {
+            width: 60px;
+            height: 60px;
+        }
+
+        .pattern-example span {
+            font-size: 0.7rem;
+            color: #6b7280;
+            display: block;
+            margin-top: 0.25rem;
+        }
+
+        .pattern-example.correct svg path {
+            stroke: #10b981;
+            stroke-width: 3;
+        }
+
         .status-badge {
             background: #f1f3f4;
-            padding: 8px 14px;
+            padding: 10px 16px;
             border-radius: 60px;
             font-size: 0.85rem;
             font-weight: 500;
-            display: inline-block;
-            margin-top: 12px;
+            margin: 1rem 0;
         }
-        .wink-guide {
-            background: #e8f0fe;
-            margin-top: 16px;
-            padding: 10px;
-            border-radius: 24px;
-            font-size: 0.85rem;
-            color: #1a73e8;
-        }
+
         .btn-auth {
-            background: #1a73e8;
+            background: linear-gradient(135deg, #667eea, #764ba2);
             border: none;
             color: white;
             font-weight: 600;
-            padding: 12px 20px;
+            padding: 14px 24px;
             border-radius: 40px;
             cursor: pointer;
             font-size: 1rem;
-            margin-top: 20px;
+            margin-top: 12px;
             width: 100%;
+            transition: all 0.2s;
         }
+
         .btn-auth:hover {
-            background: #1557b0;
             transform: scale(1.02);
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
         }
+
+        .btn-reset {
+            background: #6b7280;
+            margin-top: 8px;
+        }
+
+        .btn-reset:hover {
+            background: #4b5563;
+        }
+
+        /* App principal */
         .app-container {
             max-width: 1300px;
             margin: 0 auto;
             padding: 1.5rem;
             display: none;
         }
+
         .app-header {
             display: flex;
             justify-content: space-between;
@@ -103,9 +185,10 @@
             gap: 1rem;
             background: white;
             padding: 1rem 2rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
+
         h1 {
             font-weight: 700;
             font-size: 1.5rem;
@@ -114,7 +197,8 @@
             background-clip: text;
             color: transparent;
         }
-        .sheet-info {
+
+        .user-info {
             background: #eef2ff;
             padding: 8px 16px;
             border-radius: 40px;
@@ -122,288 +206,346 @@
             font-weight: 500;
             color: #1e40af;
         }
+
+        .sheet-info {
+            background: #fef3c7;
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #92400e;
+        }
+
         .notes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1.5rem;
         }
+
         .note-card {
             background: white;
             border-radius: 1rem;
             padding: 1.2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
+            border: 1px solid rgba(0,0,0,0.05);
         }
+
         .note-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 20px rgba(0,0,0,0.15);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
         }
+
         .note-title {
             font-size: 1.1rem;
             font-weight: 700;
             margin-bottom: 0.5rem;
             color: #202124;
         }
+
         .note-content {
             color: #5f6368;
             font-size: 0.9rem;
             line-height: 1.5;
             white-space: pre-wrap;
         }
+
         footer {
             margin-top: 3rem;
             text-align: center;
             font-size: 0.75rem;
             color: rgba(255,255,255,0.7);
         }
+
         .loading-spinner {
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 2px solid #1a73e8;
+            border: 2px solid #667eea;
             border-radius: 50%;
             border-top-color: transparent;
             animation: spin 0.6s linear infinite;
             margin-left: 8px;
             vertical-align: middle;
         }
+
         @keyframes spin { to { transform: rotate(360deg); } }
-        .error-message {
-            background: #fee2e2;
-            color: #dc2626;
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 12px;
-            font-size: 0.8rem;
+
+        @media (max-width: 640px) {
+            .auth-card { padding: 1.2rem; }
+            canvas { width: 100% !important; height: auto !important; }
         }
     </style>
 </head>
 <body>
 
+<!-- Pantalla de autenticación táctil -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
-        <i class="fas fa-camera" style="font-size: 2rem; color: #4285f4; margin-bottom: 8px;"></i>
-        <h2>🔐 Acceso con Cámara</h2>
-        <p style="color: #5f6368; margin-bottom: 8px; font-size: 0.9rem;">Reconocimiento facial + guiño del ojo derecho</p>
-        
-        <div class="video-container">
-            <video id="video" autoplay muted playsinline></video>
+        <div class="auth-icon">
+            <i class="fas fa-hand-peace"></i>
         </div>
-        
-        <div id="authStatus" class="status-badge">📷 Inicializando cámara...</div>
-        <div class="wink-guide">
-            <i class="fas fa-eye"></i> Mira al círculo y <strong>GUIÑA el OJO DERECHO</strong>
+        <h2>Dibuja la Cruz</h2>
+        <p class="subtitle">Traza una ✝️ en el recuadro para acceder</p>
+
+        <div class="canvas-container" id="canvasContainer">
+            <canvas id="drawCanvas" width="400" height="400" style="width:100%; height:auto; max-width:400px; aspect-ratio:1/1"></canvas>
         </div>
-        
-        <button id="authRetryBtn" class="btn-auth">⟳ Reintentar Cámara</button>
+
+        <div class="pattern-guide">
+            <div class="pattern-example">
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                    <line x1="15" y1="30" x2="45" y2="30" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="30" y1="15" x2="30" y2="45" stroke="#9ca3af" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                <span>✝️ Cruz</span>
+            </div>
+            <div class="pattern-example correct">
+                <svg width="60" height="60" viewBox="0 0 60 60">
+                    <line x1="15" y1="30" x2="45" y2="30" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+                    <line x1="30" y1="15" x2="30" y2="45" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+                </svg>
+                <span style="color:#10b981">✓ Correcto</span>
+            </div>
+        </div>
+
+        <div id="authStatus" class="status-badge">
+            <i class="fas fa-fingerprint"></i> Dibuja una cruz en el recuadro
+        </div>
+
+        <button id="clearBtn" class="btn-auth btn-reset">
+            <i class="fas fa-eraser"></i> Limpiar dibujo
+        </button>
     </div>
 </div>
 
+<!-- App principal -->
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone · Google Sheets</h1>
-        <div class="sheet-info">
-            <i class="fas fa-table"></i> <span id="sheetStatus">conectando...</span>
+        <div class="user-info">
+            <i class="fas fa-check-circle" style="color:#10b981"></i> Autenticado con cruz
         </div>
+    </div>
+    <div class="sheet-info" style="margin-bottom: 1.5rem;">
+        <i class="fas fa-table"></i> <span id="sheetStatus">Conectando con Google Sheets...</span>
     </div>
     <div id="notesContainer" class="notes-grid">
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Face + Guiño derecho • Datos desde Google Sheets • <a href="#" id="resetLink" style="color: white;">Salir</a>
+        🔐 Autenticación táctil • Dibuja una cruz para acceder • Datos desde Google Sheets
     </footer>
 </div>
 
 <script>
-    // ⚠️ IMPORTANTE: REEMPLAZA CON LA URL DE TU APPS SCRIPT
-    // Ve a script.google.com → Desplegar → Copiar URL de la aplicación web
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx4j8Fm7SJnUz648AJJOIpuUHlhVAqZkBkBQk9IYYZaeVL5CrBFLIuIsmuHO5W-OAok/exec";
+    // ====================================================
+    // CONFIGURACIÓN
+    // ====================================================
+    // ⚠️ REEMPLAZA CON LA URL DE TU APPS SCRIPT
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyUW9cTzgoWShaOaZ8vzZGZggd-G1jvEXLMr0jx4S-T-MepSt4EvqK6uJkeDAgzg2pY/exec";
     
-    let model = null;
-    let videoElement = null;
-    let detectionInterval = null;
+    let canvas = document.getElementById("drawCanvas");
+    let ctx = canvas.getContext("2d");
+    let drawing = false;
+    let points = [];
     let authCompleted = false;
-    let winkTriggered = false;
-    let faceDetectedFlag = false;
     
-    // Cargar TensorFlow.js
-    async function loadTensorFlow() {
-        const scripts = [
-            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-core@4.15.0/dist/tf-core.min.js",
-            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-converter@4.15.0/dist/tf-converter.min.js",
-            "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs-backend-webgl@4.15.0/dist/tf-backend-webgl.min.js",
-            "https://cdn.jsdelivr.net/npm/@tensorflow-models/face-landmarks-detection@1.0.2/dist/face-landmarks-detection.min.js"
-        ];
+    // Configurar canvas para dibujo táctil y ratón
+    function initCanvas() {
+        // Ajustar tamaño para resolución retina
+        const size = 400;
+        canvas.width = size;
+        canvas.height = size;
+        canvas.style.width = "100%";
+        canvas.style.height = "auto";
+        canvas.style.aspectRatio = "1/1";
         
-        for (const src of scripts) {
-            await new Promise((resolve) => {
-                const script = document.createElement('script');
-                script.src = src;
-                script.onload = resolve;
-                script.onerror = resolve;
-                document.head.appendChild(script);
-            });
-        }
-        console.log("✅ Librerías cargadas");
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "#667eea";
+        
+        // Eventos para ratón
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", endDrawing);
+        canvas.addEventListener("mouseleave", endDrawing);
+        
+        // Eventos para táctil (móvil)
+        canvas.addEventListener("touchstart", startDrawingTouch);
+        canvas.addEventListener("touchmove", drawTouch);
+        canvas.addEventListener("touchend", endDrawing);
+        canvas.addEventListener("touchcancel", endDrawing);
     }
     
-    // Iniciar cámara
-    async function iniciarCamara() {
-        const video = document.getElementById("video");
-        videoElement = video;
+    function getCanvasCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        let clientX, clientY;
+        
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        let x = (clientX - rect.left) * scaleX;
+        let y = (clientY - rect.top) * scaleY;
+        
+        x = Math.min(Math.max(0, x), canvas.width);
+        y = Math.min(Math.max(0, y), canvas.height);
+        
+        return { x, y };
+    }
+    
+    function startDrawing(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCanvasCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+    }
+    
+    function startDrawingTouch(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCanvasCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+    }
+    
+    function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCanvasCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function drawTouch(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCanvasCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function endDrawing() {
+        if (!drawing) return;
+        drawing = false;
+        document.getElementById("canvasContainer").classList.remove("active");
+        verificarCruz();
+    }
+    
+    // Detectar si el dibujo es una cruz
+    function verificarCruz() {
+        if (points.length < 20) {
+            actualizarEstado("⚠️ Dibuja una cruz completa", "#f1f3f4", "#6b7280");
+            return;
+        }
+        
+        // Analizar puntos para detectar líneas horizontales y verticales
+        let horizontales = 0;
+        let verticales = 0;
+        
+        // Muestrear puntos para ver dirección
+        for (let i = 10; i < points.length - 10; i += 5) {
+            const p1 = points[i - 5];
+            const p2 = points[i];
+            const p3 = points[i + 5];
+            
+            if (!p1 || !p2 || !p3) continue;
+            
+            const dx1 = p2.x - p1.x;
+            const dy1 = p2.y - p1.y;
+            const dx2 = p3.x - p2.x;
+            const dy2 = p3.y - p2.y;
+            
+            const dir1 = Math.abs(dx1) > Math.abs(dy1) ? "H" : "V";
+            const dir2 = Math.abs(dx2) > Math.abs(dy2) ? "H" : "V";
+            
+            if (dir1 === "H" && dir2 === "H") horizontales++;
+            if (dir1 === "V" && dir2 === "V") verticales++;
+        }
+        
+        // Verificar que hay suficientes trazos horizontales Y verticales
+        const tieneHorizontal = horizontales > 15;
+        const tieneVertical = verticales > 15;
+        
+        // También verificar que el dibujo cruza el centro
+        const centroX = canvas.width / 2;
+        const centroY = canvas.height / 2;
+        
+        let pasaPorCentro = false;
+        for (const p of points) {
+            if (Math.abs(p.x - centroX) < 30 && Math.abs(p.y - centroY) < 30) {
+                pasaPorCentro = true;
+                break;
+            }
+        }
+        
+        if (tieneHorizontal && tieneVertical && pasaPorCentro) {
+            actualizarEstado("✅ ¡Cruz correcta! Autenticación exitosa", "#d1fae5", "#065f46");
+            authCompleted = true;
+            setTimeout(() => {
+                finishAuthenticationSuccess();
+            }, 800);
+        } else {
+            let mensaje = "";
+            if (!tieneHorizontal) mensaje = "✏️ Traza una línea horizontal (─)";
+            else if (!tieneVertical) mensaje = "✏️ Traza una línea vertical (│)";
+            else if (!pasaPorCentro) mensaje = "✏️ Asegúrate que las líneas se crucen en el centro";
+            else mensaje = "✏️ Dibuja una cruz clara (+)";
+            
+            actualizarEstado(mensaje, "#fef3c7", "#92400e");
+        }
+    }
+    
+    function actualizarEstado(mensaje, bgColor, textColor) {
         const statusDiv = document.getElementById("authStatus");
-        
-        try {
-            statusDiv.innerHTML = "📷 Solicitando acceso a cámara...";
-            
-            const stream = await navigator.mediaDevices.getUserMedia({ 
-                video: { 
-                    facingMode: "user",
-                    width: { ideal: 640 },
-                    height: { ideal: 480 }
-                } 
-            });
-            
-            video.srcObject = stream;
-            await video.play();
-            
-            statusDiv.innerHTML = "✅ Cámara activa! Cargando modelo facial...";
-            await initFaceModel();
-            startDetection();
-            
-        } catch (err) {
-            console.error("Error:", err);
-            let errorMsg = "";
-            
-            if (err.name === "NotAllowedError") {
-                errorMsg = "❌ Permiso denegado. Haz clic en el candado en la barra de direcciones y permite la cámara.";
-            } else if (err.name === "NotFoundError") {
-                errorMsg = "❌ No se encontró cámara en este dispositivo.";
-            } else {
-                errorMsg = "❌ Error: " + err.message;
-            }
-            
-            statusDiv.innerHTML = errorMsg;
-            statusDiv.style.background = "#fee2e2";
-            statusDiv.style.color = "#dc2626";
-        }
+        statusDiv.innerHTML = `<i class="fas fa-fingerprint"></i> ${mensaje}`;
+        statusDiv.style.background = bgColor;
+        statusDiv.style.color = textColor;
     }
     
-    // Calcular Eye Aspect Ratio para detectar guiño
-    function getEyeLandmarks(landmarks) {
-        if (!landmarks || landmarks.length < 468) return { leftEAR: 1, rightEAR: 1 };
-        
-        // Índices de MediaPipe FaceMesh
-        const rightUpper = landmarks[386];
-        const rightLower = landmarks[374];
-        const rightLeftCorner = landmarks[263];
-        const rightRightCorner = landmarks[362];
-        const leftUpper = landmarks[159];
-        const leftLower = landmarks[145];
-        const leftLeftCorner = landmarks[133];
-        const leftRightCorner = landmarks[33];
-        
-        function distancia(p1, p2) {
-            return Math.hypot(p1.x - p2.x, p1.y - p2.y);
-        }
-        
-        const rightVert = distancia(rightUpper, rightLower);
-        const rightHoriz = distancia(rightLeftCorner, rightRightCorner);
-        const rightEAR = rightVert / (rightHoriz + 1e-6);
-        const leftVert = distancia(leftUpper, leftLower);
-        const leftHoriz = distancia(leftLeftCorner, leftRightCorner);
-        const leftEAR = leftVert / (leftHoriz + 1e-6);
-        
-        return { leftEAR, rightEAR };
-    }
-    
-    async function initFaceModel() {
-        try {
-            model = await faceLandmarksDetection.load(
-                faceLandmarksDetection.SupportedPackages.mediapipeFacemesh,
-                { maxFaces: 1, shouldLoadIrisModel: false }
-            );
-            console.log("✅ Modelo facial cargado");
-            return true;
-        } catch(e) {
-            document.getElementById("authStatus").innerHTML = "⚠️ Error cargando modelo facial";
-            return false;
-        }
-    }
-    
-    async function startDetection() {
-        if (!model || !videoElement) return;
-        if (detectionInterval) clearInterval(detectionInterval);
-        
-        detectionInterval = setInterval(async () => {
-            if (authCompleted || !videoElement || videoElement.readyState < 2) return;
-            
-            try {
-                const faces = await model.estimateFaces({ input: videoElement, returnTensors: false });
-                const statusDiv = document.getElementById("authStatus");
-                
-                if (faces.length === 0) {
-                    faceDetectedFlag = false;
-                    statusDiv.innerHTML = "😐 No se detecta cara. Mira al círculo.";
-                    return;
-                }
-                
-                if (!faceDetectedFlag) {
-                    faceDetectedFlag = true;
-                    statusDiv.innerHTML = "✅ Cara detectada! <strong>GUIÑA el OJO DERECHO</strong>";
-                    statusDiv.style.background = "#e8f0fe";
-                    statusDiv.style.color = "#1a73e8";
-                }
-                
-                const landmarks = faces[0].mesh;
-                const { leftEAR, rightEAR } = getEyeLandmarks(landmarks);
-                
-                // Detectar guiño del ojo derecho
-                const rightWinkNow = (rightEAR < 0.19 && leftEAR > 0.2);
-                
-                if (rightWinkNow && !winkTriggered && faceDetectedFlag && !authCompleted) {
-                    winkTriggered = true;
-                    statusDiv.innerHTML = "✨ Guiño detectado! Autenticación exitosa!";
-                    authCompleted = true;
-                    clearInterval(detectionInterval);
-                    finishAuthenticationSuccess();
-                }
-            } catch(err) {
-                console.warn(err);
-            }
-        }, 150);
-    }
-    
-    function retryCamera() {
-        if (videoElement && videoElement.srcObject) {
-            videoElement.srcObject.getTracks().forEach(t => t.stop());
-        }
-        authCompleted = false;
-        winkTriggered = false;
-        faceDetectedFlag = false;
-        if (detectionInterval) clearInterval(detectionInterval);
-        
-        document.getElementById("authStatus").innerHTML = "📷 Reiniciando cámara...";
-        document.getElementById("authStatus").style.background = "#f1f3f4";
-        document.getElementById("authStatus").style.color = "";
-        
-        iniciarCamara();
+    function limpiarCanvas() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        points = [];
+        drawing = false;
+        actualizarEstado("✏️ Dibuja una cruz en el recuadro", "#f1f3f4", "#6b7280");
+        document.getElementById("canvasContainer").classList.remove("active");
     }
     
     async function finishAuthenticationSuccess() {
-        // Detener cámara
-        if (videoElement && videoElement.srcObject) {
-            videoElement.srcObject.getTracks().forEach(t => t.stop());
-        }
-        
         // Ocultar overlay
         document.getElementById("authOverlay").style.opacity = "0";
         setTimeout(() => {
             document.getElementById("authOverlay").style.display = "none";
             document.getElementById("appMain").style.display = "block";
-        }, 400);
+        }, 500);
         
-        // Cargar notas
         await loadNotesFromSheet();
     }
     
@@ -411,32 +553,39 @@
         const sheetStatusSpan = document.getElementById("sheetStatus");
         const container = document.getElementById("notesContainer");
         
-        sheetStatusSpan.innerHTML = '<span class="loading-spinner"></span> Cargando...';
+        sheetStatusSpan.innerHTML = '<span class="loading-spinner"></span> Cargando notas...';
         
         try {
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=getNotes`);
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getNotes`, {
+                mode: 'cors',
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
             const data = await response.json();
             
-            if (data.success) {
-                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas · "${data.sheetName}"`;
+            if (data.success && data.notes && data.notes.length > 0) {
+                sheetStatusSpan.innerHTML = `✅ ${data.rowCount} notas cargadas desde "${data.sheetName}"`;
                 renderNotes(data.notes);
             } else {
-                sheetStatusSpan.innerHTML = `⚠️ ${data.message || "Usando notas de ejemplo"}`;
-                renderNotes(data.notes || getDefaultNotes());
+                sheetStatusSpan.innerHTML = "📝 Mostrando notas de ejemplo (conecta tu Google Sheets)";
+                renderNotes(getDefaultNotes());
             }
         } catch (error) {
-            console.error("Error fetching notes:", error);
-            sheetStatusSpan.innerHTML = "❌ Error de conexión con Google Sheets";
+            console.error("Error:", error);
+            sheetStatusSpan.innerHTML = "📝 Modo local - Conecta Google Sheets para datos reales";
             renderNotes(getDefaultNotes());
         }
     }
     
     function getDefaultNotes() {
         return [
-            { title: "📌 KeepClone Funcionando", content: "✅ Autenticación exitosa con guiño del ojo derecho. La cámara funciona porque el sitio está alojado en GitHub Pages." },
-            { title: "🔧 Configura tu Google Sheets", content: "1. Crea una hoja con columnas 'Title' y 'Content'. 2. Conecta este script a tu Apps Script. 3. Listo!" },
-            { title: "✨ Guiño Activado", content: "El ojo derecho cerró momentáneamente - esto te autenticó de forma segura sin contraseña." },
-            { title: "🚀 Beneficios de GitHub Pages", content: "La cámara funciona perfectamente porque el sitio está en HTTPS y no tiene restricciones de iframe." }
+            { title: "🎉 ¡Autenticación Exitosa!", content: "Has dibujado la cruz correctamente. Esta es tu libreta segura KeepClone." },
+            { title: "📝 Nota de ejemplo", content: "Puedes conectar tu Google Sheets agregando columnas 'Title' y 'Content'." },
+            { title: "🖌️ Cómo funciona", content: "La autenticación detecta los trazos horizontales y verticales que forman una cruz en el centro." },
+            { title: "✨ Ventajas", content: "✓ No necesita cámara ✓ Funciona en táctil y ratón ✓ 100% privado" },
+            { title: "🔧 Configuración", content: "Crea una hoja con 'Title' y 'Content', luego despliega Apps Script con la URL correcta." }
         ];
     }
     
@@ -444,7 +593,7 @@
         const container = document.getElementById("notesContainer");
         
         if (!notes || notes.length === 0) {
-            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas en la hoja</div>`;
+            container.innerHTML = `<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;">📭 No hay notas disponibles</div>`;
             return;
         }
         
@@ -453,7 +602,7 @@
                 <div class="note-title">${escapeHtml(note.title)}</div>
                 <div class="note-content">${escapeHtml(note.content)}</div>
                 <div style="margin-top: 12px; font-size: 11px; color: #aaa;">
-                    <i class="fas fa-google"></i> desde Google Sheets
+                    <i class="fas fa-google"></i> ${note.fromSheet ? 'Google Sheets' : 'Ejemplo'}
                 </div>
             </div>
         `).join('');
@@ -469,18 +618,9 @@
             .replace(/'/g, '&#39;');
     }
     
-    // Reset link
-    document.getElementById("resetLink")?.addEventListener("click", (e) => {
-        e.preventDefault();
-        location.reload();
-    });
-    
-    // Iniciar todo
-    loadTensorFlow().then(() => {
-        iniciarCamara();
-    });
-    
-    document.getElementById("authRetryBtn").addEventListener("click", retryCamera);
+    // Inicializar
+    initCanvas();
+    document.getElementById("clearBtn").addEventListener("click", limpiarCanvas);
 </script>
 </body>
 </html>
