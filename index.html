@@ -67,7 +67,6 @@
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
-            transition: background 0.3s ease;
         }
 
         .auth-overlay {
@@ -94,7 +93,6 @@
             text-align: center;
             box-shadow: 0 30px 50px rgba(0,0,0,0.4);
             animation: fadeUp 0.4s ease;
-            transition: background 0.3s ease;
         }
 
         @keyframes fadeUp {
@@ -140,8 +138,8 @@
             margin-top: 20px;
             transition: all 0.2s;
         }
-
         .btn-candado:hover { transform: scale(1.05); }
+
         .btn-reset {
             background: var(--btn-reset);
             border: none;
@@ -173,7 +171,6 @@
             background: var(--header-bg);
             padding: 1rem 2rem;
             border-radius: 1.5rem;
-            transition: background 0.3s ease;
         }
 
         h1 {
@@ -309,6 +306,7 @@
         .btn-cancel { background: var(--btn-reset); color: white; }
 
         footer { margin-top: 3rem; text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+
         .toast {
             position: fixed;
             bottom: 30px;
@@ -326,15 +324,21 @@
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
+
         @media (max-width: 640px) { .auth-card { padding: 1.2rem; } .notes-grid { grid-template-columns: 1fr; } }
+
         .acceso-denegado { animation: shake 0.3s ease; }
         @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+
         .button-group { display: flex; gap: 15px; justify-content: center; align-items: center; margin-top: 15px; }
+
         .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--text-primary); border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; margin-left: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
+
         .estado-conexion { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; padding: 4px 10px; border-radius: 30px; }
         .conectado { background: #10b98120; color: #10b981; }
         .offline { background: #ef444420; color: #f87171; }
+
         .tipo-selector { margin-bottom: 1rem; text-align: left; }
         .tipo-selector label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-primary); margin-top: 0.5rem; }
     </style>
@@ -385,12 +389,14 @@
 </div>
 
 <script>
+    // ============================================
+    // CONFIGURACIÓN
+    // ============================================
+    
     // 🔴 REEMPLAZA CON LA URL DE TU APPS SCRIPT DESPLEGADO
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoJNc_PxdkqWgSGfY8JcNkdIARTQb0oT5S7XRKrwSouHQooXQtRvZDV7vqaWFtrFiUUA/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw3EkL5v7rT9uH0WqhPh_SdMf5mO52TP1C0h5p8gVkbRfKsN-pLmF1u_YGFHk8XKQ/exec";
     
     let notas = [];
-    let editingId = null;
-    let editingRow = null;
     let authCompleted = false;
     let mostrarGuia = true;
     let conexionActiva = true;
@@ -404,6 +410,10 @@
         fija: true
     };
 
+    // ============================================
+    // GESTIÓN DE NOTAS LOCALES
+    // ============================================
+    
     function cargarNotasLocales() {
         const guardado = localStorage.getItem('keepclone_notas_locales');
         let locales = guardado ? JSON.parse(guardado) : [];
@@ -419,7 +429,13 @@
 
     function agregarNotaLocal(title, content) {
         const locales = cargarNotasLocales();
-        locales.push({ id: "local_" + Date.now(), title: title || "Sin título", content: content || "", type: "local", fromSheet: false });
+        locales.push({ 
+            id: "local_" + Date.now(), 
+            title: title || "Sin título", 
+            content: content || "", 
+            type: "local", 
+            fromSheet: false 
+        });
         guardarNotasLocales(locales);
     }
 
@@ -445,6 +461,10 @@
         return false;
     }
 
+    // ============================================
+    // COMUNICACIÓN CON GOOGLE SHEETS
+    // ============================================
+    
     async function probarConexion() {
         try {
             const controller = new AbortController();
@@ -497,6 +517,10 @@
         } catch { return { success: false }; }
     }
 
+    // ============================================
+    // ACTUALIZAR UI
+    // ============================================
+    
     async function actualizarUI() {
         const hayConexion = await probarConexion();
         conexionActiva = hayConexion;
@@ -525,14 +549,16 @@
             container.innerHTML = notas.map(n => {
                 const esLocal = n.type === "local" || n.fromSheet === false;
                 const esFija = n.fija === true;
+                const titleEscaped = escapeHtml(n.title);
+                const contentEscaped = escapeHtml(n.content);
                 return `
                     <div class="note-card">
                         <div class="note-badge ${esLocal ? 'badge-local' : 'badge-sheet'}">${esLocal ? '📁 Local' : '🌐 Sheets'}</div>
-                        <div class="note-title">${escapeHtml(n.title)}</div>
-                        <div class="note-content">${escapeHtml(n.content)}</div>
+                        <div class="note-title">${titleEscaped}</div>
+                        <div class="note-content">${contentEscaped}</div>
                         <div class="note-actions">
-                            <button class="btn-edit" onclick='editarNotaUI("${n.id}", "${esLocal ? 'local' : 'sheet'}", ${n.row || 'null'}, ${JSON.stringify(n.title)}, ${JSON.stringify(n.content)}, ${esFija})' ${esFija ? 'disabled' : ''}>${esFija ? 'Bloqueada' : '<i class="fas fa-edit"></i> Editar'}</button>
-                            <button class="btn-delete" onclick='eliminarNotaUI("${n.id}", "${esLocal ? 'local' : 'sheet'}", ${n.row || 'null'})' ${esFija ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-trash-alt"></i> Eliminar</button>
+                            <button class="btn-edit" onclick="editarNotaUI('${n.id}', '${esLocal ? 'local' : 'sheet'}', ${n.row || 'null'}, \`${titleEscaped.replace(/`/g, '\\`')}\`, \`${contentEscaped.replace(/`/g, '\\`')}\`, ${esFija})" ${esFija ? 'disabled' : ''}>${esFija ? 'Bloqueada' : '<i class="fas fa-edit"></i> Editar'}</button>
+                            <button class="btn-delete" onclick="eliminarNotaUI('${n.id}', '${esLocal ? 'local' : 'sheet'}', ${n.row || 'null'})" ${esFija ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-trash-alt"></i> Eliminar</button>
                         </div>
                     </div>
                 `;
@@ -541,23 +567,30 @@
         document.getElementById("noteCount").innerText = notas.length;
     }
 
-    async function agregarNotaUI(title, content, tipo) {
+    // ============================================
+    // OPERACIONES DE NOTAS
+    // ============================================
+    
+    window.agregarNotaUI = async function(title, content, tipo) {
         if (tipo === "local") {
             agregarNotaLocal(title, content);
             mostrarToast("✅ Nota local guardada");
         } else {
-            if (!conexionActiva) { mostrarToast("⚠️ Sin conexión, guardando localmente"); agregarNotaLocal(title, content); }
-            else {
+            if (!conexionActiva) { 
+                mostrarToast("⚠️ Sin conexión, guardando localmente"); 
+                agregarNotaLocal(title, content);
+            } else {
                 const res = await agregarNotaSheet(title, content);
                 if (res.success) mostrarToast("✅ Guardado en Sheets");
                 else { mostrarToast("❌ Error, guardando localmente"); agregarNotaLocal(title, content); }
             }
         }
         await actualizarUI();
-    }
+    };
 
-    async function editarNotaUI(id, tipo, row, oldTitle, oldContent, esFija) {
+    window.editarNotaUI = async function(id, tipo, row, oldTitle, oldContent, esFija) {
         if (esFija) { mostrarToast("⚠️ No se puede editar la nota fija"); return; }
+        
         const newTitle = prompt("Editar título:", oldTitle);
         if (newTitle === null) return;
         const newContent = prompt("Editar contenido:", oldContent);
@@ -572,10 +605,11 @@
             else mostrarToast("❌ Error al editar");
         }
         await actualizarUI();
-    }
+    };
 
-    async function eliminarNotaUI(id, tipo, row) {
+    window.eliminarNotaUI = async function(id, tipo, row) {
         if (!confirm("¿Eliminar esta nota?")) return;
+        
         if (tipo === "local") {
             if (eliminarNotaLocal(id)) mostrarToast("🗑️ Nota local eliminada");
         } else {
@@ -585,16 +619,17 @@
             else mostrarToast("❌ Error al eliminar");
         }
         await actualizarUI();
-    }
+    };
 
     function escapeHtml(str) {
         if (!str) return "";
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        }).replace(/\n/g, '<br>');
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/\n/g, '<br>');
     }
 
     function mostrarToast(msg) {
@@ -605,7 +640,10 @@
         setTimeout(() => t.remove(), 2500);
     }
 
-    // Modal
+    // ============================================
+    // MODAL
+    // ============================================
+    
     const modal = document.getElementById("noteModal");
     document.getElementById("openModalBtn").onclick = () => {
         document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Nueva nota';
@@ -623,8 +661,247 @@
         const tipo = document.querySelector('input[name="tipoNota"]:checked').value;
         if (!title && !content) { mostrarToast("⚠️ Escribe algo"); return; }
         modal.style.display = "none";
-        await agregarNotaUI(title || "Sin título", content, tipo);
+        await window.agregarNotaUI(title || "Sin título", content, tipo);
     };
     modal.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
 
-    // Aut
+    // ============================================
+    // AUTENTICACIÓN CON DIBUJO
+    // ============================================
+    
+    let canvas = document.getElementById("drawCanvas");
+    let ctx = canvas.getContext("2d");
+    let drawing = false;
+    let points = [];
+    
+    function dibujarGuiaRapida() {
+        if (!mostrarGuia) return;
+        
+        ctx.save();
+        ctx.globalAlpha = 0.25;
+        ctx.strokeStyle = "#667eea";
+        ctx.fillStyle = "#667eea";
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 8]);
+        
+        const centroX = canvas.width / 2;
+        const centroY = canvas.height / 2;
+        
+        ctx.beginPath();
+        ctx.arc(centroX, centroY, 100, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(centroX - 30, centroY - 30, 8, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(centroX + 30, centroY - 30, 8, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        ctx.beginPath();
+        ctx.arc(centroX, centroY + 10, 50, 0.1, Math.PI - 0.1);
+        ctx.stroke();
+        
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+        
+        setTimeout(() => {
+            if (mostrarGuia) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = "white";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                mostrarGuia = false;
+            }
+        }, 500);
+    }
+    
+    function initCanvas() {
+        canvas.width = 550;
+        canvas.height = 350;
+        
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.lineCap = "round";
+        ctx.lineJoin = "round";
+        ctx.lineWidth = 8;
+        ctx.strokeStyle = "#667eea";
+        
+        dibujarGuiaRapida();
+        
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
+        canvas.addEventListener("mouseup", endDrawing);
+        canvas.addEventListener("mouseleave", endDrawing);
+        
+        canvas.addEventListener("touchstart", startDrawingTouch);
+        canvas.addEventListener("touchmove", drawTouch);
+        canvas.addEventListener("touchend", endDrawing);
+        canvas.addEventListener("touchcancel", endDrawing);
+    }
+    
+    function startDrawing(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+        
+        if (mostrarGuia) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            mostrarGuia = false;
+        }
+    }
+    
+    function startDrawingTouch(e) {
+        e.preventDefault();
+        drawing = true;
+        const { x, y } = getCoords(e);
+        points = [{ x, y }];
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.stroke();
+        document.getElementById("canvasContainer").classList.add("active");
+        
+        if (mostrarGuia) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "white";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            mostrarGuia = false;
+        }
+    }
+    
+    function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function drawTouch(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const { x, y } = getCoords(e);
+        points.push({ x, y });
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+    }
+    
+    function getCoords(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        
+        let clientX, clientY;
+        if (e.touches) {
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
+        } else {
+            clientX = e.clientX;
+            clientY = e.clientY;
+        }
+        
+        let x = (clientX - rect.left) * scaleX;
+        let y = (clientY - rect.top) * scaleY;
+        x = Math.min(Math.max(0, x), canvas.width);
+        y = Math.min(Math.max(0, y), canvas.height);
+        return { x, y };
+    }
+    
+    function endDrawing() {
+        if (!drawing) return;
+        drawing = false;
+        document.getElementById("canvasContainer").classList.remove("active");
+    }
+    
+    function validarDibujo() {
+        if (authCompleted) return;
+        
+        if (points.length < 50) {
+            animarDenegado();
+            return;
+        }
+        
+        const esCaraFeliz = verificarCaraFeliz();
+        
+        if (esCaraFeliz) {
+            authCompleted = true;
+            setTimeout(() => {
+                document.getElementById("authOverlay").style.opacity = "0";
+                setTimeout(() => {
+                    document.getElementById("authOverlay").style.display = "none";
+                    document.getElementById("appMain").style.display = "block";
+                    actualizarUI();
+                }, 500);
+            }, 300);
+        } else {
+            animarDenegado();
+        }
+    }
+    
+    function verificarCaraFeliz() {
+        let centroX = 0, centroY = 0;
+        for (const p of points) {
+            centroX += p.x;
+            centroY += p.y;
+        }
+        centroX /= points.length;
+        centroY /= points.length;
+        
+        let distancias = [];
+        for (const p of points) {
+            distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
+        }
+        
+        let radioPromedio = distancias.reduce((a, b) => a + b, 0) / distancias.length;
+        let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
+        let coeficiente = variacion / radioPromedio;
+        
+        const tieneCirculo = coeficiente < 0.48 && radioPromedio > 60;
+        const puntosInferiores = points.filter(p => p.y > centroY + 10);
+        const tieneSonrisa = puntosInferiores.length > 18;
+        const puntosSuperiores = points.filter(p => p.y < centroY - 10);
+        const tieneOjos = puntosSuperiores.length > 12;
+        
+        return tieneCirculo && (tieneSonrisa || tieneOjos);
+    }
+    
+    function animarDenegado() {
+        const btn = document.getElementById("validarBtn");
+        btn.classList.add("acceso-denegado");
+        setTimeout(() => btn.classList.remove("acceso-denegado"), 300);
+        limpiarCanvas();
+        mostrarGuia = true;
+        dibujarGuiaRapida();
+    }
+    
+    function limpiarCanvas() {
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        points = [];
+        drawing = false;
+    }
+    
+    document.getElementById("validarBtn").addEventListener("click", validarDibujo);
+    document.getElementById("clearBtn").addEventListener("click", () => {
+        limpiarCanvas();
+        mostrarGuia = true;
+        dibujarGuiaRapida();
+    });
+    
+    initCanvas();
+</script>
+</body>
+</html>
