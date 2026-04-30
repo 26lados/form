@@ -36,7 +36,7 @@
 
         .auth-card {
             background: white;
-            max-width: 600px;
+            max-width: 650px;
             width: 90%;
             border-radius: 2rem;
             padding: 2rem;
@@ -57,7 +57,6 @@
             margin: 1rem 0;
             border: 2px solid #d1d5db;
             transition: all 0.3s;
-            position: relative;
         }
 
         .canvas-container.active {
@@ -68,7 +67,7 @@
         canvas {
             display: block;
             width: 100%;
-            max-width: 500px;
+            max-width: 550px;
             margin: 0 auto;
             background: white;
             border-radius: 1rem;
@@ -398,7 +397,7 @@
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="canvas-container" id="canvasContainer">
-            <canvas id="drawCanvas" width="500" height="300"></canvas>
+            <canvas id="drawCanvas" width="550" height="350"></canvas>
         </div>
 
         <div class="button-group">
@@ -698,7 +697,7 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CARA FELIZ
+    // AUTENTICACIÓN CARA FELIZ (FLEXIBLE)
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
@@ -706,50 +705,42 @@
     let drawing = false;
     let points = [];
     
-    // Dibujar guía rápida en el canvas
+    // Dibujar guía rápida en el canvas (más grande)
     function dibujarGuiaRapida() {
         if (!mostrarGuia) return;
         
-        // Guardar estado actual
         ctx.save();
-        
-        // Dibujar una guía tenue (círculo + sonrisa + ojos)
-        ctx.globalAlpha = 0.3;
+        ctx.globalAlpha = 0.25;
         ctx.strokeStyle = "#667eea";
         ctx.fillStyle = "#667eea";
-        ctx.lineWidth = 2;
-        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 3;
+        ctx.setLineDash([6, 8]);
         
-        // Círculo guía
+        const centroX = canvas.width / 2;
+        const centroY = canvas.height / 2;
+        
+        // Círculo guía más grande (radio 110)
         ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2, 80, 0, 2 * Math.PI);
+        ctx.arc(centroX, centroY, 110, 0, 2 * Math.PI);
         ctx.stroke();
         
-        // Ojos
+        // Ojos más grandes
         ctx.beginPath();
-        ctx.arc(canvas.width/2 - 25, canvas.height/2 - 25, 6, 0, 2 * Math.PI);
+        ctx.arc(centroX - 35, centroY - 35, 10, 0, 2 * Math.PI);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(canvas.width/2 + 25, canvas.height/2 - 25, 6, 0, 2 * Math.PI);
+        ctx.arc(centroX + 35, centroY - 35, 10, 0, 2 * Math.PI);
         ctx.fill();
         
-        // Sonrisa
+        // Sonrisa más grande
         ctx.beginPath();
-        ctx.arc(canvas.width/2, canvas.height/2 + 10, 40, 0.1, Math.PI - 0.1);
+        ctx.arc(centroX, centroY + 15, 60, 0.1, Math.PI - 0.1);
         ctx.stroke();
         
-        // Texto
-        ctx.font = "12px 'Inter'";
-        ctx.fillStyle = "#9ca3af";
-        ctx.shadowBlur = 0;
-        ctx.fillText("✏️ Dibuja aquí", canvas.width/2 - 50, canvas.height - 20);
-        
-        // Restaurar
         ctx.setLineDash([]);
         ctx.globalAlpha = 1;
         ctx.restore();
         
-        // Ocultar la guía después de 0.5 segundos
         setTimeout(() => {
             limpiarGuia();
             mostrarGuia = false;
@@ -763,8 +754,8 @@
     }
     
     function initCanvas() {
-        canvas.width = 500;
-        canvas.height = 300;
+        canvas.width = 550;
+        canvas.height = 350;
         
         ctx.fillStyle = "white";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -774,7 +765,6 @@
         ctx.lineWidth = 8;
         ctx.strokeStyle = "#667eea";
         
-        // Mostrar guía rápida al inicio
         dibujarGuiaRapida();
         
         canvas.addEventListener("mousedown", startDrawing);
@@ -798,7 +788,6 @@
         ctx.stroke();
         document.getElementById("canvasContainer").classList.add("active");
         
-        // Limpiar guía si existe
         if (mostrarGuia) {
             limpiarGuia();
             mostrarGuia = false;
@@ -876,7 +865,7 @@
     function validarDibujo() {
         if (authCompleted) return;
         
-        if (points.length < 30) {
+        if (points.length < 20) {
             animarDenegado();
             return;
         }
@@ -899,6 +888,9 @@
     }
     
     function verificarCaraFeliz() {
+        // Versión MUY flexible - solo necesita un círculo y algo en la parte inferior o superior
+        
+        // Calcular centro
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -907,6 +899,7 @@
         centroX /= points.length;
         centroY /= points.length;
         
+        // 1. Detectar si es un círculo (muy flexible)
         let distancias = [];
         for (const p of points) {
             distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
@@ -916,24 +909,24 @@
         let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
         let coeficiente = variacion / radioPromedio;
         
-        const tieneCirculo = coeficiente < 0.5 && radioPromedio > 40;
+        // MUY flexible: coeficiente < 0.65 es aceptable, radio > 40
+        const tieneCirculo = coeficiente < 0.65 && radioPromedio > 40;
         
-        let puntosInferiores = points.filter(p => p.y > centroY + 10);
-        let tieneSonrisa = false;
+        // 2. Detectar sonrisa o algo en la parte inferior
+        let puntosInferiores = points.filter(p => p.y > centroY + 5);
+        let tieneSonrisa = puntosInferiores.length > 8;
         
-        if (puntosInferiores.length > 8) {
-            let movimientoHorizontal = 0;
-            puntosInferiores.sort((a, b) => a.x - b.x);
-            for (let i = 1; i < puntosInferiores.length; i++) {
-                movimientoHorizontal += Math.abs(puntosInferiores[i].x - puntosInferiores[i-1].x);
-            }
-            tieneSonrisa = movimientoHorizontal > radioPromedio * 1.2;
-        }
+        // 3. Detectar ojos o algo en la parte superior
+        let puntosSuperiores = points.filter(p => p.y < centroY - 5);
+        let tieneOjos = puntosSuperiores.length > 5;
         
-        let puntosSuperiores = points.filter(p => p.y < centroY - 20);
-        let tieneOjos = puntosSuperiores.length >= 3;
+        // Resultado: círculo + (sonrisa O ojos)
+        const esCara = tieneCirculo && (tieneSonrisa || tieneOjos);
         
-        return tieneCirculo && (tieneSonrisa || tieneOjos);
+        console.log("📊 Círculo:", tieneCirculo, "Radio:", Math.round(radioPromedio), "Coef:", coeficiente.toFixed(2));
+        console.log("📊 Sonrisa:", tieneSonrisa, "Ojos:", tieneOjos, "Total:", esCara);
+        
+        return esCara;
     }
     
     function animarDenegado() {
