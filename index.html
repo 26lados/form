@@ -14,9 +14,62 @@
             font-family: 'Inter', sans-serif;
         }
 
+        /* Light mode (default) */
+        :root {
+            --bg-gradient-start: #667eea;
+            --bg-gradient-end: #764ba2;
+            --card-bg: white;
+            --text-primary: #202124;
+            --text-secondary: #5f6368;
+            --border-color: #e5e7eb;
+            --header-bg: white;
+            --badge-local: #dbeafe;
+            --badge-local-text: #1e40af;
+            --badge-sheet: #d1fae5;
+            --badge-sheet-text: #065f46;
+            --info-bar-bg: #fef3c7;
+            --info-bar-text: #92400e;
+            --canvas-bg: white;
+            --canvas-border: #d1d5db;
+            --canvas-active-border: #667eea;
+            --canvas-active-bg: #f0f4ff;
+            --btn-primary: linear-gradient(135deg, #667eea, #764ba2);
+            --btn-reset: #6b7280;
+            --btn-reset-hover: #4b5563;
+            --btn-add: linear-gradient(135deg, #10b981, #059669);
+            --toast-bg: #333;
+        }
+
+        /* Dark mode */
+        body.dark-mode {
+            --bg-gradient-start: #1a1a2e;
+            --bg-gradient-end: #16213e;
+            --card-bg: #1e1e2e;
+            --text-primary: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --border-color: #2d2d3d;
+            --header-bg: #252535;
+            --badge-local: #1e3a5f;
+            --badge-local-text: #93c5fd;
+            --badge-sheet: #064e3b;
+            --badge-sheet-text: #6ee7b7;
+            --info-bar-bg: #451a03;
+            --info-bar-text: #fde68a;
+            --canvas-bg: #1a1a2a;
+            --canvas-border: #3d3d4d;
+            --canvas-active-border: #818cf8;
+            --canvas-active-bg: #1e1e3a;
+            --btn-primary: linear-gradient(135deg, #818cf8, #a78bfa);
+            --btn-reset: #4a4a5a;
+            --btn-reset-hover: #5a5a6a;
+            --btn-add: linear-gradient(135deg, #34d399, #059669);
+            --toast-bg: #2d2d3d;
+        }
+
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
+            transition: all 0.3s ease;
         }
 
         .auth-overlay {
@@ -35,7 +88,7 @@
         }
 
         .auth-card {
-            background: white;
+            background: var(--card-bg);
             max-width: 650px;
             width: 90%;
             border-radius: 2rem;
@@ -43,6 +96,7 @@
             text-align: center;
             box-shadow: 0 30px 50px rgba(0,0,0,0.4);
             animation: fadeUp 0.4s ease;
+            transition: background 0.3s ease;
         }
 
         @keyframes fadeUp {
@@ -51,17 +105,17 @@
         }
 
         .canvas-container {
-            background: #f9fafb;
+            background: var(--canvas-active-bg);
             border-radius: 1.5rem;
             padding: 1rem;
             margin: 1rem 0;
-            border: 2px solid #d1d5db;
+            border: 2px solid var(--canvas-border);
             transition: all 0.3s;
         }
 
         .canvas-container.active {
-            border-color: #667eea;
-            background: #f0f4ff;
+            border-color: var(--canvas-active-border);
+            background: var(--canvas-active-bg);
         }
 
         canvas {
@@ -69,7 +123,7 @@
             width: 100%;
             max-width: 550px;
             margin: 0 auto;
-            background: white;
+            background: var(--canvas-bg);
             border-radius: 1rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             cursor: crosshair;
@@ -77,7 +131,7 @@
         }
 
         .btn-candado {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--btn-primary);
             border: none;
             color: white;
             font-size: 2rem;
@@ -97,7 +151,7 @@
         }
 
         .btn-reset {
-            background: #6b7280;
+            background: var(--btn-reset);
             border: none;
             color: white;
             font-size: 1.2rem;
@@ -111,7 +165,7 @@
         }
 
         .btn-reset:hover {
-            background: #4b5563;
+            background: var(--btn-reset-hover);
             transform: scale(1.05);
         }
 
@@ -129,38 +183,40 @@
             flex-wrap: wrap;
             margin-bottom: 2rem;
             gap: 1rem;
-            background: white;
+            background: var(--header-bg);
             padding: 1rem 2rem;
             border-radius: 1.5rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: background 0.3s ease;
         }
 
         h1 {
             font-weight: 700;
             font-size: 1.5rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--btn-primary);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
         .info-bar {
-            background: #fef3c7;
+            background: var(--info-bar-bg);
             padding: 8px 16px;
             border-radius: 40px;
             font-size: 0.8rem;
             font-weight: 500;
-            color: #92400e;
+            color: var(--info-bar-text);
             margin-bottom: 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            transition: background 0.3s ease;
         }
 
         .btn-add {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: var(--btn-add);
             border: none;
             color: white;
             font-weight: 600;
@@ -183,17 +239,18 @@
         }
 
         .note-card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 1rem;
             padding: 1.2rem;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: all 0.2s;
             position: relative;
+            border: 1px solid var(--border-color);
         }
 
         .note-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
         }
 
         .note-badge {
@@ -206,13 +263,13 @@
         }
 
         .badge-local {
-            background: #dbeafe;
-            color: #1e40af;
+            background: var(--badge-local);
+            color: var(--badge-local-text);
         }
 
         .badge-sheet {
-            background: #d1fae5;
-            color: #065f46;
+            background: var(--badge-sheet);
+            color: var(--badge-sheet-text);
         }
 
         .note-title {
@@ -220,13 +277,13 @@
             font-weight: 700;
             margin-bottom: 0.5rem;
             margin-top: 0.5rem;
-            color: #202124;
+            color: var(--text-primary);
             word-break: break-word;
             padding-right: 60px;
         }
 
         .note-content {
-            color: #5f6368;
+            color: var(--text-secondary);
             font-size: 0.9rem;
             line-height: 1.5;
             white-space: pre-wrap;
@@ -238,7 +295,7 @@
             display: flex;
             gap: 0.8rem;
             justify-content: flex-end;
-            border-top: 1px solid #e5e7eb;
+            border-top: 1px solid var(--border-color);
             padding-top: 0.8rem;
         }
 
@@ -268,6 +325,14 @@
             background: #fef2f2;
         }
 
+        body.dark-mode .btn-edit:hover {
+            background: #1e3a5f;
+        }
+
+        body.dark-mode .btn-delete:hover {
+            background: #4c0519;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -282,7 +347,7 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--card-bg);
             border-radius: 1.5rem;
             padding: 2rem;
             max-width: 500px;
@@ -293,17 +358,20 @@
         .modal-content h3 {
             margin-bottom: 1rem;
             font-size: 1.5rem;
+            color: var(--text-primary);
         }
 
         .modal-content input,
         .modal-content textarea {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--border-color);
             border-radius: 1rem;
             font-size: 1rem;
             margin-bottom: 1rem;
             font-family: 'Inter', sans-serif;
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
         .modal-content textarea {
@@ -326,13 +394,13 @@
         }
 
         .btn-save {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: var(--btn-primary);
             color: white;
         }
 
         .btn-cancel {
-            background: #f3f4f6;
-            color: #6b7280;
+            background: var(--btn-reset);
+            color: white;
         }
 
         footer {
@@ -347,7 +415,7 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: #333;
+            background: var(--toast-bg);
             color: white;
             padding: 12px 24px;
             border-radius: 40px;
@@ -388,7 +456,7 @@
             display: inline-block;
             width: 16px;
             height: 16px;
-            border: 2px solid #667eea;
+            border: 2px solid var(--text-primary);
             border-radius: 50%;
             border-top-color: transparent;
             animation: spin 0.6s linear infinite;
@@ -397,6 +465,11 @@
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        .offline-icon {
+            margin-left: 10px;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -423,6 +496,7 @@
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone</h1>
+        <div id="connectionStatus" style="font-size: 0.8rem;"></div>
     </div>
     <div class="info-bar">
         <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas</span>
@@ -443,10 +517,10 @@
     <div class="modal-content">
         <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva nota</h3>
         <div style="margin-bottom: 1rem; text-align: left;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-primary);">
                 <input type="radio" name="tipoNota" value="local" checked> 📁 Guardar localmente
             </label>
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 0.5rem;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 0.5rem; color: var(--text-primary);">
                 <input type="radio" name="tipoNota" value="sheet"> 🌐 Guardar en Google Sheets
             </label>
         </div>
@@ -467,13 +541,36 @@
     // ============================================
     
     // 🔴 REEMPLAZA CON LA URL DE TU APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwH9qtxtvswhZM-70Nl0DxOg8VVgBbLg0_eSnr_tVHDk_LKDhHGH-Obh1ElH5o37yP6yQ/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby3FNenvyqBXX_yeULkswu793oOPw0oPCJS6ji2nz3fuIEs6SqlnxrS-95NVsB9y7LIDA/exec";
     
     let notas = [];
     let editingId = null;
     let editingType = null;
     let authCompleted = false;
     let mostrarGuia = true;
+    let conexionSheets = true;
+    
+    // ============================================
+    // DARK MODE
+    // ============================================
+    
+    function activarDarkMode() {
+        document.body.classList.add('dark-mode');
+        const statusDiv = document.getElementById("connectionStatus");
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-plug"></i> Modo local <i class="fas fa-moon offline-icon"></i>';
+            statusDiv.style.color = "#fde68a";
+        }
+    }
+    
+    function activarLightMode() {
+        document.body.classList.remove('dark-mode');
+        const statusDiv = document.getElementById("connectionStatus");
+        if (statusDiv) {
+            statusDiv.innerHTML = '<i class="fas fa-cloud"></i> Conectado <i class="fas fa-sun"></i>';
+            statusDiv.style.color = "#10b981";
+        }
+    }
     
     // ============================================
     // NOTA FIJA XML (LOCAL)
@@ -500,7 +597,6 @@
             locales = JSON.parse(guardado);
         }
         
-        // Asegurar que la nota fija existe
         const existeFija = locales.some(n => n.id === NOTA_XML_FIJA.id);
         if (!existeFija) {
             locales.unshift({ ...NOTA_XML_FIJA });
@@ -555,9 +651,28 @@
     // COMUNICACIÓN CON GOOGLE SHEETS
     // ============================================
     
+    async function probarConexionSheets() {
+        try {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+            
+            const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllNotes`, {
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            return response.ok;
+        } catch (error) {
+            console.error("Error de conexión:", error);
+            return false;
+        }
+    }
+    
     async function cargarNotasSheets() {
         try {
             const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllNotes`);
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
+            
             const data = await response.json();
             
             if (data.success && data.notes) {
@@ -566,11 +681,18 @@
             return [];
         } catch (error) {
             console.error("Error cargando Sheets:", error);
+            conexionSheets = false;
+            activarDarkMode();
             return [];
         }
     }
     
     async function agregarNotaSheet(title, content) {
+        if (!conexionSheets) {
+            mostrarToast("⚠️ Sin conexión a Google Sheets. Guardando localmente...");
+            return { success: false, message: "Sin conexión" };
+        }
+        
         try {
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -587,11 +709,18 @@
             return data;
         } catch (error) {
             console.error("Error:", error);
+            conexionSheets = false;
+            activarDarkMode();
             return { success: false, message: error.toString() };
         }
     }
     
     async function editarNotaSheet(row, title, content) {
+        if (!conexionSheets) {
+            mostrarToast("⚠️ Sin conexión a Google Sheets. No se puede editar");
+            return { success: false, message: "Sin conexión" };
+        }
+        
         try {
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -609,11 +738,18 @@
             return data;
         } catch (error) {
             console.error("Error:", error);
+            conexionSheets = false;
+            activarDarkMode();
             return { success: false, message: error.toString() };
         }
     }
     
     async function eliminarNotaSheet(row) {
+        if (!conexionSheets) {
+            mostrarToast("⚠️ Sin conexión a Google Sheets. No se puede eliminar");
+            return { success: false, message: "Sin conexión" };
+        }
+        
         try {
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -629,22 +765,38 @@
             return data;
         } catch (error) {
             console.error("Error:", error);
+            conexionSheets = false;
+            activarDarkMode();
             return { success: false, message: error.toString() };
         }
     }
     
     // ============================================
-    // CARGAR TODAS LAS NOTAS (LOCALES + SHEETS)
+    // CARGAR TODAS LAS NOTAS
     // ============================================
     
     async function cargarTodasLasNotas() {
         const container = document.getElementById("notesContainer");
-        container.innerHTML = '<div style="background:white; border-radius:1rem; padding:2rem; text-align:center;"><span class="loading"></span> Cargando notas...</div>';
+        container.innerHTML = '<div style="background:var(--card-bg); border-radius:1rem; padding:2rem; text-align:center;"><span class="loading"></span> Cargando notas...</div>';
+        
+        // Probar conexión
+        const hayConexion = await probarConexionSheets();
+        if (!hayConexion) {
+            conexionSheets = false;
+            activarDarkMode();
+            mostrarToast("📡 Sin conexión a Google Sheets - Modo local activado");
+        } else {
+            conexionSheets = true;
+            activarLightMode();
+        }
         
         const locales = cargarNotasLocales();
-        const sheets = await cargarNotasSheets();
+        let sheets = [];
         
-        // Combinar: primero las de Sheets, luego las locales
+        if (conexionSheets) {
+            sheets = await cargarNotasSheets();
+        }
+        
         notas = [...sheets, ...locales];
         renderizarNotas();
         actualizarContador();
@@ -656,12 +808,21 @@
             mostrarToast("✅ Nota guardada localmente");
             await cargarTodasLasNotas();
         } else {
+            if (!conexionSheets) {
+                mostrarToast("⚠️ Sin conexión a Google Sheets. Guardando localmente...");
+                agregarNotaLocal(title, content);
+                await cargarTodasLasNotas();
+                return;
+            }
+            
             const resultado = await agregarNotaSheet(title, content);
             if (resultado.success) {
                 mostrarToast("✅ Nota guardada en Google Sheets");
                 await cargarTodasLasNotas();
             } else {
-                mostrarToast("❌ Error: " + resultado.message);
+                mostrarToast("❌ Error: guardando localmente");
+                agregarNotaLocal(title, content);
+                await cargarTodasLasNotas();
             }
         }
     }
@@ -676,6 +837,11 @@
                 mostrarToast("⚠️ No se puede editar la nota fija");
             }
         } else {
+            if (!conexionSheets) {
+                mostrarToast("⚠️ Sin conexión a Google Sheets");
+                return;
+            }
+            
             const resultado = await editarNotaSheet(row, newTitle, newContent);
             if (resultado.success) {
                 mostrarToast("✏️ Nota editada en Google Sheets");
@@ -698,6 +864,11 @@
                 mostrarToast("⚠️ No se puede eliminar la nota fija");
             }
         } else {
+            if (!conexionSheets) {
+                mostrarToast("⚠️ Sin conexión a Google Sheets");
+                return;
+            }
+            
             const resultado = await eliminarNotaSheet(row);
             if (resultado.success) {
                 mostrarToast("🗑️ Nota eliminada de Google Sheets");
@@ -719,9 +890,9 @@
         
         if (notas.length === 0) {
             container.innerHTML = `
-                <div style="background:white; border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
+                <div style="background:var(--card-bg); border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
                     <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                    <p style="color: #6b7280; margin-bottom: 1rem;">No hay notas</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">No hay notas</p>
                     <button class="btn-add" onclick="document.getElementById('openModalBtn').click()">
                         <i class="fas fa-plus"></i> Crear nota
                     </button>
@@ -769,7 +940,6 @@
         document.getElementById("noteContent").value = content;
         document.getElementById("editingId").value = id;
         
-        // Seleccionar el tipo correcto en el radio
         const radioLocal = document.querySelector('input[value="local"]');
         const radioSheet = document.querySelector('input[value="sheet"]');
         if (tipo === "local") {
@@ -812,7 +982,6 @@
         btnSave.innerHTML = '<span class="loading"></span> Guardando...';
         
         if (editId) {
-            // Obtener la nota original para saber su tipo y fila
             const notaOriginal = notas.find(n => n.id === editId);
             if (notaOriginal) {
                 const tipo = notaOriginal.type === "local" || notaOriginal.fromSheet === false ? "local" : "sheet";
@@ -851,14 +1020,14 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CARA FELIZ (+20% DIFICULTAD)
+    // AUTENTICACIÓN CARA FELIZ (+30% DIFICULTAD)
     // ============================================
-    // Parámetros más estrictos:
-    // - Radio mínimo: 50 (antes 40)
-    // - Coeficiente máximo: 0.55 (antes 0.65)
-    // - Puntos mínimos: 35 (antes 20)
-    // - Sonrisa: necesita más puntos
-    // - Ojos: necesita más puntos
+    // Parámetros aún más estrictos:
+    // - Radio mínimo: 60 (antes 50)
+    // - Coeficiente máximo: 0.48 (antes 0.55)
+    // - Puntos mínimos: 50 (antes 35)
+    // - Sonrisa: necesita más puntos (18)
+    // - Ojos: necesita más puntos (12)
     
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
@@ -1021,8 +1190,8 @@
     function validarDibujo() {
         if (authCompleted) return;
         
-        // DIFICULTAD +20%: más puntos requeridos
-        if (points.length < 35) {
+        // DIFICULTAD +30%: más puntos requeridos
+        if (points.length < 50) {
             animarDenegado();
             return;
         }
@@ -1045,7 +1214,6 @@
     }
     
     function verificarCaraFeliz() {
-        // Calcular centro
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -1054,7 +1222,6 @@
         centroX /= points.length;
         centroY /= points.length;
         
-        // 1. Detectar círculo (más estricto)
         let distancias = [];
         for (const p of points) {
             distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
@@ -1064,16 +1231,14 @@
         let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
         let coeficiente = variacion / radioPromedio;
         
-        // DIFICULTAD +20%: radio mínimo 50, coeficiente máximo 0.55
-        const tieneCirculo = coeficiente < 0.55 && radioPromedio > 50;
+        // DIFICULTAD +30%: radio mínimo 60, coeficiente máximo 0.48
+        const tieneCirculo = coeficiente < 0.48 && radioPromedio > 60;
         
-        // 2. Detectar sonrisa (más estricto)
         let puntosInferiores = points.filter(p => p.y > centroY + 10);
-        let tieneSonrisa = puntosInferiores.length > 12;
+        let tieneSonrisa = puntosInferiores.length > 18;
         
-        // 3. Detectar ojos (más estricto)
         let puntosSuperiores = points.filter(p => p.y < centroY - 10);
-        let tieneOjos = puntosSuperiores.length > 8;
+        let tieneOjos = puntosSuperiores.length > 12;
         
         const esCara = tieneCirculo && (tieneSonrisa || tieneOjos);
         
