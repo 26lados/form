@@ -57,6 +57,7 @@
             margin: 1rem 0;
             border: 2px solid #d1d5db;
             transition: all 0.3s;
+            position: relative;
         }
 
         .canvas-container.active {
@@ -399,6 +400,7 @@
         <div class="canvas-container" id="canvasContainer">
             <canvas id="drawCanvas" width="500" height="300"></canvas>
         </div>
+
         <div class="button-group">
             <button id="validarBtn" class="btn-candado">
                 <i class="fas fa-lock"></i>
@@ -425,7 +427,7 @@
         <div class="empty-state">Cargando notas...</div>
     </div>
     <footer>
-        🔐 Dibuja una cara FELIZ (círculo + sonrisa) para acceder
+        🔐
     </footer>
 </div>
 
@@ -456,6 +458,7 @@
     let editingId = null;
     let editingRow = null;
     let authCompleted = false;
+    let mostrarGuia = true;
     
     // ============================================
     // COMUNICACIÓN CON GOOGLE SHEETS
@@ -556,7 +559,7 @@
     async function agregarNota(title, content) {
         const resultado = await agregarNotaSheet(title, content);
         if (resultado.success) {
-            mostrarToast("✅ Nota guardada en Google Sheets");
+            mostrarToast("✅ Nota guardada");
             await cargarTodasLasNotas();
         } else {
             mostrarToast("❌ Error: " + resultado.message);
@@ -566,7 +569,7 @@
     async function editarNota(row, newTitle, newContent) {
         const resultado = await editarNotaSheet(row, newTitle, newContent);
         if (resultado.success) {
-            mostrarToast("✏️ Nota editada en Google Sheets");
+            mostrarToast("✏️ Nota editada");
             await cargarTodasLasNotas();
         } else {
             mostrarToast("❌ Error: " + resultado.message);
@@ -578,7 +581,7 @@
         
         const resultado = await eliminarNotaSheet(row);
         if (resultado.success) {
-            mostrarToast("🗑️ Nota eliminada de Google Sheets");
+            mostrarToast("🗑️ Nota eliminada");
             await cargarTodasLasNotas();
         } else {
             mostrarToast("❌ Error: " + resultado.message);
@@ -600,7 +603,7 @@
                     <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
                     <p style="color: #6b7280; margin-bottom: 1rem;">No hay notas</p>
                     <button class="btn-add" onclick="document.getElementById('openModalBtn').click()">
-                        <i class="fas fa-plus"></i> Crear primera nota
+                        <i class="fas fa-plus"></i> Crear
                     </button>
                 </div>
             `;
@@ -609,17 +612,15 @@
         
         container.innerHTML = notas.map(nota => `
             <div class="note-card">
-                <div class="note-badge">
-                    🌐 Sheets
-                </div>
+                <div class="note-badge">🌐</div>
                 <div class="note-title">${escapeHtml(nota.title)}</div>
                 <div class="note-content">${escapeHtml(nota.content)}</div>
                 <div class="note-actions">
                     <button class="btn-edit" onclick="abrirModalEditar('${nota.id}', ${nota.row}, '${escapeHtml(nota.title)}', '${escapeHtml(nota.content)}')">
-                        <i class="fas fa-edit"></i> Editar
+                        <i class="fas fa-edit"></i>
                     </button>
                     <button class="btn-delete" onclick="eliminarNota(${nota.row})">
-                        <i class="fas fa-trash-alt"></i> Eliminar
+                        <i class="fas fa-trash-alt"></i>
                     </button>
                 </div>
             </div>
@@ -629,7 +630,7 @@
     function abrirModalEditar(id, row, title, content) {
         editingId = id;
         editingRow = row;
-        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar nota';
+        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar';
         document.getElementById("noteTitle").value = title;
         document.getElementById("noteContent").value = content;
         document.getElementById("editingId").value = id;
@@ -654,13 +655,13 @@
         const editRow = document.getElementById("editingRow").value;
         
         if (!title && !content) {
-            mostrarToast("⚠️ Escribe título o contenido");
+            mostrarToast("⚠️ Escribe algo");
             return;
         }
         
         const btnSave = document.getElementById("saveNoteBtn");
         btnSave.disabled = true;
-        btnSave.innerHTML = '<span class="loading"></span> Guardando...';
+        btnSave.innerHTML = '<span class="loading"></span>';
         
         if (editRow) {
             await editarNota(parseInt(editRow), title || "Sin título", content);
@@ -682,7 +683,7 @@
         toast.className = 'toast';
         toast.innerHTML = mensaje;
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 3000);
+        setTimeout(() => toast.remove(), 2000);
     }
     
     function escapeHtml(str) {
@@ -697,13 +698,69 @@
     }
     
     // ============================================
-    // AUTENTICACIÓN CARA FELIZ (OBLIGATORIA)
+    // AUTENTICACIÓN CARA FELIZ
     // ============================================
     
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
     let drawing = false;
     let points = [];
+    
+    // Dibujar guía rápida en el canvas
+    function dibujarGuiaRapida() {
+        if (!mostrarGuia) return;
+        
+        // Guardar estado actual
+        ctx.save();
+        
+        // Dibujar una guía tenue (círculo + sonrisa + ojos)
+        ctx.globalAlpha = 0.3;
+        ctx.strokeStyle = "#667eea";
+        ctx.fillStyle = "#667eea";
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        
+        // Círculo guía
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2, 80, 0, 2 * Math.PI);
+        ctx.stroke();
+        
+        // Ojos
+        ctx.beginPath();
+        ctx.arc(canvas.width/2 - 25, canvas.height/2 - 25, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(canvas.width/2 + 25, canvas.height/2 - 25, 6, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        // Sonrisa
+        ctx.beginPath();
+        ctx.arc(canvas.width/2, canvas.height/2 + 10, 40, 0.1, Math.PI - 0.1);
+        ctx.stroke();
+        
+        // Texto
+        ctx.font = "12px 'Inter'";
+        ctx.fillStyle = "#9ca3af";
+        ctx.shadowBlur = 0;
+        ctx.fillText("✏️ Dibuja aquí", canvas.width/2 - 50, canvas.height - 20);
+        
+        // Restaurar
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 1;
+        ctx.restore();
+        
+        // Ocultar la guía después de 0.5 segundos
+        setTimeout(() => {
+            limpiarGuia();
+            mostrarGuia = false;
+        }, 500);
+    }
+    
+    function limpiarGuia() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
     
     function initCanvas() {
         canvas.width = 500;
@@ -716,6 +773,9 @@
         ctx.lineJoin = "round";
         ctx.lineWidth = 8;
         ctx.strokeStyle = "#667eea";
+        
+        // Mostrar guía rápida al inicio
+        dibujarGuiaRapida();
         
         canvas.addEventListener("mousedown", startDrawing);
         canvas.addEventListener("mousemove", draw);
@@ -737,6 +797,12 @@
         ctx.moveTo(x, y);
         ctx.stroke();
         document.getElementById("canvasContainer").classList.add("active");
+        
+        // Limpiar guía si existe
+        if (mostrarGuia) {
+            limpiarGuia();
+            mostrarGuia = false;
+        }
     }
     
     function startDrawingTouch(e) {
@@ -748,6 +814,11 @@
         ctx.moveTo(x, y);
         ctx.stroke();
         document.getElementById("canvasContainer").classList.add("active");
+        
+        if (mostrarGuia) {
+            limpiarGuia();
+            mostrarGuia = false;
+        }
     }
     
     function draw(e) {
@@ -805,14 +876,14 @@
     function validarDibujo() {
         if (authCompleted) return;
         
-        if (points.length < 40) {
+        if (points.length < 30) {
             animarDenegado();
             return;
         }
         
-        const resultado = verificarCaraFeliz();
+        const esCaraFeliz = verificarCaraFeliz();
         
-        if (resultado.esFeliz) {
+        if (esCaraFeliz) {
             authCompleted = true;
             setTimeout(() => {
                 document.getElementById("authOverlay").style.opacity = "0";
@@ -828,7 +899,6 @@
     }
     
     function verificarCaraFeliz() {
-        // Calcular centro
         let centroX = 0, centroY = 0;
         for (const p of points) {
             centroX += p.x;
@@ -837,7 +907,6 @@
         centroX /= points.length;
         centroY /= points.length;
         
-        // Detectar círculo (cabeza)
         let distancias = [];
         for (const p of points) {
             distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
@@ -847,52 +916,24 @@
         let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
         let coeficiente = variacion / radioPromedio;
         
-        const tieneCirculo = coeficiente < 0.45 && radioPromedio > 40;
+        const tieneCirculo = coeficiente < 0.5 && radioPromedio > 40;
         
-        // Detectar sonrisa (curva hacia ARRIBA - feliz)
-        // Una sonrisa feliz tiene puntos que suben y luego bajan formando una U invertida
-        let puntosInferiores = points.filter(p => p.y > centroY + 15);
+        let puntosInferiores = points.filter(p => p.y > centroY + 10);
+        let tieneSonrisa = false;
         
-        // Ordenar por X para analizar la curva
-        puntosInferiores.sort((a, b) => a.x - b.x);
-        
-        let tieneSonrisaFeliz = false;
-        
-        if (puntosInferiores.length > 10) {
-            // Verificar que los puntos de la sonrisa forman una U (feliz)
-            let primerY = puntosInferiores[0].y;
-            let ultimoY = puntosInferiores[puntosInferiores.length - 1].y;
-            let minimoY = Math.min(...puntosInferiores.map(p => p.y));
-            
-            // Sonrisa feliz: los extremos están más arriba que el centro
-            let extremosArriba = primerY < minimoY + 10 && ultimoY < minimoY + 10;
-            let centroAbajo = minimoY > primerY + 5;
-            
-            tieneSonrisaFeliz = extremosArriba && centroAbajo;
+        if (puntosInferiores.length > 8) {
+            let movimientoHorizontal = 0;
+            puntosInferiores.sort((a, b) => a.x - b.x);
+            for (let i = 1; i < puntosInferiores.length; i++) {
+                movimientoHorizontal += Math.abs(puntosInferiores[i].x - puntosInferiores[i-1].x);
+            }
+            tieneSonrisa = movimientoHorizontal > radioPromedio * 1.2;
         }
         
-        // Detectar si hay boca triste (curva hacia ABAJO)
-        let tieneBocaTriste = false;
-        
-        if (puntosInferiores.length > 10) {
-            let maximoY = Math.max(...puntosInferiores.map(p => p.y));
-            let minimoY = Math.min(...puntosInferiores.map(p => p.y));
-            
-            // Boca triste: el centro es más alto que los extremos
-            let esTriste = (maximoY - minimoY) > 15 && (primerY > minimoY + 5 || ultimoY > minimoY + 5);
-            tieneBocaTriste = esTriste;
-        }
-        
-        // Detectar ojos (puntos en la parte superior)
         let puntosSuperiores = points.filter(p => p.y < centroY - 20);
-        let tieneOjos = puntosSuperiores.length >= 4;
+        let tieneOjos = puntosSuperiores.length >= 3;
         
-        // RESULTADO: debe tener círculo, sonrisa feliz, y NO boca triste
-        const esFeliz = tieneCirculo && tieneSonrisaFeliz && !tieneBocaTriste;
-        
-        console.log("Círculo:", tieneCirculo, "Sonrisa feliz:", tieneSonrisaFeliz, "Boca triste:", tieneBocaTriste, "Ojos:", tieneOjos);
-        
-        return { esFeliz: esFeliz };
+        return tieneCirculo && (tieneSonrisa || tieneOjos);
     }
     
     function animarDenegado() {
@@ -902,6 +943,8 @@
             btn.classList.remove("acceso-denegado");
         }, 300);
         limpiarCanvas();
+        mostrarGuia = true;
+        dibujarGuiaRapida();
     }
     
     function limpiarCanvas() {
@@ -913,7 +956,11 @@
     
     // Eventos
     document.getElementById("validarBtn").addEventListener("click", validarDibujo);
-    document.getElementById("clearBtn").addEventListener("click", limpiarCanvas);
+    document.getElementById("clearBtn").addEventListener("click", () => {
+        limpiarCanvas();
+        mostrarGuia = true;
+        dibujarGuiaRapida();
+    });
     document.getElementById("openModalBtn").addEventListener("click", abrirModalNueva);
     document.getElementById("cancelModalBtn").addEventListener("click", cerrarModal);
     document.getElementById("saveNoteBtn").addEventListener("click", guardarNotaModal);
