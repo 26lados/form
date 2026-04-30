@@ -69,7 +69,7 @@
         body {
             background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
             min-height: 100vh;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease;
         }
 
         .auth-overlay {
@@ -466,9 +466,23 @@
 
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        .offline-icon {
-            margin-left: 10px;
-            font-size: 0.9rem;
+        .estado-conexion {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 30px;
+        }
+
+        .conectado {
+            background: #10b98120;
+            color: #10b981;
+        }
+
+        .offline {
+            background: #ef444420;
+            color: #f87171;
         }
     </style>
 </head>
@@ -480,7 +494,6 @@
         <div class="canvas-container" id="canvasContainer">
             <canvas id="drawCanvas" width="550" height="350"></canvas>
         </div>
-
         <div class="button-group">
             <button id="validarBtn" class="btn-candado">
                 <i class="fas fa-lock"></i>
@@ -496,7 +509,9 @@
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone</h1>
-        <div id="connectionStatus" style="font-size: 0.8rem;"></div>
+        <div id="connectionStatus" class="estado-conexion conectado">
+            <i class="fas fa-cloud-upload-alt"></i> Sincronizado
+        </div>
     </div>
     <div class="info-bar">
         <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas</span>
@@ -512,7 +527,7 @@
     </footer>
 </div>
 
-<!-- Modal para agregar/editar nota -->
+<!-- Modal -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva nota</h3>
@@ -541,36 +556,16 @@
     // ============================================
     
     // 🔴 REEMPLAZA CON LA URL DE TU APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyrdglPK2X3dtdAWs5iMGlJz_de2OtNXOuwhnllPfkUpHl56AVkUkEjao8Lkbt9hcwzOg/exec";
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXLioTd7BUUwV09W_T3xGOWyGd17TZZRS6H9oHQh9ahkM9KJO0vWQyo3hAsO-lrZlWpw/exec";
     
     let notas = [];
+    let notasSheets = [];
     let editingId = null;
     let editingType = null;
     let authCompleted = false;
     let mostrarGuia = true;
-    let conexionSheets = true;
-    
-    // ============================================
-    // DARK MODE
-    // ============================================
-    
-    function activarDarkMode() {
-        document.body.classList.add('dark-mode');
-        const statusDiv = document.getElementById("connectionStatus");
-        if (statusDiv) {
-            statusDiv.innerHTML = '<i class="fas fa-plug"></i> Modo local <i class="fas fa-moon offline-icon"></i>';
-            statusDiv.style.color = "#fde68a";
-        }
-    }
-    
-    function activarLightMode() {
-        document.body.classList.remove('dark-mode');
-        const statusDiv = document.getElementById("connectionStatus");
-        if (statusDiv) {
-            statusDiv.innerHTML = '<i class="fas fa-cloud"></i> Conectado <i class="fas fa-sun"></i>';
-            statusDiv.style.color = "#10b981";
-        }
-    }
+    let conexionActiva = true;
+    let cargandoInicial = true;
     
     // ============================================
     // NOTA FIJA XML (LOCAL)
@@ -594,7 +589,9 @@
         let locales = [];
         
         if (guardado) {
-            locales = JSON.parse(guardado);
+            try {
+                locales = JSON.parse(guardado);
+            } catch(e) { locales = []; }
         }
         
         const existeFija = locales.some(n => n.id === NOTA_XML_FIJA.id);
@@ -675,24 +672,17 @@
             
             const data = await response.json();
             
-            if (data.success && data.notes) {
+            if (data.success && data.notes && data.notes.length > 0) {
                 return data.notes;
             }
             return [];
         } catch (error) {
             console.error("Error cargando Sheets:", error);
-            conexionSheets = false;
-            activarDarkMode();
             return [];
         }
     }
     
     async function agregarNotaSheet(title, content) {
-        if (!conexionSheets) {
-            mostrarToast("⚠️ Sin conexión a Google Sheets. Guardando localmente...");
-            return { success: false, message: "Sin conexión" };
-        }
-        
         try {
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -709,18 +699,11 @@
             return data;
         } catch (error) {
             console.error("Error:", error);
-            conexionSheets = false;
-            activarDarkMode();
             return { success: false, message: error.toString() };
         }
     }
     
     async function editarNotaSheet(row, title, content) {
-        if (!conexionSheets) {
-            mostrarToast("⚠️ Sin conexión a Google Sheets. No se puede editar");
-            return { success: false, message: "Sin conexión" };
-        }
-        
         try {
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -738,18 +721,11 @@
             return data;
         } catch (error) {
             console.error("Error:", error);
-            conexionSheets = false;
-            activarDarkMode();
             return { success: false, message: error.toString() };
         }
     }
     
     async function eliminarNotaSheet(row) {
-        if (!conexionSheets) {
-            mostrarToast("⚠️ Sin conexión a Google Sheets. No se puede eliminar");
-            return { success: false, message: "Sin conexión" };
-        }
-        
         try {
             const response = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -765,41 +741,63 @@
             return data;
         } catch (error) {
             console.error("Error:", error);
-            conexionSheets = false;
-            activarDarkMode();
             return { success: false, message: error.toString() };
         }
     }
     
     // ============================================
-    // CARGAR TODAS LAS NOTAS
+    // ACTUALIZAR UI SEGÚN CONEXIÓN
+    // ============================================
+    
+    function actualizarModoPorConexion(conectado) {
+        const statusDiv = document.getElementById("connectionStatus");
+        
+        if (conectado) {
+            document.body.classList.remove('dark-mode');
+            statusDiv.className = "estado-conexion conectado";
+            statusDiv.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Sincronizado';
+        } else {
+            document.body.classList.add('dark-mode');
+            statusDiv.className = "estado-conexion offline";
+            statusDiv.innerHTML = '<i class="fas fa-plug"></i> Modo local';
+        }
+    }
+    
+    // ============================================
+    // CARGAR TODAS LAS NOTAS (siempre funciona)
     // ============================================
     
     async function cargarTodasLasNotas() {
         const container = document.getElementById("notesContainer");
         container.innerHTML = '<div style="background:var(--card-bg); border-radius:1rem; padding:2rem; text-align:center;"><span class="loading"></span> Cargando notas...</div>';
         
-        // Probar conexión
+        // Verificar conexión
         const hayConexion = await probarConexionSheets();
-        if (!hayConexion) {
-            conexionSheets = false;
-            activarDarkMode();
-            mostrarToast("📡 Sin conexión a Google Sheets - Modo local activado");
-        } else {
-            conexionSheets = true;
-            activarLightMode();
-        }
+        conexionActiva = hayConexion;
+        actualizarModoPorConexion(hayConexion);
         
+        // Cargar notas locales (siempre disponibles)
         const locales = cargarNotasLocales();
-        let sheets = [];
         
-        if (conexionSheets) {
+        // Cargar notas de Sheets solo si hay conexión
+        let sheets = [];
+        if (hayConexion) {
             sheets = await cargarNotasSheets();
+            if (sheets.length === 0 && !cargandoInicial) {
+                mostrarToast("📡 Conectado a Google Sheets, sin notas aún");
+            }
+        } else {
+            if (!cargandoInicial) {
+                mostrarToast("📡 Sin conexión - Trabajando en modo local");
+            }
         }
         
+        // Combinar: Sheets primero, luego locales
         notas = [...sheets, ...locales];
+        notasSheets = sheets;
         renderizarNotas();
         actualizarContador();
+        cargandoInicial = false;
     }
     
     async function agregarNota(title, content, tipo) {
@@ -808,7 +806,7 @@
             mostrarToast("✅ Nota guardada localmente");
             await cargarTodasLasNotas();
         } else {
-            if (!conexionSheets) {
+            if (!conexionActiva) {
                 mostrarToast("⚠️ Sin conexión a Google Sheets. Guardando localmente...");
                 agregarNotaLocal(title, content);
                 await cargarTodasLasNotas();
@@ -820,7 +818,7 @@
                 mostrarToast("✅ Nota guardada en Google Sheets");
                 await cargarTodasLasNotas();
             } else {
-                mostrarToast("❌ Error: guardando localmente");
+                mostrarToast("❌ Error al guardar en Sheets. Guardando localmente...");
                 agregarNotaLocal(title, content);
                 await cargarTodasLasNotas();
             }
@@ -837,8 +835,8 @@
                 mostrarToast("⚠️ No se puede editar la nota fija");
             }
         } else {
-            if (!conexionSheets) {
-                mostrarToast("⚠️ Sin conexión a Google Sheets");
+            if (!conexionActiva) {
+                mostrarToast("⚠️ Sin conexión a Google Sheets. Edición local no disponible.");
                 return;
             }
             
@@ -847,7 +845,7 @@
                 mostrarToast("✏️ Nota editada en Google Sheets");
                 await cargarTodasLasNotas();
             } else {
-                mostrarToast("❌ Error: " + resultado.message);
+                mostrarToast("❌ Error al editar: " + resultado.message);
             }
         }
     }
@@ -864,8 +862,8 @@
                 mostrarToast("⚠️ No se puede eliminar la nota fija");
             }
         } else {
-            if (!conexionSheets) {
-                mostrarToast("⚠️ Sin conexión a Google Sheets");
+            if (!conexionActiva) {
+                mostrarToast("⚠️ Sin conexión a Google Sheets. No se puede eliminar.");
                 return;
             }
             
@@ -874,7 +872,7 @@
                 mostrarToast("🗑️ Nota eliminada de Google Sheets");
                 await cargarTodasLasNotas();
             } else {
-                mostrarToast("❌ Error: " + resultado.message);
+                mostrarToast("❌ Error al eliminar: " + resultado.message);
             }
         }
     }
@@ -894,7 +892,7 @@
                     <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
                     <p style="color: var(--text-secondary); margin-bottom: 1rem;">No hay notas</p>
                     <button class="btn-add" onclick="document.getElementById('openModalBtn').click()">
-                        <i class="fas fa-plus"></i> Crear nota
+                        <i class="fas fa-plus"></i> Crear primera nota
                     </button>
                 </div>
             `;
@@ -902,7 +900,7 @@
         }
         
         container.innerHTML = notas.map(nota => {
-            const esLocal = nota.type === "local" || nota.fromSheet === false;
+            const esLocal = (nota.type === "local" || nota.fromSheet === false);
             const esFija = nota.fija === true;
             const badgeClass = esLocal ? "badge-local" : "badge-sheet";
             const badgeText = esLocal ? "📁 Local" : "🌐 Sheets";
@@ -915,7 +913,7 @@
                     <div class="note-title">${escapeHtml(nota.title)}</div>
                     <div class="note-content">${escapeHtml(nota.content)}</div>
                     <div class="note-actions">
-                        <button class="btn-edit" onclick="abrirModalEditar('${nota.id}', '${esLocal ? "local" : "sheet"}', ${nota.row || 'null'}, '${escapeHtml(nota.title)}', '${escapeHtml(nota.content)}', ${esFija})">
+                        <button class="btn-edit" onclick='abrirModalEditar("${nota.id}", "${esLocal ? "local" : "sheet"}", ${nota.row || 'null'}, ${JSON.stringify(escapeHtml(nota.title))}, ${JSON.stringify(escapeHtml(nota.content))}, ${esFija})'>
                             <i class="fas fa-edit"></i> ${esFija ? 'Bloqueada' : 'Editar'}
                         </button>
                         <button class="btn-delete" onclick="eliminarNota('${nota.id}', '${esLocal ? "local" : "sheet"}', ${nota.row || 'null'})" ${esFija ? 'disabled style="opacity:0.5;"' : ''}>
@@ -936,8 +934,8 @@
         editingId = id;
         editingType = tipo;
         document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar nota';
-        document.getElementById("noteTitle").value = title;
-        document.getElementById("noteContent").value = content;
+        document.getElementById("noteTitle").value = title.replace(/<br>/g, '\n');
+        document.getElementById("noteContent").value = content.replace(/<br>/g, '\n');
         document.getElementById("editingId").value = id;
         
         const radioLocal = document.querySelector('input[value="local"]');
@@ -984,7 +982,7 @@
         if (editId) {
             const notaOriginal = notas.find(n => n.id === editId);
             if (notaOriginal) {
-                const tipo = notaOriginal.type === "local" || notaOriginal.fromSheet === false ? "local" : "sheet";
+                const tipo = (notaOriginal.type === "local" || notaOriginal.fromSheet === false) ? "local" : "sheet";
                 await editarNota(editId, tipo, notaOriginal.row, title || "Sin título", content);
             }
         } else {
@@ -1022,12 +1020,6 @@
     // ============================================
     // AUTENTICACIÓN CARA FELIZ (+30% DIFICULTAD)
     // ============================================
-    // Parámetros aún más estrictos:
-    // - Radio mínimo: 60 (antes 50)
-    // - Coeficiente máximo: 0.48 (antes 0.55)
-    // - Puntos mínimos: 50 (antes 35)
-    // - Sonrisa: necesita más puntos (18)
-    // - Ojos: necesita más puntos (12)
     
     let canvas = document.getElementById("drawCanvas");
     let ctx = canvas.getContext("2d");
@@ -1190,7 +1182,6 @@
     function validarDibujo() {
         if (authCompleted) return;
         
-        // DIFICULTAD +30%: más puntos requeridos
         if (points.length < 50) {
             animarDenegado();
             return;
@@ -1231,7 +1222,6 @@
         let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
         let coeficiente = variacion / radioPromedio;
         
-        // DIFICULTAD +30%: radio mínimo 60, coeficiente máximo 0.48
         const tieneCirculo = coeficiente < 0.48 && radioPromedio > 60;
         
         let puntosInferiores = points.filter(p => p.y > centroY + 10);
@@ -1244,7 +1234,6 @@
         
         console.log("📊 Círculo:", tieneCirculo, "Radio:", Math.round(radioPromedio), "Coef:", coeficiente.toFixed(3));
         console.log("📊 Sonrisa:", tieneSonrisa, `(${puntosInferiores.length})`, "Ojos:", tieneOjos, `(${puntosSuperiores.length})`);
-        console.log("📊 Resultado:", esCara);
         
         return esCara;
     }
