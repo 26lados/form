@@ -14,7 +14,6 @@
             font-family: 'Inter', sans-serif;
         }
 
-        /* Light mode (default) */
         :root {
             --bg-gradient-start: #667eea;
             --bg-gradient-end: #764ba2;
@@ -40,7 +39,6 @@
             --toast-bg: #333;
         }
 
-        /* Dark mode */
         body.dark-mode {
             --bg-gradient-start: #1a1a2e;
             --bg-gradient-end: #16213e;
@@ -125,7 +123,6 @@
             margin: 0 auto;
             background: var(--canvas-bg);
             border-radius: 1rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             cursor: crosshair;
             touch-action: none;
         }
@@ -142,14 +139,9 @@
             height: 80px;
             margin-top: 20px;
             transition: all 0.2s;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
         }
 
-        .btn-candado:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 28px rgba(102,126,234,0.4);
-        }
-
+        .btn-candado:hover { transform: scale(1.05); }
         .btn-reset {
             background: var(--btn-reset);
             border: none;
@@ -161,13 +153,8 @@
             width: 50px;
             height: 50px;
             margin-top: 10px;
-            transition: all 0.2s;
         }
-
-        .btn-reset:hover {
-            background: var(--btn-reset-hover);
-            transform: scale(1.05);
-        }
+        .btn-reset:hover { background: var(--btn-reset-hover); }
 
         .app-container {
             max-width: 1300px;
@@ -186,7 +173,6 @@
             background: var(--header-bg);
             padding: 1rem 2rem;
             border-radius: 1.5rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             transition: background 0.3s ease;
         }
 
@@ -212,7 +198,6 @@
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
-            transition: background 0.3s ease;
         }
 
         .btn-add {
@@ -223,13 +208,6 @@
             padding: 10px 20px;
             border-radius: 40px;
             cursor: pointer;
-            font-size: 0.85rem;
-            transition: all 0.2s;
-        }
-
-        .btn-add:hover {
-            transform: scale(1.02);
-            box-shadow: 0 4px 12px rgba(16,185,129,0.3);
         }
 
         .notes-grid {
@@ -242,16 +220,11 @@
             background: var(--card-bg);
             border-radius: 1rem;
             padding: 1.2rem;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.2s;
             position: relative;
             border: 1px solid var(--border-color);
+            transition: all 0.2s;
         }
-
-        .note-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-        }
+        .note-card:hover { transform: translateY(-3px); }
 
         .note-badge {
             position: absolute;
@@ -261,16 +234,8 @@
             padding: 2px 8px;
             border-radius: 20px;
         }
-
-        .badge-local {
-            background: var(--badge-local);
-            color: var(--badge-local-text);
-        }
-
-        .badge-sheet {
-            background: var(--badge-sheet);
-            color: var(--badge-sheet-text);
-        }
+        .badge-local { background: var(--badge-local); color: var(--badge-local-text); }
+        .badge-sheet { background: var(--badge-sheet); color: var(--badge-sheet-text); }
 
         .note-title {
             font-size: 1.1rem;
@@ -278,7 +243,6 @@
             margin-bottom: 0.5rem;
             margin-top: 0.5rem;
             color: var(--text-primary);
-            word-break: break-word;
             padding-right: 60px;
         }
 
@@ -287,7 +251,6 @@
             font-size: 0.9rem;
             line-height: 1.5;
             white-space: pre-wrap;
-            word-break: break-word;
             margin-bottom: 1rem;
         }
 
@@ -298,7 +261,6 @@
             border-top: 1px solid var(--border-color);
             padding-top: 0.8rem;
         }
-
         .note-actions button {
             background: none;
             border: none;
@@ -306,32 +268,9 @@
             font-size: 0.9rem;
             padding: 6px 12px;
             border-radius: 30px;
-            transition: all 0.2s;
         }
-
-        .btn-edit {
-            color: #3b82f6;
-        }
-
-        .btn-edit:hover {
-            background: #eff6ff;
-        }
-
-        .btn-delete {
-            color: #ef4444;
-        }
-
-        .btn-delete:hover {
-            background: #fef2f2;
-        }
-
-        body.dark-mode .btn-edit:hover {
-            background: #1e3a5f;
-        }
-
-        body.dark-mode .btn-delete:hover {
-            background: #4c0519;
-        }
+        .btn-edit { color: #3b82f6; }
+        .btn-delete { color: #ef4444; }
 
         .modal {
             display: none;
@@ -345,71 +284,31 @@
             justify-content: center;
             align-items: center;
         }
-
         .modal-content {
             background: var(--card-bg);
             border-radius: 1.5rem;
             padding: 2rem;
             max-width: 500px;
             width: 90%;
-            animation: fadeUp 0.3s ease;
         }
-
-        .modal-content h3 {
-            margin-bottom: 1rem;
-            font-size: 1.5rem;
-            color: var(--text-primary);
-        }
-
-        .modal-content input,
-        .modal-content textarea {
+        .modal-content h3 { margin-bottom: 1rem; color: var(--text-primary); }
+        .modal-content input, .modal-content textarea {
             width: 100%;
             padding: 12px;
             border: 2px solid var(--border-color);
             border-radius: 1rem;
             font-size: 1rem;
             margin-bottom: 1rem;
-            font-family: 'Inter', sans-serif;
             background: var(--card-bg);
             color: var(--text-primary);
         }
+        .modal-content textarea { min-height: 120px; resize: vertical; }
+        .modal-buttons { display: flex; gap: 1rem; }
+        .modal-buttons button { flex: 1; padding: 12px; border-radius: 40px; border: none; font-weight: 600; cursor: pointer; }
+        .btn-save { background: var(--btn-primary); color: white; }
+        .btn-cancel { background: var(--btn-reset); color: white; }
 
-        .modal-content textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .modal-buttons {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .modal-buttons button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 40px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .btn-save {
-            background: var(--btn-primary);
-            color: white;
-        }
-
-        .btn-cancel {
-            background: var(--btn-reset);
-            color: white;
-        }
-
-        footer {
-            margin-top: 3rem;
-            text-align: center;
-            font-size: 0.75rem;
-            color: rgba(255,255,255,0.7);
-        }
-
+        footer { margin-top: 3rem; text-align: center; font-size: 0.75rem; color: rgba(255,255,255,0.7); }
         .toast {
             position: fixed;
             bottom: 30px;
@@ -423,126 +322,61 @@
             z-index: 3000;
             animation: fadeInUp 0.3s ease;
         }
-
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateX(-50%) translateY(20px); }
             to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
-
-        @media (max-width: 640px) {
-            .auth-card { padding: 1.2rem; }
-            .notes-grid { grid-template-columns: 1fr; }
-        }
-
-        .acceso-denegado {
-            animation: shake 0.3s ease;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .button-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
-            margin-top: 15px;
-        }
-
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--text-primary);
-            border-radius: 50%;
-            border-top-color: transparent;
-            animation: spin 0.6s linear infinite;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-
+        @media (max-width: 640px) { .auth-card { padding: 1.2rem; } .notes-grid { grid-template-columns: 1fr; } }
+        .acceso-denegado { animation: shake 0.3s ease; }
+        @keyframes shake { 0%,100%{transform:translateX(0);} 25%{transform:translateX(-5px);} 75%{transform:translateX(5px);} }
+        .button-group { display: flex; gap: 15px; justify-content: center; align-items: center; margin-top: 15px; }
+        .loading { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--text-primary); border-radius: 50%; border-top-color: transparent; animation: spin 0.6s linear infinite; margin-left: 8px; vertical-align: middle; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .estado-conexion {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.75rem;
-            padding: 4px 10px;
-            border-radius: 30px;
-        }
-
-        .conectado {
-            background: #10b98120;
-            color: #10b981;
-        }
-
-        .offline {
-            background: #ef444420;
-            color: #f87171;
-        }
+        .estado-conexion { display: flex; align-items: center; gap: 8px; font-size: 0.75rem; padding: 4px 10px; border-radius: 30px; }
+        .conectado { background: #10b98120; color: #10b981; }
+        .offline { background: #ef444420; color: #f87171; }
+        .tipo-selector { margin-bottom: 1rem; text-align: left; }
+        .tipo-selector label { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-primary); margin-top: 0.5rem; }
     </style>
 </head>
 <body>
 
-<!-- Pantalla de autenticación -->
 <div id="authOverlay" class="auth-overlay">
     <div class="auth-card">
         <div class="canvas-container" id="canvasContainer">
             <canvas id="drawCanvas" width="550" height="350"></canvas>
         </div>
         <div class="button-group">
-            <button id="validarBtn" class="btn-candado">
-                <i class="fas fa-lock"></i>
-            </button>
-            <button id="clearBtn" class="btn-reset">
-                <i class="fas fa-trash-alt"></i>
-            </button>
+            <button id="validarBtn" class="btn-candado"><i class="fas fa-lock"></i></button>
+            <button id="clearBtn" class="btn-reset"><i class="fas fa-trash-alt"></i></button>
         </div>
     </div>
 </div>
 
-<!-- App principal -->
 <div id="appMain" class="app-container">
     <div class="app-header">
         <h1><i class="fas fa-sticky-note"></i> KeepClone</h1>
-        <div id="connectionStatus" class="estado-conexion conectado">
-            <i class="fas fa-cloud-upload-alt"></i> Sincronizado
-        </div>
+        <div id="connectionStatus" class="estado-conexion conectado"><i class="fas fa-cloud-upload-alt"></i> Sincronizado</div>
     </div>
     <div class="info-bar">
         <span><i class="fas fa-database"></i> <span id="noteCount">0</span> notas</span>
-        <button id="openModalBtn" class="btn-add">
-            <i class="fas fa-plus"></i> Nueva nota
-        </button>
+        <button id="openModalBtn" class="btn-add"><i class="fas fa-plus"></i> Nueva nota</button>
     </div>
-    <div id="notesContainer" class="notes-grid">
-        <div class="empty-state">Cargando notas...</div>
-    </div>
-    <footer>
-        🔐
-    </footer>
+    <div id="notesContainer" class="notes-grid">Cargando notas...</div>
+    <footer>🔐</footer>
 </div>
 
-<!-- Modal -->
 <div id="noteModal" class="modal">
     <div class="modal-content">
         <h3 id="modalTitle"><i class="fas fa-plus-circle"></i> Nueva nota</h3>
-        <div style="margin-bottom: 1rem; text-align: left;">
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; color: var(--text-primary);">
-                <input type="radio" name="tipoNota" value="local" checked> 📁 Guardar localmente
-            </label>
-            <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; margin-top: 0.5rem; color: var(--text-primary);">
-                <input type="radio" name="tipoNota" value="sheet"> 🌐 Guardar en Google Sheets
-            </label>
+        <div class="tipo-selector">
+            <label><input type="radio" name="tipoNota" value="local" checked> 📁 Guardar localmente</label>
+            <label><input type="radio" name="tipoNota" value="sheet"> 🌐 Guardar en Google Sheets</label>
         </div>
-        <input type="text" id="noteTitle" placeholder="Título" maxlength="100">
+        <input type="text" id="noteTitle" placeholder="Título">
         <textarea id="noteContent" placeholder="Contenido"></textarea>
-        <input type="hidden" id="editingId" value="">
-        <input type="hidden" id="editingType" value="">
+        <input type="hidden" id="editingId">
+        <input type="hidden" id="editingRow">
         <div class="modal-buttons">
             <button class="btn-cancel" id="cancelModalBtn">Cancelar</button>
             <button class="btn-save" id="saveNoteBtn">Guardar</button>
@@ -551,26 +385,16 @@
 </div>
 
 <script>
-    // ============================================
-    // CONFIGURACIÓN
-    // ============================================
-    
-    // 🔴 REEMPLAZA CON LA URL DE TU APPS SCRIPT
-    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwXLioTd7BUUwV09W_T3xGOWyGd17TZZRS6H9oHQh9ahkM9KJO0vWQyo3hAsO-lrZlWpw/exec";
+    // 🔴 REEMPLAZA CON LA URL DE TU APPS SCRIPT DESPLEGADO
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxoJNc_PxdkqWgSGfY8JcNkdIARTQb0oT5S7XRKrwSouHQooXQtRvZDV7vqaWFtrFiUUA/exec";
     
     let notas = [];
-    let notasSheets = [];
     let editingId = null;
-    let editingType = null;
+    let editingRow = null;
     let authCompleted = false;
     let mostrarGuia = true;
     let conexionActiva = true;
-    let cargandoInicial = true;
-    
-    // ============================================
-    // NOTA FIJA XML (LOCAL)
-    // ============================================
-    
+
     const NOTA_XML_FIJA = {
         id: "local_fija_001",
         title: "📌 Nota Fija XML",
@@ -579,180 +403,106 @@
         fromSheet: false,
         fija: true
     };
-    
-    // ============================================
-    // GESTIÓN DE NOTAS LOCALES
-    // ============================================
-    
+
     function cargarNotasLocales() {
         const guardado = localStorage.getItem('keepclone_notas_locales');
-        let locales = [];
-        
-        if (guardado) {
-            try {
-                locales = JSON.parse(guardado);
-            } catch(e) { locales = []; }
-        }
-        
+        let locales = guardado ? JSON.parse(guardado) : [];
         const existeFija = locales.some(n => n.id === NOTA_XML_FIJA.id);
-        if (!existeFija) {
-            locales.unshift({ ...NOTA_XML_FIJA });
-        }
-        
-        guardarNotasLocales(locales);
+        if (!existeFija) locales.unshift({ ...NOTA_XML_FIJA });
+        localStorage.setItem('keepclone_notas_locales', JSON.stringify(locales));
         return locales;
     }
-    
+
     function guardarNotasLocales(locales) {
         localStorage.setItem('keepclone_notas_locales', JSON.stringify(locales));
     }
-    
+
     function agregarNotaLocal(title, content) {
         const locales = cargarNotasLocales();
-        const nuevaNota = {
-            id: "local_" + Date.now(),
-            title: title || "Sin título",
-            content: content || "",
-            type: "local",
-            fromSheet: false
-        };
-        locales.push(nuevaNota);
+        locales.push({ id: "local_" + Date.now(), title: title || "Sin título", content: content || "", type: "local", fromSheet: false });
         guardarNotasLocales(locales);
-        return nuevaNota;
     }
-    
+
     function editarNotaLocal(id, newTitle, newContent) {
         const locales = cargarNotasLocales();
-        const index = locales.findIndex(n => n.id === id);
-        if (index !== -1 && !locales[index].fija) {
-            locales[index].title = newTitle || "Sin título";
-            locales[index].content = newContent || "";
+        const idx = locales.findIndex(n => n.id === id);
+        if (idx !== -1 && !locales[idx].fija) {
+            locales[idx].title = newTitle || "Sin título";
+            locales[idx].content = newContent || "";
             guardarNotasLocales(locales);
             return true;
         }
         return false;
     }
-    
+
     function eliminarNotaLocal(id) {
         const locales = cargarNotasLocales();
         const nota = locales.find(n => n.id === id);
         if (nota && !nota.fija) {
-            const nuevas = locales.filter(n => n.id !== id);
-            guardarNotasLocales(nuevas);
+            guardarNotasLocales(locales.filter(n => n.id !== id));
             return true;
         }
         return false;
     }
-    
-    // ============================================
-    // COMUNICACIÓN CON GOOGLE SHEETS
-    // ============================================
-    
-    async function probarConexionSheets() {
+
+    async function probarConexion() {
         try {
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 5000);
-            
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllNotes`, {
-                signal: controller.signal
-            });
-            
-            clearTimeout(timeoutId);
-            return response.ok;
-        } catch (error) {
-            console.error("Error de conexión:", error);
-            return false;
-        }
+            setTimeout(() => controller.abort(), 5000);
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=getAllNotes`, { signal: controller.signal });
+            return res.ok;
+        } catch { return false; }
     }
-    
+
     async function cargarNotasSheets() {
         try {
-            const response = await fetch(`${APPS_SCRIPT_URL}?action=getAllNotes`);
-            if (!response.ok) throw new Error(`HTTP ${response.status}`);
-            
-            const data = await response.json();
-            
-            if (data.success && data.notes && data.notes.length > 0) {
-                return data.notes;
-            }
+            const res = await fetch(`${APPS_SCRIPT_URL}?action=getAllNotes`);
+            if (!res.ok) throw new Error();
+            const data = await res.json();
+            if (data.success && data.notes) return data.notes;
             return [];
-        } catch (error) {
-            console.error("Error cargando Sheets:", error);
-            return [];
-        }
+        } catch { return []; }
     }
-    
+
     async function agregarNotaSheet(title, content) {
         try {
-            const response = await fetch(APPS_SCRIPT_URL, {
+            const res = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'addNote',
-                    title: title,
-                    content: content
-                })
+                body: JSON.stringify({ action: 'addNote', title, content })
             });
-            
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error:", error);
-            return { success: false, message: error.toString() };
-        }
+            return await res.json();
+        } catch { return { success: false }; }
     }
-    
+
     async function editarNotaSheet(row, title, content) {
         try {
-            const response = await fetch(APPS_SCRIPT_URL, {
+            const res = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'updateNote',
-                    row: row,
-                    title: title,
-                    content: content
-                })
+                body: JSON.stringify({ action: 'updateNote', row, title, content })
             });
-            
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error:", error);
-            return { success: false, message: error.toString() };
-        }
+            return await res.json();
+        } catch { return { success: false }; }
     }
-    
+
     async function eliminarNotaSheet(row) {
         try {
-            const response = await fetch(APPS_SCRIPT_URL, {
+            const res = await fetch(APPS_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'deleteNote',
-                    row: row
-                })
+                body: JSON.stringify({ action: 'deleteNote', row })
             });
-            
-            const data = await response.json();
-            return data;
-        } catch (error) {
-            console.error("Error:", error);
-            return { success: false, message: error.toString() };
-        }
+            return await res.json();
+        } catch { return { success: false }; }
     }
-    
-    // ============================================
-    // ACTUALIZAR UI SEGÚN CONEXIÓN
-    // ============================================
-    
-    function actualizarModoPorConexion(conectado) {
-        const statusDiv = document.getElementById("connectionStatus");
+
+    async function actualizarUI() {
+        const hayConexion = await probarConexion();
+        conexionActiva = hayConexion;
         
-        if (conectado) {
+        const statusDiv = document.getElementById("connectionStatus");
+        if (hayConexion) {
             document.body.classList.remove('dark-mode');
             statusDiv.className = "estado-conexion conectado";
             statusDiv.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> Sincronizado';
@@ -761,517 +511,120 @@
             statusDiv.className = "estado-conexion offline";
             statusDiv.innerHTML = '<i class="fas fa-plug"></i> Modo local';
         }
-    }
-    
-    // ============================================
-    // CARGAR TODAS LAS NOTAS (siempre funciona)
-    // ============================================
-    
-    async function cargarTodasLasNotas() {
-        const container = document.getElementById("notesContainer");
-        container.innerHTML = '<div style="background:var(--card-bg); border-radius:1rem; padding:2rem; text-align:center;"><span class="loading"></span> Cargando notas...</div>';
         
-        // Verificar conexión
-        const hayConexion = await probarConexionSheets();
-        conexionActiva = hayConexion;
-        actualizarModoPorConexion(hayConexion);
-        
-        // Cargar notas locales (siempre disponibles)
         const locales = cargarNotasLocales();
-        
-        // Cargar notas de Sheets solo si hay conexión
         let sheets = [];
-        if (hayConexion) {
-            sheets = await cargarNotasSheets();
-            if (sheets.length === 0 && !cargandoInicial) {
-                mostrarToast("📡 Conectado a Google Sheets, sin notas aún");
-            }
-        } else {
-            if (!cargandoInicial) {
-                mostrarToast("📡 Sin conexión - Trabajando en modo local");
-            }
-        }
+        if (hayConexion) sheets = await cargarNotasSheets();
         
-        // Combinar: Sheets primero, luego locales
         notas = [...sheets, ...locales];
-        notasSheets = sheets;
-        renderizarNotas();
-        actualizarContador();
-        cargandoInicial = false;
+        
+        const container = document.getElementById("notesContainer");
+        if (notas.length === 0) {
+            container.innerHTML = `<div style="background:var(--card-bg); border-radius:1rem; padding:3rem; text-align:center;"><i class="fas fa-sticky-note" style="font-size:3rem; margin-bottom:1rem;"></i><p>No hay notas</p><button class="btn-add" onclick="document.getElementById('openModalBtn').click()">Crear primera nota</button></div>`;
+        } else {
+            container.innerHTML = notas.map(n => {
+                const esLocal = n.type === "local" || n.fromSheet === false;
+                const esFija = n.fija === true;
+                return `
+                    <div class="note-card">
+                        <div class="note-badge ${esLocal ? 'badge-local' : 'badge-sheet'}">${esLocal ? '📁 Local' : '🌐 Sheets'}</div>
+                        <div class="note-title">${escapeHtml(n.title)}</div>
+                        <div class="note-content">${escapeHtml(n.content)}</div>
+                        <div class="note-actions">
+                            <button class="btn-edit" onclick='editarNotaUI("${n.id}", "${esLocal ? 'local' : 'sheet'}", ${n.row || 'null'}, ${JSON.stringify(n.title)}, ${JSON.stringify(n.content)}, ${esFija})' ${esFija ? 'disabled' : ''}>${esFija ? 'Bloqueada' : '<i class="fas fa-edit"></i> Editar'}</button>
+                            <button class="btn-delete" onclick='eliminarNotaUI("${n.id}", "${esLocal ? 'local' : 'sheet'}", ${n.row || 'null'})' ${esFija ? 'disabled style="opacity:0.5;"' : ''}><i class="fas fa-trash-alt"></i> Eliminar</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        document.getElementById("noteCount").innerText = notas.length;
     }
-    
-    async function agregarNota(title, content, tipo) {
+
+    async function agregarNotaUI(title, content, tipo) {
         if (tipo === "local") {
             agregarNotaLocal(title, content);
-            mostrarToast("✅ Nota guardada localmente");
-            await cargarTodasLasNotas();
+            mostrarToast("✅ Nota local guardada");
         } else {
-            if (!conexionActiva) {
-                mostrarToast("⚠️ Sin conexión a Google Sheets. Guardando localmente...");
-                agregarNotaLocal(title, content);
-                await cargarTodasLasNotas();
-                return;
-            }
-            
-            const resultado = await agregarNotaSheet(title, content);
-            if (resultado.success) {
-                mostrarToast("✅ Nota guardada en Google Sheets");
-                await cargarTodasLasNotas();
-            } else {
-                mostrarToast("❌ Error al guardar en Sheets. Guardando localmente...");
-                agregarNotaLocal(title, content);
-                await cargarTodasLasNotas();
+            if (!conexionActiva) { mostrarToast("⚠️ Sin conexión, guardando localmente"); agregarNotaLocal(title, content); }
+            else {
+                const res = await agregarNotaSheet(title, content);
+                if (res.success) mostrarToast("✅ Guardado en Sheets");
+                else { mostrarToast("❌ Error, guardando localmente"); agregarNotaLocal(title, content); }
             }
         }
+        await actualizarUI();
     }
-    
-    async function editarNota(id, tipo, row, newTitle, newContent) {
+
+    async function editarNotaUI(id, tipo, row, oldTitle, oldContent, esFija) {
+        if (esFija) { mostrarToast("⚠️ No se puede editar la nota fija"); return; }
+        const newTitle = prompt("Editar título:", oldTitle);
+        if (newTitle === null) return;
+        const newContent = prompt("Editar contenido:", oldContent);
+        if (newContent === null) return;
+        
         if (tipo === "local") {
-            const exito = editarNotaLocal(id, newTitle, newContent);
-            if (exito) {
-                mostrarToast("✏️ Nota local editada");
-                await cargarTodasLasNotas();
-            } else {
-                mostrarToast("⚠️ No se puede editar la nota fija");
-            }
+            if (editarNotaLocal(id, newTitle, newContent)) mostrarToast("✏️ Nota local editada");
         } else {
-            if (!conexionActiva) {
-                mostrarToast("⚠️ Sin conexión a Google Sheets. Edición local no disponible.");
-                return;
-            }
-            
-            const resultado = await editarNotaSheet(row, newTitle, newContent);
-            if (resultado.success) {
-                mostrarToast("✏️ Nota editada en Google Sheets");
-                await cargarTodasLasNotas();
-            } else {
-                mostrarToast("❌ Error al editar: " + resultado.message);
-            }
+            if (!conexionActiva) { mostrarToast("⚠️ Sin conexión a Sheets"); return; }
+            const res = await editarNotaSheet(row, newTitle, newContent);
+            if (res.success) mostrarToast("✏️ Nota editada en Sheets");
+            else mostrarToast("❌ Error al editar");
         }
+        await actualizarUI();
     }
-    
-    async function eliminarNota(id, tipo, row) {
+
+    async function eliminarNotaUI(id, tipo, row) {
         if (!confirm("¿Eliminar esta nota?")) return;
-        
         if (tipo === "local") {
-            const exito = eliminarNotaLocal(id);
-            if (exito) {
-                mostrarToast("🗑️ Nota local eliminada");
-                await cargarTodasLasNotas();
-            } else {
-                mostrarToast("⚠️ No se puede eliminar la nota fija");
-            }
+            if (eliminarNotaLocal(id)) mostrarToast("🗑️ Nota local eliminada");
         } else {
-            if (!conexionActiva) {
-                mostrarToast("⚠️ Sin conexión a Google Sheets. No se puede eliminar.");
-                return;
-            }
-            
-            const resultado = await eliminarNotaSheet(row);
-            if (resultado.success) {
-                mostrarToast("🗑️ Nota eliminada de Google Sheets");
-                await cargarTodasLasNotas();
-            } else {
-                mostrarToast("❌ Error al eliminar: " + resultado.message);
-            }
+            if (!conexionActiva) { mostrarToast("⚠️ Sin conexión a Sheets"); return; }
+            const res = await eliminarNotaSheet(row);
+            if (res.success) mostrarToast("🗑️ Nota eliminada de Sheets");
+            else mostrarToast("❌ Error al eliminar");
         }
+        await actualizarUI();
     }
-    
-    function actualizarContador() {
-        const countSpan = document.getElementById("noteCount");
-        if (countSpan) countSpan.textContent = notas.length;
+
+    function escapeHtml(str) {
+        if (!str) return "";
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/\n/g, '<br>');
     }
-    
-    function renderizarNotas() {
-        const container = document.getElementById("notesContainer");
-        if (!container) return;
-        
-        if (notas.length === 0) {
-            container.innerHTML = `
-                <div style="background:var(--card-bg); border-radius:1rem; padding:3rem; text-align: center; grid-column: 1/-1;">
-                    <i class="fas fa-sticky-note" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
-                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">No hay notas</p>
-                    <button class="btn-add" onclick="document.getElementById('openModalBtn').click()">
-                        <i class="fas fa-plus"></i> Crear primera nota
-                    </button>
-                </div>
-            `;
-            return;
-        }
-        
-        container.innerHTML = notas.map(nota => {
-            const esLocal = (nota.type === "local" || nota.fromSheet === false);
-            const esFija = nota.fija === true;
-            const badgeClass = esLocal ? "badge-local" : "badge-sheet";
-            const badgeText = esLocal ? "📁 Local" : "🌐 Sheets";
-            
-            return `
-                <div class="note-card">
-                    <div class="note-badge ${badgeClass}">
-                        ${badgeText}
-                    </div>
-                    <div class="note-title">${escapeHtml(nota.title)}</div>
-                    <div class="note-content">${escapeHtml(nota.content)}</div>
-                    <div class="note-actions">
-                        <button class="btn-edit" onclick='abrirModalEditar("${nota.id}", "${esLocal ? "local" : "sheet"}", ${nota.row || 'null'}, ${JSON.stringify(escapeHtml(nota.title))}, ${JSON.stringify(escapeHtml(nota.content))}, ${esFija})'>
-                            <i class="fas fa-edit"></i> ${esFija ? 'Bloqueada' : 'Editar'}
-                        </button>
-                        <button class="btn-delete" onclick="eliminarNota('${nota.id}', '${esLocal ? "local" : "sheet"}', ${nota.row || 'null'})" ${esFija ? 'disabled style="opacity:0.5;"' : ''}>
-                            <i class="fas fa-trash-alt"></i> Eliminar
-                        </button>
-                    </div>
-                </div>
-            `;
-        }).join('');
+
+    function mostrarToast(msg) {
+        const t = document.createElement('div');
+        t.className = 'toast';
+        t.innerHTML = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 2500);
     }
-    
-    function abrirModalEditar(id, tipo, row, title, content, esFija) {
-        if (esFija) {
-            mostrarToast("⚠️ Esta nota fija no se puede editar");
-            return;
-        }
-        
-        editingId = id;
-        editingType = tipo;
-        document.getElementById("modalTitle").innerHTML = '<i class="fas fa-edit"></i> Editar nota';
-        document.getElementById("noteTitle").value = title.replace(/<br>/g, '\n');
-        document.getElementById("noteContent").value = content.replace(/<br>/g, '\n');
-        document.getElementById("editingId").value = id;
-        
-        const radioLocal = document.querySelector('input[value="local"]');
-        const radioSheet = document.querySelector('input[value="sheet"]');
-        if (tipo === "local") {
-            radioLocal.checked = true;
-            radioSheet.checked = false;
-        } else {
-            radioLocal.checked = false;
-            radioSheet.checked = true;
-        }
-        
-        document.getElementById("noteModal").style.display = "flex";
-    }
-    
-    function abrirModalNueva() {
-        editingId = null;
-        editingType = null;
+
+    // Modal
+    const modal = document.getElementById("noteModal");
+    document.getElementById("openModalBtn").onclick = () => {
         document.getElementById("modalTitle").innerHTML = '<i class="fas fa-plus-circle"></i> Nueva nota';
         document.getElementById("noteTitle").value = "";
         document.getElementById("noteContent").value = "";
         document.getElementById("editingId").value = "";
-        
+        document.getElementById("editingRow").value = "";
         document.querySelector('input[value="local"]').checked = true;
-        
-        document.getElementById("noteModal").style.display = "flex";
-    }
-    
-    async function guardarNotaModal() {
+        modal.style.display = "flex";
+    };
+    document.getElementById("cancelModalBtn").onclick = () => modal.style.display = "none";
+    document.getElementById("saveNoteBtn").onclick = async () => {
         const title = document.getElementById("noteTitle").value.trim();
         const content = document.getElementById("noteContent").value.trim();
-        const editId = document.getElementById("editingId").value;
-        const tipoSeleccionado = document.querySelector('input[name="tipoNota"]:checked').value;
-        
-        if (!title && !content) {
-            mostrarToast("⚠️ Escribe título o contenido");
-            return;
-        }
-        
-        const btnSave = document.getElementById("saveNoteBtn");
-        btnSave.disabled = true;
-        btnSave.innerHTML = '<span class="loading"></span> Guardando...';
-        
-        if (editId) {
-            const notaOriginal = notas.find(n => n.id === editId);
-            if (notaOriginal) {
-                const tipo = (notaOriginal.type === "local" || notaOriginal.fromSheet === false) ? "local" : "sheet";
-                await editarNota(editId, tipo, notaOriginal.row, title || "Sin título", content);
-            }
-        } else {
-            await agregarNota(title || "Sin título", content, tipoSeleccionado);
-        }
-        
-        btnSave.disabled = false;
-        btnSave.innerHTML = 'Guardar';
-        cerrarModal();
-    }
-    
-    function cerrarModal() {
-        document.getElementById("noteModal").style.display = "none";
-    }
-    
-    function mostrarToast(mensaje) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerHTML = mensaje;
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
-    }
-    
-    function escapeHtml(str) {
-        if (!str) return "";
-        return str
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/"/g, '&quot;')
-            .replace(/'/g, '&#39;')
-            .replace(/\n/g, '<br>');
-    }
-    
-    // ============================================
-    // AUTENTICACIÓN CARA FELIZ (+30% DIFICULTAD)
-    // ============================================
-    
-    let canvas = document.getElementById("drawCanvas");
-    let ctx = canvas.getContext("2d");
-    let drawing = false;
-    let points = [];
-    
-    function dibujarGuiaRapida() {
-        if (!mostrarGuia) return;
-        
-        ctx.save();
-        ctx.globalAlpha = 0.25;
-        ctx.strokeStyle = "#667eea";
-        ctx.fillStyle = "#667eea";
-        ctx.lineWidth = 3;
-        ctx.setLineDash([6, 8]);
-        
-        const centroX = canvas.width / 2;
-        const centroY = canvas.height / 2;
-        
-        ctx.beginPath();
-        ctx.arc(centroX, centroY, 100, 0, 2 * Math.PI);
-        ctx.stroke();
-        
-        ctx.beginPath();
-        ctx.arc(centroX - 30, centroY - 30, 8, 0, 2 * Math.PI);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(centroX + 30, centroY - 30, 8, 0, 2 * Math.PI);
-        ctx.fill();
-        
-        ctx.beginPath();
-        ctx.arc(centroX, centroY + 10, 50, 0.1, Math.PI - 0.1);
-        ctx.stroke();
-        
-        ctx.setLineDash([]);
-        ctx.globalAlpha = 1;
-        ctx.restore();
-        
-        setTimeout(() => {
-            limpiarGuia();
-            mostrarGuia = false;
-        }, 500);
-    }
-    
-    function limpiarGuia() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-    }
-    
-    function initCanvas() {
-        canvas.width = 550;
-        canvas.height = 350;
-        
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        ctx.lineCap = "round";
-        ctx.lineJoin = "round";
-        ctx.lineWidth = 8;
-        ctx.strokeStyle = "#667eea";
-        
-        dibujarGuiaRapida();
-        
-        canvas.addEventListener("mousedown", startDrawing);
-        canvas.addEventListener("mousemove", draw);
-        canvas.addEventListener("mouseup", endDrawing);
-        canvas.addEventListener("mouseleave", endDrawing);
-        
-        canvas.addEventListener("touchstart", startDrawingTouch);
-        canvas.addEventListener("touchmove", drawTouch);
-        canvas.addEventListener("touchend", endDrawing);
-        canvas.addEventListener("touchcancel", endDrawing);
-    }
-    
-    function startDrawing(e) {
-        e.preventDefault();
-        drawing = true;
-        const { x, y } = getCoords(e);
-        points = [{ x, y }];
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.stroke();
-        document.getElementById("canvasContainer").classList.add("active");
-        
-        if (mostrarGuia) {
-            limpiarGuia();
-            mostrarGuia = false;
-        }
-    }
-    
-    function startDrawingTouch(e) {
-        e.preventDefault();
-        drawing = true;
-        const { x, y } = getCoords(e);
-        points = [{ x, y }];
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.stroke();
-        document.getElementById("canvasContainer").classList.add("active");
-        
-        if (mostrarGuia) {
-            limpiarGuia();
-            mostrarGuia = false;
-        }
-    }
-    
-    function draw(e) {
-        if (!drawing) return;
-        e.preventDefault();
-        const { x, y } = getCoords(e);
-        points.push({ x, y });
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-    
-    function drawTouch(e) {
-        if (!drawing) return;
-        e.preventDefault();
-        const { x, y } = getCoords(e);
-        points.push({ x, y });
-        ctx.lineTo(x, y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-    }
-    
-    function getCoords(e) {
-        const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-        
-        let clientX, clientY;
-        
-        if (e.touches) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
-        } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
-        }
-        
-        let x = (clientX - rect.left) * scaleX;
-        let y = (clientY - rect.top) * scaleY;
-        
-        x = Math.min(Math.max(0, x), canvas.width);
-        y = Math.min(Math.max(0, y), canvas.height);
-        
-        return { x, y };
-    }
-    
-    function endDrawing() {
-        if (!drawing) return;
-        drawing = false;
-        document.getElementById("canvasContainer").classList.remove("active");
-    }
-    
-    function validarDibujo() {
-        if (authCompleted) return;
-        
-        if (points.length < 50) {
-            animarDenegado();
-            return;
-        }
-        
-        const esCaraFeliz = verificarCaraFeliz();
-        
-        if (esCaraFeliz) {
-            authCompleted = true;
-            setTimeout(() => {
-                document.getElementById("authOverlay").style.opacity = "0";
-                setTimeout(() => {
-                    document.getElementById("authOverlay").style.display = "none";
-                    document.getElementById("appMain").style.display = "block";
-                    cargarTodasLasNotas();
-                }, 500);
-            }, 300);
-        } else {
-            animarDenegado();
-        }
-    }
-    
-    function verificarCaraFeliz() {
-        let centroX = 0, centroY = 0;
-        for (const p of points) {
-            centroX += p.x;
-            centroY += p.y;
-        }
-        centroX /= points.length;
-        centroY /= points.length;
-        
-        let distancias = [];
-        for (const p of points) {
-            distancias.push(Math.hypot(p.x - centroX, p.y - centroY));
-        }
-        
-        let radioPromedio = distancias.reduce((a, b) => a + b, 0) / distancias.length;
-        let variacion = distancias.reduce((a, d) => a + Math.abs(d - radioPromedio), 0) / distancias.length;
-        let coeficiente = variacion / radioPromedio;
-        
-        const tieneCirculo = coeficiente < 0.48 && radioPromedio > 60;
-        
-        let puntosInferiores = points.filter(p => p.y > centroY + 10);
-        let tieneSonrisa = puntosInferiores.length > 18;
-        
-        let puntosSuperiores = points.filter(p => p.y < centroY - 10);
-        let tieneOjos = puntosSuperiores.length > 12;
-        
-        const esCara = tieneCirculo && (tieneSonrisa || tieneOjos);
-        
-        console.log("📊 Círculo:", tieneCirculo, "Radio:", Math.round(radioPromedio), "Coef:", coeficiente.toFixed(3));
-        console.log("📊 Sonrisa:", tieneSonrisa, `(${puntosInferiores.length})`, "Ojos:", tieneOjos, `(${puntosSuperiores.length})`);
-        
-        return esCara;
-    }
-    
-    function animarDenegado() {
-        const btn = document.getElementById("validarBtn");
-        btn.classList.add("acceso-denegado");
-        setTimeout(() => {
-            btn.classList.remove("acceso-denegado");
-        }, 300);
-        limpiarCanvas();
-        mostrarGuia = true;
-        dibujarGuiaRapida();
-    }
-    
-    function limpiarCanvas() {
-        ctx.fillStyle = "white";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        points = [];
-        drawing = false;
-    }
-    
-    // Eventos
-    document.getElementById("validarBtn").addEventListener("click", validarDibujo);
-    document.getElementById("clearBtn").addEventListener("click", () => {
-        limpiarCanvas();
-        mostrarGuia = true;
-        dibujarGuiaRapida();
-    });
-    document.getElementById("openModalBtn").addEventListener("click", abrirModalNueva);
-    document.getElementById("cancelModalBtn").addEventListener("click", cerrarModal);
-    document.getElementById("saveNoteBtn").addEventListener("click", guardarNotaModal);
-    
-    document.getElementById("noteModal").addEventListener("click", (e) => {
-        if (e.target === document.getElementById("noteModal")) cerrarModal();
-    });
-    
-    initCanvas();
-</script>
-</body>
-</html>
+        const tipo = document.querySelector('input[name="tipoNota"]:checked').value;
+        if (!title && !content) { mostrarToast("⚠️ Escribe algo"); return; }
+        modal.style.display = "none";
+        await agregarNotaUI(title || "Sin título", content, tipo);
+    };
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = "none"; };
+
+    // Aut
